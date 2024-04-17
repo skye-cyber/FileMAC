@@ -636,7 +636,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
                     for i in range(0, len(text), CHUNK_SIZE):
                         chunk = text[i:i+CHUNK_SIZE]
                         output_filename = f"{output_file}_{i}.ogg"
-                        print(output_filename)
+                        # print(output_filename)
                         if os.path.exists(output_filename):
                             output_filename = f"{output_file}_{i+1}.ogg"
                         # print(output_filename)
@@ -672,7 +672,8 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
         finally:
             # print(out_ls)
             # Combine generated gTTS objects
-            FileSynthesis.join_audios(out_ls, output_file)
+            if len(out_ls) >= 1:
+                FileSynthesis.join_audios(out_ls, output_file)
 
             st = speedtest.Speedtest()
             logger.info("Done")
