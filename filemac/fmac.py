@@ -1,18 +1,17 @@
-#!/usr/bin/env python3.11.7
-# multimedia_cli/main.py
-from . import handle_warnings
-
+#!/usr/bin/env python3.11
 import argparse
 import logging
 import logging.handlers
 import sys
 
+from . import handle_warnings
 from .AudioExtractor import ExtractAudio
 from .converter import (AudioConverter, FileSynthesis, ImageConverter,
                         MakeConversion, VideoConverter)
 from .formats import (SUPPORTED_AUDIO_FORMATS_SHOW, SUPPORTED_DOC_FORMATS,
                       SUPPORTED_IMAGE_FORMATS_SHOW,
                       SUPPORTED_VIDEO_FORMATS_SHOW)
+from .image_op import Compress_Size
 from .OCRTextExtractor import ExtractText
 from .Simple_v_Analyzer import SA
 
@@ -103,6 +102,13 @@ def main():
         example [\033[1;33mfilemac --convert_image example.jpg -t png\033[0m]")
 
     parser.add_argument(
+        "--resize_image", help="Change image size example [\033[1;33mfilemac \
+resize_image example.png --t_size\033[0m]")
+
+    parser.add_argument("--t_size", help="used in combination with --resize_image to \
+specify estimate target image size")
+
+    parser.add_argument(
         "--convert_doc2image", help="Convert documents to images ie png to jpg.\
         example [\033[1;33mfilemac --convert_doc2image example.pdf -t png\033[0m]")
 
@@ -117,8 +123,8 @@ def main():
     parser.add_argument("-t", "--target_format",
                         help="Target format for conversion (optional)")
 
-    parser.add_argument("--OCR", help=("Extract text from an image.\
-        example [\033[1;33mfilemac --OCR image.jpg\033[0m]"))
+    parser.add_argument("--OCR", help="Extract text from an image.\
+        example [\033[1;33mfilemac --OCR image.jpg\033[0m]")
 
     args = parser.parse_args()
 
@@ -147,6 +153,11 @@ def main():
             sys.exit(1)
         conv = ImageConverter(args.convert_image, args.target_format)
         conv.convert_image()
+
+# Handle image resizing
+    elif args.resize_image:
+        res = Compress_Size(args.resize_image)
+        res.resize_image(args.t_size)
 
 # Handle documents to images conversion
     elif args.convert_doc2image:

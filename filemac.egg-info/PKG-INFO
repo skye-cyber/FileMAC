@@ -154,7 +154,7 @@ the output file assumes the base name of the input file but the extension confor
 ## Help
 in any case you can pass the string help to an option to see its supported operations or inputs nd output formats.
 ```shell
-   filemac --conver_doc help
+   filemac --convert_doc help
 ```
 The above command displays the surported input and output formats for document conversion.
 ## Contributing

@@ -23,9 +23,17 @@ def p():
 
 
 # Add supported input and output formats for each media type
-SUPPORTED_AUDIO_FORMATS = ["wav", "mp3", "ogg",
-                           "flv", "avi", "ogv", "matroska", "mov", "webm",
-                           "aac", "bpf", "aiff", "flac"]
+SUPPORTED_AUDIO_FORMATS = ["wav",  # Waveform Audio File Format
+                           "mp3",  # MPEG Audio Layer III
+                           "ogg",
+                           "flv",
+                           "ogv",
+                           "webm",
+                           "aac",  # Advanced Audio Codec
+                           "bpf",
+                           "aiff",
+                           "flac"]  # Free Lossless Audio Codec)
+
 SUPPORTED_AUDIO_FORMATS_SHOW = '''
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 |  \033[1;94mSupported I/O formats \033[0m    |
@@ -35,51 +43,56 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 |          ogg               |
 |          flv               |
 |          ogv               |
-|          matroska          |
-|          mov               |
+|          flac              |
+|          aiff              |
 |          webm              |
 |          aac               |
 |          bpf               |
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 '''
 
-SUPPORTED_VIDEO_FORMATS = ["MP4",
-                           "AVI",
+SUPPORTED_VIDEO_FORMATS = ["MP4",  # MPEG-4 part 14
+                           "AVI",  # Audio Video Interleave
                            "OGV",
                            "WEBM",
-                           "MOV",
-                           "MKV",
-                           "FLV",
+                           "MOV",  # QuickTime Movie
+                           "MKV",  # Matroska Multimedia Container - MKV is known for its support of high-quality content.
+                           "FLV",  #
                            "WMV"]
 
 SUPPORTED_VIDEO_FORMATS_SHOW = '''
 ,_______________________________________,
 |x| \033[1;94mSupported I/O formats\033[0m             |x|
 |x|-----------------------------------\033[1;93m|x|
-|x|              \033[1;95m MP4 \033[1;93m                |x|
-|x|               \033[1;95mAVI \033[1;93m                |x|
-|x|               \033[1;95mOGV \033[1;93m                |x|
+|x|               \033[1;95m MP4\033[1;93m                |x|
+|x|               \033[1;95mAVI\033[1;93m                 |x|
+|x|               \033[1;95mOGV\033[1;93m                 |x|
 |x|               \033[1;95mWEBM\033[1;93m                |x|
-|x|               \033[1;95mMOV \033[1;93m                |x|
-|x|               \033[1;95mMKV \033[1;93m                |x|
-|x|               \033[1;95mFLV \033[1;93m                |x|
-|x|               \033[1;95mWMV \033[1;93m                |x|
+|x|               \033[1;95mMOV\033[1;93m                 |x|
+|x|               \033[1;95mMKV\033[1;93m                 |x|
+|x|               \033[1;95mFLV\033[1;93m                 |x|
+|x|               \033[1;95mWMV\033[1;93m                 |x|
 |,|___________________________________|,|\033[1;93m
 '''
 SUPPORTED_IMAGE_FORMATS = {
-    "JPEG": ".jpg",
-    "PNG": ".png",
-    "GIF": ".gif",
+    "JPEG": ".jpg",  # Joint Photographic Experts Group -Lossy compression
+    "PNG": ".png",  # Joint Photographic Experts Group - not lossy
+    "GIF": ".gif",  # Graphics Interchange Format
     "BM": ".bmp",
-    "TIFF": ".tiff",
+    "BMP": ".dib",
+    "DXF": ".dxf",  # Autocad format 2D
+    "TIFF": ".tiff",  # Tagged Image File Format A flexible and high-quality image format that supports lossless compression
     "EXR": ".exr",
+    "pic": ".pic",
+    "pict": "pct",
     "PDF": ".pdf",
     "WebP": ".webp",
     "ICNS": ".icns",
     "PSD": ".psd",
-    "SVG": ".svg",
+    "SVG": ".svg",  # Scalable vector Graphics
     "EPS": ".eps",
-    "PostSciript": ".ps"}
+    "PostSciript": ".ps",
+    "PS": ".ps"}
 
 SUPPORTED_IMAGE_FORMATS_SHOW = '''
 __________________________________________
@@ -93,11 +106,13 @@ __________________________________________
 |x|               \033[1;95mEXR\033[1;93m                   |x|
 |x|               \033[1;95mPDF\033[1;93m                   |x|
 |x|               \033[1;95mWebP\033[1;93m                  |x|
-|x|               \033[1;95mICNS \033[1;93m                 |x|
-|x|               \033[1;95mPSD \033[1;93m                  |x|
-|x|               \033[1;95mSVG \033[1;93m                  |x|
+|x|               \033[1;95mICNS\033[1;93m                  |x|
+|x|               \033[1;95mPSD\033[1;93m                   |x|
+|x|               \033[1;95mSVG\033[1;93m                   |x|
+|x|               \033[1;95mPIC\033[1;93m                   |x|
+|x|               \033[1;95mPICT\033[1;93m                  |x|
 |x|               \033[1;95mEPS\033[1;93m                   |x|
-|x|               \033[1;95mPostscript \033[1;93m           |x|
+|x|               \033[1;95mPostscript/ps\033[1;93m         |x|
 |_|_____________________________________|x|
 '''
 

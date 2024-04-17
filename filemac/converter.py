@@ -1,7 +1,7 @@
 #############################################################################
 import logging
 import logging.handlers
-import math
+# import math
 import os
 import re
 import sqlite3
@@ -246,7 +246,7 @@ to {word_file}\033[0m")
                         f.write(paragraph.text + '\n')
                         Par += 1
                         print(f"Par:\033[94m{Par}/{len(doc.paragraphs)}\033[0m", end='\r')
-                    logger.info(f"\033[1;95mConversion of file to txt success\033[0m")
+                    logger.info("\033[1;95mConversion of file to txt success\033[0m")
 
             except KeyboardInterrupt:
                 print("\nExit")
@@ -576,7 +576,7 @@ class FileSynthesis:
 
     def __init__(self, input_file):
         self.input_file = input_file
-        self.CHUNK_SIZE = 20000
+        self.CHUNK_SIZE = 20_000
 
     def preprocess(self):
         files_to_process = []
@@ -592,29 +592,32 @@ class FileSynthesis:
         return files_to_process
 
     @staticmethod
-    def join_audios(path, output_file):
+    def join_audios(files, output_file):
         masterfile = output_file + "_master.mp3"
         print(
             f"\033[1;94mCreate a master file \033[1;95m{masterfile}\033[0m", end='\r')
         # Create a list to store files
         ogg_files = []
         # loop through the directory while adding the ogg files to the list
-        for filename in os.listdir(path):
-            if filename.endswith('.ogg'):
-                ogg_file = os.path.join(path, filename)
-                ogg_files.append(AudioSegment.from_file(ogg_file))
+        print(files)
+        for filename in files:
+            print(f"Join \033[1;94m{len(files)}\033[0m files")
+            # if filename.endswith('.ogg'):
+            # ogg_file = os.path.join(path, filename)
+            ogg_files.append(AudioSegment.from_file(filename))
 
         # Concatenate the ogg files
         combined_ogg = ogg_files[0]
-        for i in range(1, len(ogg_files)):
+        for i in range(1, len(files)):
             combined_ogg += ogg_files[i]
 
         # Export the combined ogg to new mp3 file or ogg file
         combined_ogg.export(output_file + "_master.mp3", format='mp3')
         print("\033[1;92mMaster file:Ok                                                                             \033[0m")
 
-    def Synthesise(self, text: str, output_file: str = None, ogg_folder: str = 'tempfile', retries: int = 3) -> None:
+    def Synthesise(self, text: str, output_file: str, CHUNK_SIZE: int = 20_000, ogg_folder: str = 'tempfile', retries: int = 5) -> None:
         """Converts given text to speech using Google Text-to-Speech API."""
+        out_ls = []
         try:
             if not os.path.exists(ogg_folder):
                 os.mkdir(ogg_folder)
@@ -630,15 +633,18 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
                 try:
                     '''Split input text into smaller parts and generate
                     individual gTTS objects'''
-                    for i in range(0, len(text), self.CHUNK_SIZE):
-                        chunk = text[i:i+self.CHUNK_SIZE]
-                        for i in range(0, math.ceil(len(text)/self.CHUNK_SIZE)):
-                            output_filename = f"{output_file}_{i}.ogg"
-                            if os.path.exists(output_filename):
-                                output_filename = f"{output_file}_{i+1}.ogg"
+                    for i in range(0, len(text), CHUNK_SIZE):
+                        chunk = text[i:i+CHUNK_SIZE]
+                        output_filename = f"{output_file}_{i}.ogg"
+                        print(output_filename)
+                        if os.path.exists(output_filename):
+                            output_filename = f"{output_file}_{i+1}.ogg"
+                        # print(output_filename)
                         tts = gTTS(text=chunk, lang='en', slow=False)
                         tts.save(output_filename)
-
+                        out_ls.append(output_filename)
+                    break
+                    # print(out_ls)
                     '''Handle any network related issue gracefully'''
                 except Exception in (ConnectionError, ConnectionAbortedError,
                                      ConnectionRefusedError,
@@ -661,10 +667,12 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
             if attempt >= retries:
                 logger.error(
                     f"Conversion unsuccessful after {retries} attempts.")
+                sys.exit(2)
 
         finally:
+            # print(out_ls)
             # Combine generated gTTS objects
-            FileSynthesis.join_audios(ogg_folder, output_file)
+            FileSynthesis.join_audios(out_ls, output_file)
 
             st = speedtest.Speedtest()
             logger.info("Done")
@@ -684,6 +692,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
                 for page_num in range(len(pdf_reader.pages)):
                     page = pdf_reader.pages[page_num]
                     text += page.extract_text()
+                print("\033[1;92mOk\033[0m")
                 return text
         except Exception as e:
             logger.error(
@@ -722,7 +731,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
         input_list = self.preprocess()
         extdoc = ["docx", "doc"]
         ls = {"pdf", "docx", "doc", "txt"}
-        input_list = [item for item in input_list if item.lower().endswith(ls)]
+        input_list = [item for item in input_list if item.lower().endswith(tuple(ls))]
         for input_file in input_list:
             if input_file.endswith('.pdf'):
                 text = FileSynthesis.pdf_to_text(input_file)
@@ -741,9 +750,8 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
                 logger.error('Unsupported file format. Please provide \
 a PDF, txt, or Word document.')
                 sys.exit(1)
-
             try:
-                FileSynthesis.Synthesise(text, output_file)
+                FileSynthesis.Synthesise(None, text, output_file)
             except KeyboardInterrupt:
                 sys.exit(1)
 
