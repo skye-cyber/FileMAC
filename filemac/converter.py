@@ -627,18 +627,20 @@ class FileSynthesis:
             download_speed: float = st.download()  # Keep units as bytes
             logger.info(
                 f"\033[32m Conversion to mp3 sequence initialized start\
-speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
+speed \033[36m{download_speed/1_000_000:.2f}Kbps\033[0m")
 
             for attempt in range(retries):
                 try:
                     '''Split input text into smaller parts and generate
                     individual gTTS objects'''
+                    counter = 0
                     for i in range(0, len(text), CHUNK_SIZE):
                         chunk = text[i:i+CHUNK_SIZE]
-                        output_filename = f"{output_file}_{i}.ogg"
+                        output_filename = f"{output_file}_{counter}.ogg"
+                        counter += 1
                         # print(output_filename)
                         if os.path.exists(output_filename):
-                            output_filename = f"{output_file}_{i+1}.ogg"
+                            output_filename = f"{output_file}_{counter+1}.ogg"
                         # print(output_filename)
                         tts = gTTS(text=chunk, lang='en', slow=False)
                         tts.save(output_filename)
@@ -679,7 +681,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
             logger.info("Done")
             print("Get final speed ...")
             logger.info(
-                f"\033[33m Final Network Speed: {st.download()/(10**6):.2f} Mbps\033[0m")
+                f"\033[33m Final Network Speed: {st.download()/(10**6):.2f} Kbps\033[0m")
 
     @staticmethod
     def pdf_to_text(pdf_path):
