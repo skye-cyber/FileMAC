@@ -1,6 +1,7 @@
 LICENSE
 MANIFEST.ini
 README.md
+conversion.log
 setup.py
 version.txt
 __pycache__/Analyzer.cpython-311.pyc
@@ -15,11 +16,16 @@ filemac/AudioExtractor.py
 filemac/OCRTextExtractor.py
 filemac/Simple_v_Analyzer.py
 filemac/__init__.py
+filemac/colors.py
 filemac/converter.py
 filemac/fmac.py
 filemac/formats.py
 filemac/handle_warnings.py
+<<<<<<< HEAD
 filemac/image_op.py
+=======
+filemac/test.py
+>>>>>>> dev
 filemac.egg-info/PKG-INFO
 filemac.egg-info/SOURCES.txt
 filemac.egg-info/dependency_links.txt

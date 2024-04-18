@@ -1,4 +1,5 @@
-#!/usr/bin/env python3.11
+#!/usr/bin/env python3.11.7
+# multimedia_cli/main.py
 import argparse
 import logging
 import logging.handlers
@@ -6,8 +7,9 @@ import sys
 
 from . import handle_warnings
 from .AudioExtractor import ExtractAudio
+from .colors import (RESET, DYELLOW)
 from .converter import (AudioConverter, FileSynthesis, ImageConverter,
-                        MakeConversion, VideoConverter)
+                        MakeConversion, Scanner, VideoConverter)
 from .formats import (SUPPORTED_AUDIO_FORMATS_SHOW, SUPPORTED_DOC_FORMATS,
                       SUPPORTED_IMAGE_FORMATS_SHOW,
                       SUPPORTED_VIDEO_FORMATS_SHOW)
@@ -76,7 +78,7 @@ class Eval:
                     conv.audiofy()
 
             else:
-                print("\033[1;93mUnsupported Conversion type\033[0m")
+                print(f"{DYELLOW}Unsupported Conversion type{RESET}")
         except Exception as e:
             logger.error(e)
 
@@ -86,45 +88,43 @@ def main():
         description="Multimedia Element Operations")
 
     parser.add_argument(
-        "--convert_doc", help="Converter document file(s) to different format ie pdf_to_docx.\
-       example [\033[1;33mfilemac --convert_doc example.docx -t pdf\033[0m]")
+        "--convert_doc", help=f"Converter document file(s) to different format ie pdf_to_docx.\
+       example {DYELLOW}filemac --convert_doc example.docx -t pdf{RESET}")
 
     parser.add_argument(
-        "--convert_audio", help="Convert audio file(s) to and from different format ie mp3 to wav\
-        example [\033[1;33mfilemac --convert_audio example.mp3 -t wav\033[0m]")
+        "--convert_audio", help=f"Convert audio file(s) to and from different format ie mp3 to wav\
+        example {DYELLOW}filemac --convert_audio example.mp3 -t wav{RESET}")
 
     parser.add_argument(
-        "--convert_video", help="Convert video file(s) to and from different format ie mp4 to mkv.\
-        example [\033[1;33mfilemac --convert_video example.mp4 -t mkv\033[0m]")
+        "--convert_video", help=f"Convert video file(s) to and from different format ie mp4 to mkv.\
+        example {DYELLOW}filemac --convert_video example.mp4 -t mkv{RESET}")
 
     parser.add_argument(
-        "--convert_image", help="Convert image file(s) to and from different format ie png to jpg.\
-        example [\033[1;33mfilemac --convert_image example.jpg -t png\033[0m]")
+        "--convert_image", help=f"Convert image file(s) to and from different format ie png to jpg.\
+        example {DYELLOW}filemac --convert_image example.jpg -t png{RESET}")
 
     parser.add_argument(
-        "--resize_image", help="Change image size example [\033[1;33mfilemac \
-resize_image example.png --t_size\033[0m]")
 
-    parser.add_argument("--t_size", help="used in combination with --resize_image to \
-specify estimate target image size")
-
-    parser.add_argument(
-        "--convert_doc2image", help="Convert documents to images ie png to jpg.\
-        example [\033[1;33mfilemac --convert_doc2image example.pdf -t png\033[0m]")
+        "--convert_doc2image", help=f"Convert documents to images ie png to jpg.\
+        example {DYELLOW}filemac --convert_doc2image example.pdf -t png{RESET}")
 
     parser.add_argument("-xA", "--extract_audio",
-                        help="Extract audio from a video.\
-                        example [\033[1;33mfilemac -xA example.mp4 \033[0m]")
+                        help=f"Extract audio from a video.\
+                        example {DYELLOW}filemac -xA example.mp4 {RESET}")
 
     parser.add_argument(
-        "-Av", "--Analyze_video", help="Analyze a given video.\
-        example [\033[1;33mfilemac --analyze_video example.mp4 \033[0m]")
+        "-Av", "--Analyze_video", help=f"Analyze a given video.\
+        example {DYELLOW}filemac --analyze_video example.mp4 {RESET}")
 
     parser.add_argument("-t", "--target_format",
                         help="Target format for conversion (optional)")
 
-    parser.add_argument("--OCR", help="Extract text from an image.\
-        example [\033[1;33mfilemac --OCR image.jpg\033[0m]")
+    parser.add_argument(
+        "--scan", help=f"Scan pdf file and extract text\
+                        example {DYELLOW}filemac --scan example.pdf {RESET}")
+
+    parser.add_argument("--OCR", help=f"Extract text from an image.\
+        example {DYELLOW}filemac --OCR image.png{RESET}")
 
     args = parser.parse_args()
 
@@ -178,7 +178,10 @@ specify estimate target image size")
         vi = ExtractAudio(args.extract_audio)
         vi.moviepyextract()
 
-
+# Call module to scan the input and extract text
+    elif args.scan:
+        sc = Scanner(args.scan)
+        sc.scanPDF()
 # Call module to handle Candidate images for text extraction inputs before begining conversion
     elif args.OCR:
         conv = ExtractText(args.OCR)
