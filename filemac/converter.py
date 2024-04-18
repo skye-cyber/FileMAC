@@ -215,7 +215,7 @@ to {word_file}{RESET}")
 
                 # Save the PowerPoint presentation
                 prs.save(pptx_file)
-                print("\n{DGREEN}Done{RESET}")
+                print(f"\n{DGREEN}Done{RESET}")
             except KeyboardInterrupt:
                 print("\nExiting")
                 sys.exit(1)
@@ -651,7 +651,7 @@ class FileSynthesis:
         # loop through the directory while adding the ogg files to the list
         print(files)
         for filename in files:
-            print(f"Join \033[1;94m{len(files)}\033[0m files")
+            print(f"Join {DBLUE}{len(files)}{RESET} files")
             # if filename.endswith('.ogg'):
             # ogg_file = os.path.join(path, filename)
             ogg_files.append(AudioSegment.from_file(filename))
@@ -747,7 +747,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
                 for page_num in range(len(pdf_reader.pages)):
                     page = pdf_reader.pages[page_num]
                     text += page.extract_text()
-                print("\033[1;92mOk\033[0m")
+                print(F"{DGREEN}mOk{RESET}")
                 return text
         except Exception as e:
             logger.error(
