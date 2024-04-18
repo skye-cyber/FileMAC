@@ -24,9 +24,17 @@ def p():
 
 
 # Add supported input and output formats for each media type
-SUPPORTED_AUDIO_FORMATS = ["wav", "mp3", "ogg",
-                           "flv", "avi", "ogv", "matroska", "mov", "webm",
-                           "aac", "bpf", "aiff", "flac"]
+SUPPORTED_AUDIO_FORMATS = ["wav",  # Waveform Audio File Format
+                           "mp3",  # MPEG Audio Layer III
+                           "ogg",
+                           "flv",
+                           "ogv",
+                           "webm",
+                           "aac",  # Advanced Audio Codec
+                           "bpf",
+                           "aiff",
+                           "flac"]  # Free Lossless Audio Codec)
+
 SUPPORTED_AUDIO_FORMATS_SHOW = f'''
 |==============================|
 |  {DBLUE}Supported I/O formats {RESET}      |
@@ -42,15 +50,16 @@ SUPPORTED_AUDIO_FORMATS_SHOW = f'''
 |          {CYAN} aac {DYELLOW}               |
 |          {CYAN} bpf {DYELLOW}               |
 --------------------------------
+
 '''
 
-SUPPORTED_VIDEO_FORMATS = ["MP4",
-                           "AVI",
+SUPPORTED_VIDEO_FORMATS = ["MP4",  # MPEG-4 part 14
+                           "AVI",  # Audio Video Interleave
                            "OGV",
                            "WEBM",
-                           "MOV",
-                           "MKV",
-                           "FLV",
+                           "MOV",  # QuickTime Movie
+                           "MKV",  # Matroska Multimedia Container - MKV is known for its support of high-quality content.
+                           "FLV",  #
                            "WMV"]
 
 SUPPORTED_VIDEO_FORMATS_SHOW = f'''
@@ -69,19 +78,24 @@ SUPPORTED_VIDEO_FORMATS_SHOW = f'''
 '''
 
 SUPPORTED_IMAGE_FORMATS = {
-    "JPEG": ".jpg",
-    "PNG": ".png",
-    "GIF": ".gif",
+    "JPEG": ".jpg",  # Joint Photographic Experts Group -Lossy compression
+    "PNG": ".png",  # Joint Photographic Experts Group - not lossy
+    "GIF": ".gif",  # Graphics Interchange Format
     "BM": ".bmp",
-    "TIFF": ".tiff",
+    "BMP": ".dib",
+    "DXF": ".dxf",  # Autocad format 2D
+    "TIFF": ".tiff",  # Tagged Image File Format A flexible and high-quality image format that supports lossless compression
     "EXR": ".exr",
+    "pic": ".pic",
+    "pict": "pct",
     "PDF": ".pdf",
     "WebP": ".webp",
     "ICNS": ".icns",
     "PSD": ".psd",
-    "SVG": ".svg",
+    "SVG": ".svg",  # Scalable vector Graphics
     "EPS": ".eps",
-    "PostSciript": ".ps"}
+    "PostSciript": ".ps",
+    "PS": ".ps"}
 
 SUPPORTED_IMAGE_FORMATS_SHOW = f'''
 __________________________________________

@@ -74,14 +74,13 @@ text..\033[0m")
                 with open(file_path, 'w') as file:
                     file.write(text)
                 logger.info(
-                    f"File saved in \033[33m{current_path}\033[0m as \033[32m\
-{OCR_file}\033[0m:")
+                    f"File saved as \033[32m{OCR_file}\033[0m:")
                 '''If there are multiple candidate images for text extraction,
-                wait for key press before proceeding to the next image otherwise
-                don't wait
+                wait for key press before proceeding to the next
+                image otherwise don't wait
                 size = [i for i in enumerate(image_list)]'''
                 if len(image_list) >= 2:
-                    input("Press Enter to continue ")
+                    input("\033[5;97mPress Enter to continue\033[0m")
             except KeyboardInterrupt:
                 print("\nExiting")
                 sys.exit(0)

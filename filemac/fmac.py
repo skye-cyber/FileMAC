@@ -120,6 +120,13 @@ def main():
                         help="Target format for conversion (optional)")
 
     parser.add_argument(
+        "--resize_image", help=f"change size of an image compress/decompress \
+        example {DYELLOW}filemac --resize_image example.png -t png {RESET}")
+
+    parser.add_argument("-t_size", help="used in combination with resize_image \
+                        to specify target image size")
+
+    parser.add_argument(
         "--scan", help=f"Scan pdf file and extract text\
                         example {DYELLOW}filemac --scan example.pdf {RESET}")
 
@@ -182,10 +189,12 @@ def main():
     elif args.scan:
         sc = Scanner(args.scan)
         sc.scanPDF()
+
 # Call module to handle Candidate images for text extraction inputs before begining conversion
     elif args.OCR:
         conv = ExtractText(args.OCR)
         conv.OCR()
+
     elif args.Analyze_video:
         analyzer = SA(args.Analyze_video)
         analyzer.SimpleAnalyzer()
