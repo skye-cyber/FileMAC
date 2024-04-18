@@ -598,7 +598,7 @@ class Scanner:
         pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
 
         for pdf in pdf_list:
-            out_f = pdf[:-4]
+            out_f = pdf[:-3] + 'txt'
             print(f"{YELLOW}Read pdf ..{RESET}")
 
             with open(pdf, 'rb') as f:
