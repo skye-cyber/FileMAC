@@ -146,7 +146,7 @@ to {word_file}{RESET}")
                 print("\nExiting..")
                 sys.exit(1)
             except Exception as e:
-                logger.info(f'{DRED}All conversion attempts have failed: \
+                logger.info(f'{DRED}mAll conversion attempts have failed: \
 {e}{RESET}')
 
 ###############################################################################
@@ -699,7 +699,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
                 except requests.exceptions.RequestException as e:
                     logger.error(f"{e}")
                 except Exception as e:
-                    logger.error(f'{DRED} Error during conversion attempt \
+                    logger.error(f'{DRED}m Error during conversion attempt \
 {attempt+1}/{retries}:{e}{RESET}')
                     tb = traceback.extract_tb(sys.exc_info()[2])
                     logger.info("\n".join([f"  > {line}"
@@ -736,7 +736,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
                 return text
         except Exception as e:
             logger.error(
-                f"{DRED}Failed to extract text from '{YELLOW}{pdf_path}'{RESET}:\n {e}")
+                f"{DRED}mFailed to extract text from '{YELLOW}{pdf_path}'{RESET}:\n {e}")
 
     @staticmethod
     def text_file(input_file):
@@ -748,7 +748,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
             logger.error("File '{}' was not found.".format(input_file))
         except Exception as e:
             logger.error(
-                F"{DRED}Error converting {input_file} to text: {str(e)}\
+                F"{DRED}mError converting {input_file} to text: {str(e)}\
 {RESET}")
 
     @staticmethod
@@ -762,7 +762,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
             logger.error(f"File '{docx_path}' was not found.")
         except Exception as e:
             logger.error(
-                F"{DRED}Error converting {docx_path} to text: {e}\
+                F"{DRED}mError converting {docx_path} to text: {e}\
 {RESET}")
 
     '''Handle input files based on type to initialize conversion sequence'''
