@@ -1,18 +1,19 @@
 # multimedia_cli/formats.py
+from .colors import CYAN, DBLUE, DMAGENTA, DYELLOW, RESET
 
-SUPPORTED_DOC_FORMATS = """
+SUPPORTED_DOC_FORMATS = f"""
 |---------------------------------------------------------------------------
-|\033[1;94mInput format\033[0m                    |\033[1;94mOutput format\033[0m                             |
+|{DBLUE}Input format{RESET}                    |{DBLUE}Output format{RESET}                             |
 |________________________________|__________________________________________|
-|   xlsx    \033[1;93m-------------------->\033[0m|csv txt doc/docx db(sql)                  |
+|   xlsx    {DYELLOW}-------------------->{RESET}|csv txt doc/docx db(sql)                  |
 |                                |                                          |
-|   doc/docx\033[1;93m-------------------->\033[0m|txt pdf ppt/pptx audio(ogg)               |
+|   doc/docx{DYELLOW}-------------------->{RESET}|txt pdf ppt/pptx audio(ogg)               |
 |                                |                                          |
-|   txt     \033[1;93m-------------------->\033[0m|pdf docx/doc audio(ogg)                   |
+|   txt     {DYELLOW}-------------------->{RESET}|pdf docx/doc audio(ogg)                   |
 |                                |                                          |
-|   pdf     \033[1;93m-------------------->\033[0m|doc/docx txt audio(ogg)                   |
+|   pdf     {DYELLOW}-------------------->{RESET}|doc/docx txt audio(ogg)                   |
 |                                |                                          |
-|   pptx/ppt\033[1;93m-------------------->\033[0m|doc/docx                                  |
+|   pptx/ppt{DYELLOW}-------------------->{RESET}|doc/docx                                  |
 |                                                                           |
 |___________________________________________________________________________|
 """
@@ -26,21 +27,21 @@ def p():
 SUPPORTED_AUDIO_FORMATS = ["wav", "mp3", "ogg",
                            "flv", "avi", "ogv", "matroska", "mov", "webm",
                            "aac", "bpf", "aiff", "flac"]
-SUPPORTED_AUDIO_FORMATS_SHOW = '''
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-|  \033[1;94mSupported I/O formats \033[0m    |
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-|          wav               |
-|          mp3               |
-|          ogg               |
-|          flv               |
-|          ogv               |
-|          matroska          |
-|          mov               |
-|          webm              |
-|          aac               |
-|          bpf               |
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+SUPPORTED_AUDIO_FORMATS_SHOW = f'''
+|==============================|
+|  {DBLUE}Supported I/O formats {RESET}      |
+|==============================|
+|          {CYAN} wav {DYELLOW}               |
+|          {CYAN} mp3 {DYELLOW}               |
+|          {CYAN} ogg {DYELLOW}               |
+|          {CYAN} flv {DYELLOW}               |
+|          {CYAN} ogv {DYELLOW}               |
+|          {CYAN} matroska {DYELLOW}          |
+|          {CYAN} mov {DYELLOW}               |
+|          {CYAN} webm {DYELLOW}              |
+|          {CYAN} aac {DYELLOW}               |
+|          {CYAN} bpf {DYELLOW}               |
+--------------------------------
 '''
 
 SUPPORTED_VIDEO_FORMATS = ["MP4",
@@ -52,20 +53,21 @@ SUPPORTED_VIDEO_FORMATS = ["MP4",
                            "FLV",
                            "WMV"]
 
-SUPPORTED_VIDEO_FORMATS_SHOW = '''
+SUPPORTED_VIDEO_FORMATS_SHOW = f'''
 ,_______________________________________,
-|x| \033[1;94mSupported I/O formats\033[0m             |x|
-|x|-----------------------------------\033[1;93m|x|
-|x|              \033[1;95m MP4 \033[1;93m                |x|
-|x|               \033[1;95mAVI \033[1;93m                |x|
-|x|               \033[1;95mOGV \033[1;93m                |x|
-|x|               \033[1;95mWEBM\033[1;93m                |x|
-|x|               \033[1;95mMOV \033[1;93m                |x|
-|x|               \033[1;95mMKV \033[1;93m                |x|
-|x|               \033[1;95mFLV \033[1;93m                |x|
-|x|               \033[1;95mWMV \033[1;93m                |x|
-|,|___________________________________|,|\033[1;93m
+|x| {DBLUE}Supported I/O formats{RESET}             |x|
+|x|-----------------------------------{DYELLOW}|x|
+|x|               {DMAGENTA} MP4 {DYELLOW}               |x|
+|x|               {DMAGENTA} AVI {DYELLOW}               |x|
+|x|               {DMAGENTA} OGV {DYELLOW}               |x|
+|x|               {DMAGENTA} WEBM{DYELLOW}               |x|
+|x|               {DMAGENTA} MOV {DYELLOW}               |x|
+|x|               {DMAGENTA} MKV {DYELLOW}               |x|
+|x|               {DMAGENTA} FLV {DYELLOW}               |x|
+|x|               {DMAGENTA} WMV {DYELLOW}               |x|
+|,|___________________________________|,|{DYELLOW}
 '''
+
 SUPPORTED_IMAGE_FORMATS = {
     "JPEG": ".jpg",
     "PNG": ".png",
@@ -81,24 +83,25 @@ SUPPORTED_IMAGE_FORMATS = {
     "EPS": ".eps",
     "PostSciript": ".ps"}
 
-SUPPORTED_IMAGE_FORMATS_SHOW = '''
+SUPPORTED_IMAGE_FORMATS_SHOW = f'''
 __________________________________________
-|x|\033[1;94mSupported I/O formats\033[0m                |x|
-|x|_____________________________________\033[1;93m|x|
-|x|               \033[1;95mJPEG\033[1;93m                  |x|
-|x|               \033[1;95mPNG\033[1;93m                   |x|
-|x|               \033[1;95mGIF\033[1;93m                   |x|
-|x|               \033[1;95mBM\033[1;93m                    |x|
-|x|               \033[1;95mTIFF\033[1;93m                  |x|
-|x|               \033[1;95mEXR\033[1;93m                   |x|
-|x|               \033[1;95mPDF\033[1;93m                   |x|
-|x|               \033[1;95mWebP\033[1;93m                  |x|
-|x|               \033[1;95mICNS \033[1;93m                 |x|
-|x|               \033[1;95mPSD \033[1;93m                  |x|
-|x|               \033[1;95mSVG \033[1;93m                  |x|
-|x|               \033[1;95mEPS\033[1;93m                   |x|
-|x|               \033[1;95mPostscript \033[1;93m           |x|
+|x|{DBLUE}Supported I/O formats{RESET}                |x|
+|x|_____________________________________{DYELLOW}|x|
+|x|               {DMAGENTA} JPEG {DYELLOW}                |x|
+|x|               {DMAGENTA} PNG {DYELLOW}                 |x|
+|x|               {DMAGENTA} GIF {DYELLOW}                 |x|
+|x|               {DMAGENTA} BM {DYELLOW}                  |x|
+|x|               {DMAGENTA} TIFF {DYELLOW}                |x|
+|x|               {DMAGENTA} EXR {DYELLOW}                 |x|
+|x|               {DMAGENTA} PDF {DYELLOW}                 |x|
+|x|               {DMAGENTA} WebP{DYELLOW}                 |x|
+|x|               {DMAGENTA} ICNS {DYELLOW}                |x|
+|x|               {DMAGENTA} PSD {DYELLOW}                 |x|
+|x|               {DMAGENTA} SVG {DYELLOW}                 |x|
+|x|               {DMAGENTA} EPS {DYELLOW}                 |x|
+|x|               {DMAGENTA} Postscript {DYELLOW}          |x|
 |_|_____________________________________|x|
 '''
 
-SUPPORTED_DOCUMENT_FORMATS = [...]
+SUPPORTED_DOCUMENT_FORMATS = ['pdf', 'doc', 'docx', 'csv', 'xlsx', 'xls',
+                              'ppt', 'pptx', 'txt', 'ogg', 'mp3', 'audio']

@@ -28,6 +28,8 @@ from pdf2docx import parse
 from PIL import Image
 from pptx import Presentation
 from pydub import AudioSegment
+from .colors import (RESET, GREEN, DGREEN, YELLOW, DYELLOW, CYAN, BLUE, DBLUE,
+                     MAGENTA, DMAGENTA, RED, DRED, ICYAN)
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate
 
@@ -97,7 +99,7 @@ class MakeConversion:
 
             try:
                 print(
-                    f'\033[34mConverting: \033[0m{word_file} \033[34mto \033[0m{pdf_file}')
+                    f'{BLUE}Converting: {RESET}{word_file} {BLUE}to {RESET}{pdf_file}')
                 if os.name == 'posix':  # Check if running on Linux
                     # Use subprocess to run the dpkg and grep commands
                     result = subprocess.run(
@@ -108,7 +110,7 @@ class MakeConversion:
                         sys.exit(1)
                     subprocess.run(['soffice', '--convert-to',
                                    'pdf', word_file, pdf_file])
-                    # print(f"\033[1;95m Successfully converted {word_file} to {pdf_file}\033[0m")
+                    # print(f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}")
                 elif os.name == "nt":
                     try:
                         from docx2pdf import convert
@@ -117,7 +119,7 @@ class MakeConversion:
                         sys.exit(1)
                     convert(word_file, pdf_file)
                     print(
-                        f"\033[1;95m Successfully converted {word_file} to {pdf_file}\033[0m")
+                        f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}")
 
             except Exception as e:
                 print(f"Error converting {word_file} to {pdf_file}: {e}")
@@ -136,16 +138,16 @@ class MakeConversion:
 
                 parse(pdf_file, word_file, start=0, end=None)
 
-                print('\033[32mConverting to word..\033[0m', end='\r')
+                print(f'{GREEN}Converting to word..{RESET}', end='\r')
 
-                logger.info(f"\033[1;95m Successfully converted{pdf_file} \
-to {word_file}\033[0m")
+                logger.info(f"{DMAGENTA} Successfully converted{pdf_file} \
+to {word_file}{RESET}")
             except KeyboardInterrupt:
                 print("\nExiting..")
                 sys.exit(1)
             except Exception as e:
-                logger.info(f'\033[31mAll conversion attempts have failed: \
-{e}\033[0m')
+                logger.info(f'{DRED}mAll conversion attempts have failed: \
+{e}{RESET}')
 
 ###############################################################################
 # Convert text file(s) to pdf document (docx)
@@ -189,22 +191,22 @@ to {word_file}\033[0m")
                 pptx_file = word_file[:-3] + "pptx"
             try:
                 # Load the Word document
-                print("\033[1;33mLoad the Word document..\033[0m")
+                print(F"{DYELLOW}Load the Word document..{RESET}")
                 doc = Document(word_file)
 
                 # Create a new PowerPoint presentation
-                print("\033[1;33mCreate a new PowerPoint presentation..\033[0m")
+                print(F"{DYELLOW}Create a new PowerPoint presentation..{RESET}")
                 prs = Presentation()
 
                 # Iterate through each paragraph in the Word document
                 print(
-                    f"\033[1;32mPopulating pptx slides with \033[1;33m{len(doc.paragraphs)}\033[1;32m entries..\033[0m")
+                    f"{DGREEN}Populating pptx slides with {DYELLOW}{len(doc.paragraphs)}{DGREEN} entries..{RESET}")
                 count = 0
                 for paragraph in doc.paragraphs:
                     count += 1
                     perc = (count/len(doc.paragraphs))*100
                     print(
-                        f"\033[1;35mProgress:: \033[1;36m{perc:.2f}%\033[0m", end="\r")
+                        f"{DMAGENTA}Progress:: \033[1;36m{perc:.2f}%{RESET}", end="\r")
                     # Create a new slide in the PowerPoint presentation
                     slide = prs.slides.add_slide(prs.slide_layouts[1])
 
@@ -213,7 +215,7 @@ to {word_file}\033[0m")
 
                 # Save the PowerPoint presentation
                 prs.save(pptx_file)
-                print("\n\033[1;32mDone\033[0m")
+                print("\n{DGREEN}Done{RESET}")
             except KeyboardInterrupt:
                 print("\nExiting")
                 sys.exit(1)
@@ -245,8 +247,8 @@ to {word_file}\033[0m")
                     for paragraph in doc.paragraphs:
                         f.write(paragraph.text + '\n')
                         Par += 1
-                        print(f"Par:\033[94m{Par}/{len(doc.paragraphs)}\033[0m", end='\r')
-                    logger.info(f"\033[1;95mConversion of file to txt success\033[0m")
+                        print(f"Par:{BLUE}{Par}/{len(doc.paragraphs)}{RESET}", end='\r')
+                    logger.info(f"{DMAGENTA}Conversion of file to txt success{RESET}")
 
             except KeyboardInterrupt:
                 print("\nExit")
@@ -275,8 +277,8 @@ REASON->{e}")
                         text += page.extract_text()
                 with open(txt_file, 'w', encoding='utf-8') as f:
                     f.write(text)
-                    logger.info(f"\033[1;95mSuccessfully converted {file_path} to \
-{txt_file}\033[0m")
+                    logger.info(f"{DMAGENTA}Successfully converted {file_path} to \
+{txt_file}{RESET}")
             except Exception as e:
                 logger.error(
                     f"Oops somethin went astray while converting {file_path} \
@@ -329,8 +331,8 @@ to {txt_file}: {e}")
                             # Add a new paragraph after each slide
                             document.add_paragraph()
                 document.save(word_file)
-                logger.info(f"\033[1;95mSuccessfully converted {file_path} to \
-        {word_file}\033[0m")
+                logger.info(f"{DMAGENTA}Successfully converted {file_path} to \
+        {word_file}{RESET}")
             except Exception as e:
                 logger.error(
                     f"Oops somethin gwent awry while attempting to convert \
@@ -366,8 +368,8 @@ to {txt_file}: {e}")
 
                 # Save the document as a Word file
                 doc.save(word_file)
-                logger.info(f"\033[1;95mSuccessfully converted {file_path} to \
-        {word_file}\033[0m")
+                logger.info(f"{DMAGENTA}Successfully converted {file_path} to \
+        {word_file}{RESET}")
             except FileExistsError as e:
                 logger.error(f"{str(e)}")
             except Exception as e:
@@ -386,7 +388,7 @@ to {txt_file}: {e}")
         ls = ["xlsx", "xls"]
         xls_list = [item for item in xls_list if any(
             item.lower().endswith(ext) for ext in ls)]
-        print("\033[1;32mInitializing conversion sequence\033[0m")
+        print(F"{DGREEN}Initializing conversion sequence{RESET}")
         for xls_file in xls_list:
             if xls_file.lower().endswith("xlsx"):
                 word_file = xls_file[:-4] + "docx"
@@ -402,7 +404,7 @@ to {txt_file}: {e}")
 
                 '''Iterate over the rows of the dataframe and add them to the
                 Word document'''
-                logger.info(f"\033[3;36mConverting {xls_file}..\033[0m")
+                logger.info(f"{ICYAN}Converting {xls_file}..{RESET}")
                 # time.sleep(2)
                 total_rows = df.shape[0]
                 for _, row in df.iterrows():
@@ -410,13 +412,13 @@ to {txt_file}: {e}")
                     percentage = (current_row / total_rows)*100
                     for value in row:
                         doc.add_paragraph(str(value))
-                    print(f"Row \033[1;33m{current_row}/{total_rows} \
-\033[1;34m{percentage:.1f}%\033[0m", end="\r")
-                    # print(f"\033[1;36m{row}\033[0m")
+                    print(f"Row {DYELLOW}{current_row}/{total_rows} \
+{DBLUE}{percentage:.1f}%{RESET}", end="\r")
+                    # print(f"\033[1;36m{row}{RESET}")
 
                 # Save the Word document
                 doc.save(word_file)
-                print("\033[1;32mConversion successful!\033[0m", end="\n")
+                print(F"{DGREEN}Conversion successful!{RESET}", end="\n")
             except KeyboardInterrupt:
                 print("\nExiting")
                 sys.exit(1)
@@ -433,7 +435,7 @@ to {txt_file}: {e}")
         xls_list = [
             item for item in xls_list if any(item.lower().endswith(ext)
                                              for ext in ls)]
-        print("\033[1;32mInitializing conversion sequence\033[0m")
+        print(F"{DGREEN}Initializing conversion sequence{RESET}")
         for xls_file in xls_list:
             if xls_file .lower().endswith("xlsx"):
                 txt_file = xls_file[:-4] + "txt"
@@ -451,14 +453,14 @@ to {txt_file}: {e}")
                 lines = len(text.splitlines())
 
                 print(
-                    f"Preparing to write: \033[1;33m{chars} \033[1;30m \
-characters\033[1;33m {words}\033[1;30m words \033[1;33m{lines}\033[1;30m \
-lines \033[0m", end="\n")
+                    f"Preparing to write: {DYELLOW}{chars} \033[1;30m \
+characters{DYELLOW} {words}\033[1;30m words {DYELLOW}{lines}\033[1;30m \
+lines {RESET}", end="\n")
                 # Write the plain text to the output file
                 with open(txt_file, 'w') as file:
                     file.write(text)
 
-                print("\033[1;32mConversion successful!\033[0m", end="\n")
+                print(F"{DGREEN}Conversion successful!{RESET}", end="\n")
             except KeyboardInterrupt:
                 print("\nExiting")
                 sys.exit(1)
@@ -482,16 +484,16 @@ lines \033[0m", end="\n")
                 csv_file = xls_file[:-3] + "csv"
             try:
                 '''Load the Excel file'''
-                print("\033[1;32mInitializing conversion sequence\033[0m")
+                print(F"{DGREEN}Initializing conversion sequence{RESET}")
                 df = pd.read_excel(xls_file)
                 logger.info(f"Converting {xls_file}..")
                 total_rows = df.shape[0]
-                print(f"Writing \033[1;33m{total_rows} rows \033[0m", end="\n")
+                print(f"Writing {DYELLOW}{total_rows} rows {RESET}", end="\n")
                 for i in range(101):
                     print(f"Progress: {i}%", end="\r")
                 '''Save the DataFrame to CSV'''
                 df.to_csv(csv_file, index=False)
-                print("\033[1;95m Conversion successful\033[0m")
+                print(F"{DMAGENTA} Conversion successful{RESET}")
             except KeyboardInterrupt:
                 print("Exiting")
                 sys.exit(1)
@@ -515,9 +517,9 @@ lines \033[0m", end="\n")
                 sqlfile = xlsx_file[:-3]
             try:
                 db_file = input(
-                    "\033[1;34m Please enter desired sql filename: \033[0m")
+                    F"{DBLUE}Please enter desired sql filename: {RESET}")
                 table_name = input(
-                    "\033[1;37m Please enter desired table name: \033[0m")
+                    "Please enter desired table name: ")
                 # res = ["db_file", "table_name"]
                 if any(db_file) == "":
                     db_file = sqlfile + "sql"
@@ -530,16 +532,16 @@ lines \033[0m", end="\n")
                 # Read the Excel file into a pandas DataFrame
                 print(f"Reading {xlsx_file}...")
                 df = pd.read_excel(xlsx_file)
-                print("\033[1;32mInitializing conversion sequence\033[0m")
-                print("\033[1;32m Connected to sqlite3 database::\033[0m")
+                print(f"{DGREEN}Initializing conversion sequence{RESET}")
+                print(f"{DGREEN} Connected to sqlite3 database::{RESET}")
                 # Create a connection to the SQLite database
                 conn = sqlite3.connect(db_file)
-                print("\033[1;33m Creating database table::\033[0m")
+                print(F"{DYELLOW} Creating database table::{RESET}")
                 # Insert the DataFrame into a new table in the database
                 df.to_sql(table_name, column, conn,
                           if_exists='replace', index=False)
                 print(
-                    f"Operation successful\033[0m file saved as \033[32{db_file}\033[0m")
+                    f"Operation successful{RESET} file saved as \033[32{db_file}{RESET}")
                 # Close the database connection
                 conn.close()
             except KeyboardInterrupt:
@@ -565,18 +567,65 @@ lines \033[0m", end="\n")
 
                 # Save each image to a file
                 fname = file[:-4]
-                print(f"\033[93mTarget images\033[94m {len(images)}\033[0m")
+                print(f"{YELLOW}Target images{BLUE} {len(images)}{RESET}")
                 for i, image in enumerate(images):
-                    print(f"\033[1;94m{i}\033[0m", end="\r")
+                    print(f"{DBLUE}{i}{RESET}", end="\r")
                     image.save(f"{fname}_{i+1}.{outf}")
-                print("\033[92mOk\033[0m")
+                print(f"{GREEN}mOk{RESET}")
+
+
+class Scanner:
+
+    def __init__(self, input_file):
+        self.input_file = input_file
+
+    def preprocess(self):
+        files_to_process = []
+
+        if os.path.isfile(self.input_file):
+            files_to_process.append(self.input_file)
+        elif os.path.isdir(self.input_file):
+            for file in os.listdir(self.input_file):
+                file_path = os.path.join(self.input_file, file)
+                if os.path.isfile(file_path):
+                    files_to_process.append(file_path)
+
+        return files_to_process
+
+    def scanPDF(self):
+        pdf_list = self.preprocess()
+        pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
+
+        for pdf in pdf_list:
+            out_f = pdf[:-4]
+            print(f"{YELLOW}Read pdf ..{RESET}")
+
+            with open(pdf, 'rb') as f:
+                reader = PyPDF2.PdfReader(f)
+                text = ''
+
+                pg = 0
+                for page_num in range(len(reader.pages)):
+                    pg += 1
+
+                    print(f"{DYELLOW}Progress:{RESET}", end="")
+                    print(f"{CYAN}{pg}/{len(reader.pages)}{RESET}", end="\r")
+                    page = reader.pages[page_num]
+                    text += page.extract_text()
+
+            print(f"\n{text}")
+            print(F"\n{YELLOW}Write text to {GREEN}{out_f}{RESET}")
+            with open(out_f, 'w') as f:
+                f.write(text)
+
+            print(F"{DGREEN}Ok{RESET}")
 
 
 class FileSynthesis:
 
     def __init__(self, input_file):
         self.input_file = input_file
-        self.CHUNK_SIZE = 20000
+        # self.CHUNK_SIZE = 20000
 
     def preprocess(self):
         files_to_process = []
@@ -595,7 +644,7 @@ class FileSynthesis:
     def join_audios(path, output_file):
         masterfile = output_file + "_master.mp3"
         print(
-            f"\033[1;94mCreate a master file \033[1;95m{masterfile}\033[0m", end='\r')
+            f"{DBLUE}Create a master file {DMAGENTA}{masterfile}{RESET}", end='\r')
         # Create a list to store files
         ogg_files = []
         # loop through the directory while adding the ogg files to the list
@@ -611,20 +660,20 @@ class FileSynthesis:
 
         # Export the combined ogg to new mp3 file or ogg file
         combined_ogg.export(output_file + "_master.mp3", format='mp3')
-        print("\033[1;92mMaster file:Ok                                                                             \033[0m")
+        print(F"{DGREEN}Master file:Ok                                                                             {RESET}")
 
     def Synthesise(self, text: str, output_file: str = None, ogg_folder: str = 'tempfile', retries: int = 3) -> None:
         """Converts given text to speech using Google Text-to-Speech API."""
         try:
             if not os.path.exists(ogg_folder):
                 os.mkdir(ogg_folder)
-            print("\033[1;93mGet initial net speed..\033[0m")
+            print("\033[1;93mGet initial net speed..{RESET}")
             st = speedtest.Speedtest()  # get initial network speed
             st.get_best_server()
             download_speed: float = st.download()  # Keep units as bytes
             logger.info(
-                f"\033[32m Conversion to mp3 sequence initialized start\
-speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
+                f"{GREEN} Conversion to mp3 sequence initialized start\
+speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
 
             for attempt in range(retries):
                 try:
@@ -650,8 +699,8 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
                 except requests.exceptions.RequestException as e:
                     logger.error(f"{e}")
                 except Exception as e:
-                    logger.error(f'\033[31m Error during conversion attempt \
-{attempt+1}/{retries}:{e}\033[0m')
+                    logger.error(f'{DRED}m Error during conversion attempt \
+{attempt+1}/{retries}:{e}{RESET}')
                     tb = traceback.extract_tb(sys.exc_info()[2])
                     logger.info("\n".join([f"  > {line}"
                                            for line in map(str, tb)]))
@@ -670,13 +719,13 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
             logger.info("Done")
             print("Get final speed ...")
             logger.info(
-                f"\033[33m Final Network Speed: {st.download()/(10**6):.2f} Mbps\033[0m")
+                f"{YELLOW}Final Network Speed: {st.download()/(10**6):.2f} Kbps{RESET}")
 
     @staticmethod
     def pdf_to_text(pdf_path):
         logger.info('''Processing the file...\n''')
         logger.info(
-            '\033[32m Initializing pdf to text conversion sequence...\033[0m')
+            F'{GREEN} Initializing pdf to text conversion sequence...{RESET}')
         try:
             with open(pdf_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
@@ -687,7 +736,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
                 return text
         except Exception as e:
             logger.error(
-                f"\033[31mFailed to extract text from '\033[93m{pdf_path}'\033[0m:\n {e}")
+                f"{DRED}mFailed to extract text from '{YELLOW}{pdf_path}'{RESET}:\n {e}")
 
     @staticmethod
     def text_file(input_file):
@@ -699,22 +748,22 @@ speed \033[36m{download_speed/1_000_000:.2f}Mbps\033[0m")
             logger.error("File '{}' was not found.".format(input_file))
         except Exception as e:
             logger.error(
-                "\033[31mError converting {} to text: {}\
-\033[0m".format(input_file, str(e)))
+                F"{DRED}mError converting {input_file} to text: {str(e)}\
+{RESET}")
 
     @staticmethod
     def docx_to_text(docx_path):
         try:
-            logger.info(f"\033[34m Converting {docx_path} to text...\033[0m")
+            logger.info(f"{BLUE} Converting {docx_path} to text...{RESET}")
             doc = Document(docx_path)
             paragraphs = [paragraph.text for paragraph in doc.paragraphs]
             return '\n'.join(paragraphs)
         except FileNotFoundError:
-            logger.error("File '{}' was not found.".format(docx_path))
+            logger.error(f"File '{docx_path}' was not found.")
         except Exception as e:
             logger.error(
-                "\033[31mError converting {} to text: {}\
-\033[0m".format(docx_path, str(e)))
+                F"{DRED}mError converting {docx_path} to text: {e}\
+{RESET}")
 
     '''Handle input files based on type to initialize conversion sequence'''
 
@@ -781,7 +830,7 @@ class VideoConverter:
             out_f = self.out_format.upper()
             input_list = [item for item in input_list if any(
                 item.upper().endswith(ext) for ext in SUPPORTED_VIDEO_FORMATS)]
-            print("\033[1;33mInitializing conversion..\033[0m")
+            print(F"{DYELLOW}Initializing conversion..{RESET}")
 
             for file in input_list:
                 if out_f.upper() in SUPPORTED_VIDEO_FORMATS:
@@ -802,14 +851,14 @@ class VideoConverter:
                     # "WMV": "WMV"
                 }
                 '''Load the video file'''
-                print("\033[1;34mLoad file\033[0m")
+                print(f"{DBLUE}oad file{RESET}")
                 video = VideoFileClip(file)
                 '''Export the video to a different format'''
-                print(f"\033[1;35mConverting file to {output_filename}\033[0m")
+                print(f"{DMAGENTA}Converting file to {output_filename}{RESET}")
                 video.write_videofile(
                     output_filename, codec=format_codec[out_f])
                 '''Close the video file'''
-                print("\033[1;32mDone\033[0m")
+                print(f"{DGREEN}Done{RESET}")
                 video.close()
         except KeyboardInterrupt:
             print("\nExiting..")
@@ -850,7 +899,7 @@ class AudioConverter:
         out_f = self.out_format
         input_list = [item for item in input_list if any(
             item.lower().endswith(ext) for ext in SUPPORTED_AUDIO_FORMATS)]
-        print("\033[1;33mInitializing conversion..\033[0m")
+        print(F"{DYELLOW}Initializing conversion..{RESET}")
         for file in input_list:
             if out_f.lower() in SUPPORTED_AUDIO_FORMATS:
                 _, ext = os.path.splitext(file)
@@ -861,10 +910,10 @@ class AudioConverter:
             fmt = ext[1:]
             print(fmt, out_f)
             audio = pydub.AudioSegment.from_file(file, fmt)
-            print(f"\033[1;35mConverting to {output_filename}\033[0m")
+            print(f"{DMAGENTA}Converting to {output_filename}{RESET}")
             audio.export(output_filename, format=out_f)
             # new_audio = pydub.AudioSegment.from_file('output_audio.')
-            print("\033[1;32mDone\033[0m")
+            print(f"{DGREEN}Done{RESET}")
             # play(new_audio)
             # new_audio.close()
 
@@ -917,17 +966,17 @@ class ImageConverter:
                     print("Unsupported output format")
                     sys.exit(1)
                 '''Load the image using OpenCV: '''
-                print("\033[1;33mReading input image..\033[0m")
+                print(F"{DYELLOW}Reading input image..{RESET}")
                 img = cv2.imread(file)
                 '''Convert the OpenCV image to a PIL image: '''
-                print("\033[1;35mConverting to PIL image\033[0m")
+                print(f"{DMAGENTA}Converting to PIL image{RESET}")
                 pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
                 '''Save the PIL image to a different format: '''
-                print(f"\033[1;36mSaving image as {output_filename}\033[0m")
+                print(f"\033[1;36mSaving image as {output_filename}{RESET}")
                 pil_img.save(output_filename, out_f)
-                print("\033[1;32mDone\033[0m")
+                print(f"{DGREEN}Done{RESET}")
                 '''Load the image back into OpenCV: '''
-                print("\033[1;35mLoad and display image\033[0m")
+                print(f"{DMAGENTA}Load and display image{RESET}")
                 opencv_img = cv2.imread(output_filename)
                 '''Display the images: '''
                 cv2.imshow('OpenCV Image', opencv_img)
