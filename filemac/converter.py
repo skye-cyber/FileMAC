@@ -662,7 +662,7 @@ class FileSynthesis:
             combined_ogg += ogg_files[i]
 
         # Export the combined ogg to new mp3 file or ogg file
-        combined_ogg.export(output_file + "_master.mp3", format='mp3')
+        combined_ogg.export(output_file + "_master.ogg", format='ogg')
         print(F"{DGREEN}Master file:Ok                                                                             {RESET}")
 
     def Synthesise(self, text: str, output_file: str, CHUNK_SIZE: int = 20_000, ogg_folder: str = 'tempfile', retries: int = 5) -> None:
@@ -671,14 +671,14 @@ class FileSynthesis:
         try:
             if not os.path.exists(ogg_folder):
                 os.mkdir(ogg_folder)
-            print("\033[1;93mGet initial net speed..{RESET}")
+            print(f"{DYELLOW}Get initial net speed..{RESET}")
             st = speedtest.Speedtest()  # get initial network speed
             st.get_best_server()
             download_speed: float = st.download()  # Keep units as bytes
             logger.info(
 
                 f"{GREEN} Conversion to mp3 sequence initialized start\
-speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
+speed {CYAN}{download_speed/1_000_000:.2f}Kbps{RESET}")
 
             for attempt in range(retries):
                 try:
@@ -747,7 +747,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
                 for page_num in range(len(pdf_reader.pages)):
                     page = pdf_reader.pages[page_num]
                     text += page.extract_text()
-                print(F"{DGREEN}mOk{RESET}")
+                print(F"{DGREEN}Ok{RESET}")
                 return text
         except Exception as e:
             logger.error(
