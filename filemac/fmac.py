@@ -127,8 +127,12 @@ def main():
                         to specify target image size")
 
     parser.add_argument(
-        "--scan", help=f"Scan pdf file and extract text\
+        "-S", "--scan", help=f"Scan pdf file and extract text\
                         example {DYELLOW}filemac --scan example.pdf {RESET}")
+
+    parser.add_argument(
+        "-SA", "--scanAsImg", help=f"Scan pdf file and extract text\
+                        example {DYELLOW}filemac --scanAsImg example.pdf {RESET}")
 
     parser.add_argument("--OCR", help=f"Extract text from an image.\
         example {DYELLOW}filemac --OCR image.png{RESET}")
@@ -190,6 +194,10 @@ def main():
         sc = Scanner(args.scan)
         sc.scanPDF()
 
+# Call module to scan the input FILE as image object and extract text
+    elif args.scanAsImg:
+        sc = Scanner(args.scanAsImg)
+        tx = sc.scanAsImgs()
 # Call module to handle Candidate images for text extraction inputs before begining conversion
     elif args.OCR:
         conv = ExtractText(args.OCR)

@@ -39,7 +39,7 @@ class ExtractText:
 
     def OCR(self):
         image_list = self.preprocess()
-        ls = {'png', 'jpg'}
+        ls = ['png', 'jpg']
         image_list = [
             item for item in image_list if any(item.lower().endswith(ext)
                                                for ext in ls)]
@@ -48,7 +48,7 @@ class ExtractText:
             '''Load image using OpenCV'''
             img = cv2.imread(image_path)
 
-            logger.info(f"\033[5;34mprocessing {image_path}...\033[0m")
+            logger.info(f"\033[2;95mprocessing {image_path}...\033[0m")
 
             try:
                 '''Preprocess image for better OCR results'''
@@ -68,13 +68,13 @@ class ExtractText:
                 current_path = os.getcwd()
                 file_path = os.path.join(current_path, OCR_file)
                 ''' Save the extracted text to specified file '''
-                logger.info("\033[32mGenerating text file for the extracted \
+                logger.info("\033[1;92mGenerating text file for the extracted \
 text..\033[0m")
 
                 with open(file_path, 'w') as file:
                     file.write(text)
                 logger.info(
-                    f"File saved as \033[32m{OCR_file}\033[0m:")
+                    f"File saved as \033[1;93m{OCR_file}\033[0m:")
                 '''If there are multiple candidate images for text extraction,
                 wait for key press before proceeding to the next
                 image otherwise don't wait
@@ -97,5 +97,5 @@ Reason: {str(e)}\033[0m")
             return text
 
         for image_path in image_list:
-            OCR_file = image_path[:-3] + "txt"
+            OCR_file = image_path[:-4] + ".txt"
             ocr_text_extraction(image_path)

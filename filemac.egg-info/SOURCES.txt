@@ -35,6 +35,3 @@ filemac/__pycache__/Simple_v_Analyzer.cpython-311.pyc
 filemac/__pycache__/colors.cpython-311.pyc
 filemac/__pycache__/converter.cpython-311.pyc
 filemac/__pycache__/formats.cpython-311.pyc
-tets/dd.py
-tets/test.py
-tets/__pycache__/dd.cpython-311.pyc

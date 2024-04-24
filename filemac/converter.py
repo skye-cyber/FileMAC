@@ -551,15 +551,19 @@ lines {RESET}", end="\n")
             except Exception as e:
                 logger.error(f"{e}")
 
+###############################################################################
+# Create image objects from given files
+###############################################################################
     def doc2image(self, outf="png"):
         outf_list = ['png', 'jpg']
         if outf not in outf_list:
             outf = "png"
         path_list = self.preprocess()
-        ls = ["pdf"]
+        ls = ["pdf", "doc", "docx"]
         file_list = [
             item for item in path_list if any(item.lower().endswith(ext)
                                               for ext in ls)]
+        imgs = []
         for file in file_list:
             if file.lower().endswith("pdf"):
                 # Convert the PDF to a list of PIL image objects
@@ -571,8 +575,12 @@ lines {RESET}", end="\n")
                 print(f"{YELLOW}Target images{BLUE} {len(images)}{RESET}")
                 for i, image in enumerate(images):
                     print(f"{DBLUE}{i}{RESET}", end="\r")
-                    image.save(f"{fname}_{i+1}.{outf}")
-                print(f"{GREEN}mOk{RESET}")
+                    yd = f"{fname}_{i+1}.{outf}"
+                    image.save(yd)
+                    imgs.append(yd)
+            print(f"{GREEN}Ok{RESET}")
+
+        return imgs
 
 
 class Scanner:
@@ -620,6 +628,22 @@ class Scanner:
                 f.write(text)
 
             print(F"{DGREEN}Ok{RESET}")
+
+    def scanAsImgs(self):
+        file = self.input_file
+        mc = MakeConversion(file)
+        img_objs = mc.doc2image()
+        # print(img_objs)
+        from .OCRTextExtractor import ExtractText
+        text = ''
+        for i in img_objs:
+            extract = ExtractText(i)
+            tx = extract.OCR()
+            if tx is not None:
+                text += tx
+        print(text)
+        print(f"{GREEN}Ok{RESET}")
+        return text
 
 
 class FileSynthesis:
