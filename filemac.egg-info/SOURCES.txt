@@ -3,6 +3,7 @@ MANIFEST.ini
 README.md
 setup.py
 version.txt
+.github/workflows/python-publish.yml
 __pycache__/Analyzer.cpython-311.pyc
 __pycache__/AudioExtractor.cpython-311.pyc
 __pycache__/OCRTextExtractor.cpython-311.pyc
