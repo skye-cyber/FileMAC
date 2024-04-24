@@ -6,6 +6,7 @@ moviepy
 numpy
 opencv-python
 pandas
+pdf2docx
 pdf2image
 pdfminer.six
 pydub

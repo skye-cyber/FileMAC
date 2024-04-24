@@ -1,7 +1,7 @@
 #############################################################################
 import logging
 import logging.handlers
-import math
+# import math
 import os
 import re
 import sqlite3
@@ -146,7 +146,7 @@ to {word_file}{RESET}")
                 print("\nExiting..")
                 sys.exit(1)
             except Exception as e:
-                logger.info(f'{DRED}mAll conversion attempts have failed: \
+                logger.info(f'{DRED}All conversion attempts have failed: \
 {e}{RESET}')
 
 ###############################################################################
@@ -215,7 +215,7 @@ to {word_file}{RESET}")
 
                 # Save the PowerPoint presentation
                 prs.save(pptx_file)
-                print("\n{DGREEN}Done{RESET}")
+                print(f"\n{DGREEN}Done{RESET}")
             except KeyboardInterrupt:
                 print("\nExiting")
                 sys.exit(1)
@@ -247,6 +247,7 @@ to {word_file}{RESET}")
                     for paragraph in doc.paragraphs:
                         f.write(paragraph.text + '\n')
                         Par += 1
+
                         print(f"Par:{BLUE}{Par}/{len(doc.paragraphs)}{RESET}", end='\r')
                     logger.info(f"{DMAGENTA}Conversion of file to txt success{RESET}")
 
@@ -550,15 +551,19 @@ lines {RESET}", end="\n")
             except Exception as e:
                 logger.error(f"{e}")
 
+###############################################################################
+# Create image objects from given files
+###############################################################################
     def doc2image(self, outf="png"):
         outf_list = ['png', 'jpg']
         if outf not in outf_list:
             outf = "png"
         path_list = self.preprocess()
-        ls = ["pdf"]
+        ls = ["pdf", "doc", "docx"]
         file_list = [
             item for item in path_list if any(item.lower().endswith(ext)
                                               for ext in ls)]
+        imgs = []
         for file in file_list:
             if file.lower().endswith("pdf"):
                 # Convert the PDF to a list of PIL image objects
@@ -570,8 +575,12 @@ lines {RESET}", end="\n")
                 print(f"{YELLOW}Target images{BLUE} {len(images)}{RESET}")
                 for i, image in enumerate(images):
                     print(f"{DBLUE}{i}{RESET}", end="\r")
-                    image.save(f"{fname}_{i+1}.{outf}")
-                print(f"{GREEN}mOk{RESET}")
+                    yd = f"{fname}_{i+1}.{outf}"
+                    image.save(yd)
+                    imgs.append(yd)
+            print(f"{GREEN}Ok{RESET}")
+
+        return imgs
 
 
 class Scanner:
@@ -597,7 +606,7 @@ class Scanner:
         pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
 
         for pdf in pdf_list:
-            out_f = pdf[:-4]
+            out_f = pdf[:-3] + 'txt'
             print(f"{YELLOW}Read pdf ..{RESET}")
 
             with open(pdf, 'rb') as f:
@@ -620,12 +629,28 @@ class Scanner:
 
             print(F"{DGREEN}Ok{RESET}")
 
+    def scanAsImgs(self):
+        file = self.input_file
+        mc = MakeConversion(file)
+        img_objs = mc.doc2image()
+        # print(img_objs)
+        from .OCRTextExtractor import ExtractText
+        text = ''
+        for i in img_objs:
+            extract = ExtractText(i)
+            tx = extract.OCR()
+            if tx is not None:
+                text += tx
+        print(text)
+        print(f"{GREEN}Ok{RESET}")
+        return text
+
 
 class FileSynthesis:
 
     def __init__(self, input_file):
         self.input_file = input_file
-        # self.CHUNK_SIZE = 20000
+        # self.CHUNK_SIZE = 20_000
 
     def preprocess(self):
         files_to_process = []
@@ -641,53 +666,62 @@ class FileSynthesis:
         return files_to_process
 
     @staticmethod
-    def join_audios(path, output_file):
+    def join_audios(files, output_file):
         masterfile = output_file + "_master.mp3"
         print(
             f"{DBLUE}Create a master file {DMAGENTA}{masterfile}{RESET}", end='\r')
         # Create a list to store files
         ogg_files = []
         # loop through the directory while adding the ogg files to the list
-        for filename in os.listdir(path):
-            if filename.endswith('.ogg'):
-                ogg_file = os.path.join(path, filename)
-                ogg_files.append(AudioSegment.from_file(ogg_file))
+        print(files)
+        for filename in files:
+            print(f"Join {DBLUE}{len(files)}{RESET} files")
+            # if filename.endswith('.ogg'):
+            # ogg_file = os.path.join(path, filename)
+            ogg_files.append(AudioSegment.from_file(filename))
 
         # Concatenate the ogg files
         combined_ogg = ogg_files[0]
-        for i in range(1, len(ogg_files)):
+        for i in range(1, len(files)):
             combined_ogg += ogg_files[i]
 
         # Export the combined ogg to new mp3 file or ogg file
-        combined_ogg.export(output_file + "_master.mp3", format='mp3')
+        combined_ogg.export(output_file + "_master.ogg", format='ogg')
         print(F"{DGREEN}Master file:Ok                                                                             {RESET}")
 
-    def Synthesise(self, text: str, output_file: str = None, ogg_folder: str = 'tempfile', retries: int = 3) -> None:
+    def Synthesise(self, text: str, output_file: str, CHUNK_SIZE: int = 20_000, ogg_folder: str = 'tempfile', retries: int = 5) -> None:
         """Converts given text to speech using Google Text-to-Speech API."""
+        out_ls = []
         try:
             if not os.path.exists(ogg_folder):
                 os.mkdir(ogg_folder)
-            print("\033[1;93mGet initial net speed..{RESET}")
+            print(f"{DYELLOW}Get initial net speed..{RESET}")
             st = speedtest.Speedtest()  # get initial network speed
             st.get_best_server()
             download_speed: float = st.download()  # Keep units as bytes
             logger.info(
+
                 f"{GREEN} Conversion to mp3 sequence initialized start\
-speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
+speed {CYAN}{download_speed/1_000_000:.2f}Kbps{RESET}")
 
             for attempt in range(retries):
                 try:
                     '''Split input text into smaller parts and generate
                     individual gTTS objects'''
-                    for i in range(0, len(text), self.CHUNK_SIZE):
-                        chunk = text[i:i+self.CHUNK_SIZE]
-                        for i in range(0, math.ceil(len(text)/self.CHUNK_SIZE)):
-                            output_filename = f"{output_file}_{i}.ogg"
-                            if os.path.exists(output_filename):
-                                output_filename = f"{output_file}_{i+1}.ogg"
+                    counter = 0
+                    for i in range(0, len(text), CHUNK_SIZE):
+                        chunk = text[i:i+CHUNK_SIZE]
+                        output_filename = f"{output_file}_{counter}.ogg"
+                        counter += 1
+                        # print(output_filename)
+                        if os.path.exists(output_filename):
+                            output_filename = f"{output_file}_{counter+1}.ogg"
+                        # print(output_filename)
                         tts = gTTS(text=chunk, lang='en', slow=False)
                         tts.save(output_filename)
-
+                        out_ls.append(output_filename)
+                    break
+                    # print(out_ls)
                     '''Handle any network related issue gracefully'''
                 except Exception in (ConnectionError, ConnectionAbortedError,
                                      ConnectionRefusedError,
@@ -699,7 +733,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
                 except requests.exceptions.RequestException as e:
                     logger.error(f"{e}")
                 except Exception as e:
-                    logger.error(f'{DRED}m Error during conversion attempt \
+                    logger.error(f'{DRED} Error during conversion attempt \
 {attempt+1}/{retries}:{e}{RESET}')
                     tb = traceback.extract_tb(sys.exc_info()[2])
                     logger.info("\n".join([f"  > {line}"
@@ -710,15 +744,19 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
             if attempt >= retries:
                 logger.error(
                     f"Conversion unsuccessful after {retries} attempts.")
+                sys.exit(2)
 
         finally:
+            # print(out_ls)
             # Combine generated gTTS objects
-            FileSynthesis.join_audios(ogg_folder, output_file)
+            if len(out_ls) >= 1:
+                FileSynthesis.join_audios(out_ls, output_file)
 
             st = speedtest.Speedtest()
             logger.info("Done")
             print("Get final speed ...")
             logger.info(
+
                 f"{YELLOW}Final Network Speed: {st.download()/(10**6):.2f} Kbps{RESET}")
 
     @staticmethod
@@ -733,10 +771,11 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
                 for page_num in range(len(pdf_reader.pages)):
                     page = pdf_reader.pages[page_num]
                     text += page.extract_text()
+                print(F"{DGREEN}Ok{RESET}")
                 return text
         except Exception as e:
             logger.error(
-                f"{DRED}mFailed to extract text from '{YELLOW}{pdf_path}'{RESET}:\n {e}")
+                f"{DRED}Failed to extract text from '{YELLOW}{pdf_path}'{RESET}:\n {e}")
 
     @staticmethod
     def text_file(input_file):
@@ -748,7 +787,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
             logger.error("File '{}' was not found.".format(input_file))
         except Exception as e:
             logger.error(
-                F"{DRED}mError converting {input_file} to text: {str(e)}\
+                F"{DRED}Error converting {input_file} to text: {str(e)}\
 {RESET}")
 
     @staticmethod
@@ -762,7 +801,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
             logger.error(f"File '{docx_path}' was not found.")
         except Exception as e:
             logger.error(
-                F"{DRED}mError converting {docx_path} to text: {e}\
+                F"{DRED}Error converting {docx_path} to text: {e}\
 {RESET}")
 
     '''Handle input files based on type to initialize conversion sequence'''
@@ -771,7 +810,7 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
         input_list = self.preprocess()
         extdoc = ["docx", "doc"]
         ls = {"pdf", "docx", "doc", "txt"}
-        input_list = [item for item in input_list if item.lower().endswith(ls)]
+        input_list = [item for item in input_list if item.lower().endswith(tuple(ls))]
         for input_file in input_list:
             if input_file.endswith('.pdf'):
                 text = FileSynthesis.pdf_to_text(input_file)
@@ -790,9 +829,8 @@ speed \033[36m{download_speed/1_000_000:.2f}Kbps{RESET}")
                 logger.error('Unsupported file format. Please provide \
 a PDF, txt, or Word document.')
                 sys.exit(1)
-
             try:
-                FileSynthesis.Synthesise(text, output_file)
+                FileSynthesis.Synthesise(None, text, output_file)
             except KeyboardInterrupt:
                 sys.exit(1)
 

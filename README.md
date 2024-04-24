@@ -5,25 +5,12 @@ analyzes files, manipulates files.
 Your can also convert text file to mp3 formart using google Text to speech library (gTTS).
 
 ## Installation
-
-1. Clone the repository:
-
-   ```shell
-   git clone https://github.com/skye-cyber/FileMAC
-   ```
-
-
-2. Navigate to the project directory:
+1. using pip
 
    ```shell
-   cd FileMAC
+	pip install filemac
    ```
-
-3. Install the package:
-   ```shell
-   pip install ./
-   ```
-or simply install with pip
+2. Install from github
 
     ```shell
     pip install git+https://github.com/skye-cyber/FileMAC.git
@@ -117,7 +104,7 @@ the output file assumes the base name of the input file but the extension confor
                 `1`.JPEG: `.jpg`
                 `2`.PNG": `.png`
                 `3`.GIF": `.gif`
-                `4`.BM":  `bmp`
+                `4`.BM":  `.bmp`
                 `5`.TIFF: `.tiff`
                 `6`.EXR   `.exr`
                 `7`.PDF:  `.pdf`

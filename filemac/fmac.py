@@ -13,6 +13,7 @@ from .converter import (AudioConverter, FileSynthesis, ImageConverter,
 from .formats import (SUPPORTED_AUDIO_FORMATS_SHOW, SUPPORTED_DOC_FORMATS,
                       SUPPORTED_IMAGE_FORMATS_SHOW,
                       SUPPORTED_VIDEO_FORMATS_SHOW)
+from .image_op import Compress_Size
 from .OCRTextExtractor import ExtractText
 from .Simple_v_Analyzer import SA
 
@@ -103,6 +104,7 @@ def main():
         example {DYELLOW}filemac --convert_image example.jpg -t png{RESET}")
 
     parser.add_argument(
+
         "--convert_doc2image", help=f"Convert documents to images ie png to jpg.\
         example {DYELLOW}filemac --convert_doc2image example.pdf -t png{RESET}")
 
@@ -118,8 +120,19 @@ def main():
                         help="Target format for conversion (optional)")
 
     parser.add_argument(
-        "--scan", help=f"Scan pdf file and extract text\
+        "--resize_image", help=f"change size of an image compress/decompress \
+        example {DYELLOW}filemac --resize_image example.png -t png {RESET}")
+
+    parser.add_argument("-t_size", help="used in combination with resize_image \
+                        to specify target image size")
+
+    parser.add_argument(
+        "-S", "--scan", help=f"Scan pdf file and extract text\
                         example {DYELLOW}filemac --scan example.pdf {RESET}")
+
+    parser.add_argument(
+        "-SA", "--scanAsImg", help=f"Scan pdf file and extract text\
+                        example {DYELLOW}filemac --scanAsImg example.pdf {RESET}")
 
     parser.add_argument("--OCR", help=f"Extract text from an image.\
         example {DYELLOW}filemac --OCR image.png{RESET}")
@@ -152,6 +165,11 @@ def main():
         conv = ImageConverter(args.convert_image, args.target_format)
         conv.convert_image()
 
+# Handle image resizing
+    elif args.resize_image:
+        res = Compress_Size(args.resize_image)
+        res.resize_image(args.t_size)
+
 # Handle documents to images conversion
     elif args.convert_doc2image:
         conv = MakeConversion(args.convert_doc2image)
@@ -175,10 +193,16 @@ def main():
     elif args.scan:
         sc = Scanner(args.scan)
         sc.scanPDF()
+
+# Call module to scan the input FILE as image object and extract text
+    elif args.scanAsImg:
+        sc = Scanner(args.scanAsImg)
+        tx = sc.scanAsImgs()
 # Call module to handle Candidate images for text extraction inputs before begining conversion
     elif args.OCR:
         conv = ExtractText(args.OCR)
         conv.OCR()
+
     elif args.Analyze_video:
         analyzer = SA(args.Analyze_video)
         analyzer.SimpleAnalyzer()

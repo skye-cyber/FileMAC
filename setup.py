@@ -12,6 +12,12 @@ def sri():
             print("Requirement poppler-utils installing")
             subprocess.run(['sudo', 'apt', 'install', 'poppler-utils'])
 
+        result = subprocess.run(
+                        ['dpkg', '-l', 'speedtest-cli'], stdout=subprocess.PIPE, text=True)
+        if result.returncode != 0:
+            print("Requirement speedtest-cli -> installing")
+            subprocess.run(['sudo', 'apt', 'install', 'speedtest-cli'])
+
 
 DESCRIPTION = 'Open source Python CLI toolkit for conversion, manipulation, Analysis'
 EXCLUDE_FROM_PACKAGES = ["build", "dist", "test"]
@@ -49,6 +55,7 @@ setup(
         'opencv-python',
         'pytesseract',
         'PyPDF2',
+        'pdf2docx',
         'requests',
         'moviepy',
         'reportlab',
@@ -73,7 +80,6 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: Implementation :: PyPi",
     ],
 
 
