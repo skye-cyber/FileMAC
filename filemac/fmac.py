@@ -131,6 +131,10 @@ def main():
                         example {DYELLOW}filemac --scan example.pdf {RESET}")
 
     parser.add_argument(
+        "-pdf2L", "--doc_long_image", help=f"Convert pdf file to long image\
+                        example {DYELLOW}filemac --pdf_long_image example.pdf {RESET}")
+
+    parser.add_argument(
         "-SA", "--scanAsImg", help=f"Scan pdf file and extract text\
                         example {DYELLOW}filemac --scanAsImg example.pdf {RESET}")
 
@@ -151,7 +155,7 @@ def main():
 
 # Call function to handle video conversion inputs before begining conversion
     elif args.convert_video:
-        if args.convert_video == 'help' or args.convert_video is None:
+        if args.convert_video == 'help':
             print(SUPPORTED_VIDEO_FORMATS_SHOW)
             sys.exit(1)
         ev = VideoConverter(args.convert_video, args.target_format)
@@ -159,7 +163,7 @@ def main():
 # Call function to handle image conversion inputs before begining conversion
 
     elif args.convert_image:
-        if args.convert_image == 'help' or args.convert_image is None:
+        if args.convert_image == 'help':
             print(SUPPORTED_IMAGE_FORMATS_SHOW)
             sys.exit(1)
         conv = ImageConverter(args.convert_image, args.target_format)
@@ -177,7 +181,7 @@ def main():
 
 # Call function to handle audio conversion inputs before begining conversion
     elif args.convert_audio:
-        if args.convert_audio == 'help' or args.convert_audio is None:
+        if args.convert_audio == 'help':
             print(SUPPORTED_AUDIO_FORMATS_SHOW)
             sys.exit(1)
         ev = AudioConverter(args.convert_audio, args.target_format)
@@ -197,7 +201,12 @@ def main():
 # Call module to scan the input FILE as image object and extract text
     elif args.scanAsImg:
         sc = Scanner(args.scanAsImg)
-        tx = sc.scanAsImgs()
+        sc.scanAsImgs()
+
+    elif args.doc_2long_image:
+        from .longImg import LImage
+        conv = LImage(args.pdf_long_image)
+        conv.preprocess()
 # Call module to handle Candidate images for text extraction inputs before begining conversion
     elif args.OCR:
         conv = ExtractText(args.OCR)
