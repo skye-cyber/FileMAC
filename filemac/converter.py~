@@ -95,7 +95,6 @@ class MakeConversion:
 
             pdf_file_dir = os.path.dirname(word_file)
             pdf_file = os.path.abspath(pdf_file_dir + '/' + (word_file.split('/')[-1].split('.')[0]) + '.pdf')
->>>>>>> 17889de (improv2)
 
             try:
                 print(
@@ -650,10 +649,13 @@ class Scanner:
 
     def scanAsLongImg(self):
         file = self.input_file
-        from .longImg import pdf_2L_Img
-        LImg = pdf_2L_Img(file)
+        from .longImg import LImage
+        LI = LImage(file)
+        fl = LI.preprocess()
         from .OCRTextExtractor import ExtractText
-        text = ExtractText(LImg)
+        fpath = file.split('.')[0] + '.png'
+        tx = ExtractText(fl)
+        text = tx.OCR()
         print(text)
         print(f"{GREEN}Ok{RESET}")
         return text

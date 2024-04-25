@@ -7,7 +7,7 @@ import sys
 
 from . import handle_warnings
 from .AudioExtractor import ExtractAudio
-from .colors import (RESET, DYELLOW)
+from .colors import CYAN, DYELLOW, RESET
 from .converter import (AudioConverter, FileSynthesis, ImageConverter,
                         MakeConversion, Scanner, VideoConverter)
 from .formats import (SUPPORTED_AUDIO_FORMATS_SHOW, SUPPORTED_DOC_FORMATS,
@@ -139,6 +139,11 @@ def main():
         "-SA", "--scanAsImg", help=f"Scan pdf file and extract text\
                         example {DYELLOW}filemac --scanAsImg example.pdf {RESET}")
 
+    parser.add_argument(
+        "-SALI", "--scanAsLong_Image", help=f"Scan {CYAN}[doc, docx, pdf]\
+        {RESET} file and extract text,-> very effective\
+                    example {DYELLOW}filemac - -scanAsImg example.pdf {RESET}")
+
     parser.add_argument("--OCR", help=f"Extract text from an image.\
         example {DYELLOW}filemac --OCR image.png{RESET}")
 
@@ -203,6 +208,12 @@ def main():
     elif args.scanAsImg:
         sc = Scanner(args.scanAsImg)
         sc.scanAsImgs()
+
+# Call module to scan the input FILE as long image object and extract text
+# effective for text intengration(combining)
+    elif args.scanAsLong_Image:
+        sc = Scanner(args.scanAsLong_Image)
+        sc.scanAsLongImg()
 
 # convert document to long image
     elif args.doc_long_image:

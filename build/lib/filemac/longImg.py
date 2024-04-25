@@ -18,12 +18,14 @@ class LImage:
         doc = self.doc
         ext = doc.split('.')[-1].lower()
         if ext == "pdf":
-            LImage.pdf_2L_Img(doc)
+            LI = LImage.pdf_2L_Img(doc)
+            return LI
         if ext == 'doc' or ext == 'docx':
             conv = MakeConversion(doc)
-            path = conv.word_to_pdf()
-            LImage.pdf_2L_Img(path)
 
+            path = conv.word_to_pdf()
+            LI = LImage.pdf_2L_Img(path)
+            return LI
         elif ext == 'odt':
             # pdf_file = ext = doc.split('.')[0] + 'docx'
             print(f"{DCYAN}Call soffice and wait ..{RESET}")
@@ -32,9 +34,8 @@ class LImage:
                                         doc)])
             pdf_file = os.path.abspath(os.path.dirname(
                 doc) + '/' + (doc.split('/')[-1].split('.')[0]) + '.pdf')
-            LImage.pdf_2L_Img(pdf_file)
-        else:
-            print(f"Unsupported format: {ext}")
+            LI = LImage.pdf_2L_Img(pdf_file)
+            return LI
 
     @staticmethod
     def pdf_2L_Img(pdf_file):
@@ -56,8 +57,7 @@ class LImage:
             print(f"{DYELLOW}Save dest: {DMAGENTA}{out_img}{RESET}")
             new_im.save(out_img)
             print(f"{DGREEN}Done{RESET}")
-            sys.exit()
-            return new_im
+            return out_img
         except FileNotFoundError:
             print(f"{RED}File not found!{RESET}")
         except KeyboardInterrupt:

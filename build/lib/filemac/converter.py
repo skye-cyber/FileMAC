@@ -29,11 +29,7 @@ from PIL import Image
 from pptx import Presentation
 from pydub import AudioSegment
 from .colors import (RESET, GREEN, DGREEN, YELLOW, DYELLOW, CYAN, BLUE, DBLUE,
-<<<<<<< HEAD
-                     MAGENTA, DMAGENTA, RED, DRED, ICYAN)
-=======
                      DMAGENTA, DRED, ICYAN)
->>>>>>> 17889de (improv2)
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate
 
@@ -96,15 +92,9 @@ class MakeConversion:
         word_list = [
             item for item in word_list if any(item.lower().endswith(ext) for ext in ls)]
         for word_file in word_list:
-<<<<<<< HEAD
-            if word_file.lower().endswith("doc"):
-                pdf_file = word_file[:-3] + "pdf"
-            elif word_file.lower().endswith("docx"):
-                pdf_file = word_file[:-4] + "pdf"
-=======
+
             pdf_file_dir = os.path.dirname(word_file)
             pdf_file = os.path.abspath(pdf_file_dir + '/' + (word_file.split('/')[-1].split('.')[0]) + '.pdf')
->>>>>>> 17889de (improv2)
 
             try:
                 print(
@@ -118,12 +108,9 @@ class MakeConversion:
                             "Please install libreoffice to use this functionality !")
                         sys.exit(1)
                     subprocess.run(['soffice', '--convert-to',
-<<<<<<< HEAD
-                                   'pdf', word_file, pdf_file])
-=======
+
                                    'pdf', word_file, '--outdir', pdf_file_dir])
                     return pdf_file
->>>>>>> 17889de (improv2)
                     # print(f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}")
                 elif os.name == "nt":
                     try:
@@ -134,10 +121,7 @@ class MakeConversion:
                     convert(word_file, pdf_file)
                     print(
                         f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}")
-<<<<<<< HEAD
-=======
                     return pdf_file
->>>>>>> 17889de (improv2)
 
             except Exception as e:
                 print(f"Error converting {word_file} to {pdf_file}: {e}")
@@ -663,19 +647,19 @@ class Scanner:
         print(f"{GREEN}Ok{RESET}")
         return text
 
-<<<<<<< HEAD
-=======
     def scanAsLongImg(self):
         file = self.input_file
-        from .longImg import pdf_2L_Img
-        LImg = pdf_2L_Img(file)
+        from .longImg import LImage
+        LI = LImage(file)
+        fl = LI.preprocess()
         from .OCRTextExtractor import ExtractText
-        text = ExtractText(LImg)
+        fpath = file.split('.')[0] + '.png'
+        tx = ExtractText(fl)
+        text = tx.OCR()
         print(text)
         print(f"{GREEN}Ok{RESET}")
         return text
 
->>>>>>> 17889de (improv2)
 
 class FileSynthesis:
 

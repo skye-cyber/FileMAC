@@ -1,5 +1,2 @@
-<<<<<<< HEAD
 build
-=======
->>>>>>> 17889de (improv2)
 filemac
