@@ -134,6 +134,7 @@ def main():
 
         "-doc2L", "--doc_long_image", help=f"Convert pdf file to long image\
                         example {DYELLOW}filemac --doc_long_image example.pdf {RESET}")
+>>>>>>> 17889de (improv2)
 
     parser.add_argument(
         "-SA", "--scanAsImg", help=f"Scan pdf file and extract text\

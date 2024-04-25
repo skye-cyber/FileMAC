@@ -92,10 +92,9 @@ class MakeConversion:
         word_list = [
             item for item in word_list if any(item.lower().endswith(ext) for ext in ls)]
         for word_file in word_list:
-            if word_file.lower().endswith("doc"):
-                pdf_file = word_file[:-3] + "pdf"
-            elif word_file.lower().endswith("docx"):
-                pdf_file = word_file[:-4] + "pdf"
+
+            pdf_file_dir = os.path.dirname(word_file)
+            pdf_file = os.path.abspath(pdf_file_dir + '/' + (word_file.split('/')[-1].split('.')[0]) + '.pdf')
 
             try:
                 print(
@@ -109,7 +108,8 @@ class MakeConversion:
                             "Please install libreoffice to use this functionality !")
                         sys.exit(1)
                     subprocess.run(['soffice', '--convert-to',
-                                   'pdf', word_file, pdf_file])
+
+                                   'pdf', word_file, '--outdir', pdf_file_dir])
                     return pdf_file
                     # print(f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}")
                 elif os.name == "nt":

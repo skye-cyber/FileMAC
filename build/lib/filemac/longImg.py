@@ -21,7 +21,6 @@ class LImage:
             LImage.pdf_2L_Img(doc)
         if ext == 'doc' or ext == 'docx':
             conv = MakeConversion(doc)
-
             path = conv.word_to_pdf()
             LImage.pdf_2L_Img(path)
 

@@ -131,6 +131,13 @@ def main():
                         example {DYELLOW}filemac --scan example.pdf {RESET}")
 
     parser.add_argument(
+<<<<<<< HEAD
+=======
+        "-doc2L", "--doc_long_image", help=f"Convert pdf file to long image\
+                        example {DYELLOW}filemac --doc_long_image example.pdf {RESET}")
+
+    parser.add_argument(
+>>>>>>> 17889de (improv2)
         "-SA", "--scanAsImg", help=f"Scan pdf file and extract text\
                         example {DYELLOW}filemac --scanAsImg example.pdf {RESET}")
 
@@ -151,7 +158,11 @@ def main():
 
 # Call function to handle video conversion inputs before begining conversion
     elif args.convert_video:
+<<<<<<< HEAD
         if args.convert_video == 'help' or args.convert_video is None:
+=======
+        if args.convert_video == 'help':
+>>>>>>> 17889de (improv2)
             print(SUPPORTED_VIDEO_FORMATS_SHOW)
             sys.exit(1)
         ev = VideoConverter(args.convert_video, args.target_format)
@@ -159,7 +170,11 @@ def main():
 # Call function to handle image conversion inputs before begining conversion
 
     elif args.convert_image:
+<<<<<<< HEAD
         if args.convert_image == 'help' or args.convert_image is None:
+=======
+        if args.convert_image == 'help':
+>>>>>>> 17889de (improv2)
             print(SUPPORTED_IMAGE_FORMATS_SHOW)
             sys.exit(1)
         conv = ImageConverter(args.convert_image, args.target_format)
@@ -177,7 +192,11 @@ def main():
 
 # Call function to handle audio conversion inputs before begining conversion
     elif args.convert_audio:
+<<<<<<< HEAD
         if args.convert_audio == 'help' or args.convert_audio is None:
+=======
+        if args.convert_audio == 'help':
+>>>>>>> 17889de (improv2)
             print(SUPPORTED_AUDIO_FORMATS_SHOW)
             sys.exit(1)
         ev = AudioConverter(args.convert_audio, args.target_format)
@@ -197,7 +216,17 @@ def main():
 # Call module to scan the input FILE as image object and extract text
     elif args.scanAsImg:
         sc = Scanner(args.scanAsImg)
+<<<<<<< HEAD
         tx = sc.scanAsImgs()
+=======
+        sc.scanAsImgs()
+
+# convert document to long image
+    elif args.doc_long_image:
+        from .longImg import LImage
+        conv = LImage(args.doc_long_image)
+        conv.preprocess()
+>>>>>>> 17889de (improv2)
 # Call module to handle Candidate images for text extraction inputs before begining conversion
     elif args.OCR:
         conv = ExtractText(args.OCR)

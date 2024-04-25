@@ -23,6 +23,10 @@ filemac/fmac.py
 filemac/formats.py
 filemac/handle_warnings.py
 filemac/image_op.py
+<<<<<<< HEAD
+=======
+filemac/longImg.py
+>>>>>>> 17889de (improv2)
 filemac.egg-info/PKG-INFO
 filemac.egg-info/SOURCES.txt
 filemac.egg-info/dependency_links.txt
