@@ -29,7 +29,7 @@ from PIL import Image
 from pptx import Presentation
 from pydub import AudioSegment
 from .colors import (RESET, GREEN, DGREEN, YELLOW, DYELLOW, CYAN, BLUE, DBLUE,
-                     MAGENTA, DMAGENTA, RED, DRED, ICYAN)
+                     DMAGENTA, DRED, ICYAN)
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate
 
@@ -110,6 +110,7 @@ class MakeConversion:
                         sys.exit(1)
                     subprocess.run(['soffice', '--convert-to',
                                    'pdf', word_file, pdf_file])
+                    return pdf_file
                     # print(f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}")
                 elif os.name == "nt":
                     try:
@@ -120,6 +121,7 @@ class MakeConversion:
                     convert(word_file, pdf_file)
                     print(
                         f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}")
+                    return pdf_file
 
             except Exception as e:
                 print(f"Error converting {word_file} to {pdf_file}: {e}")
@@ -641,6 +643,16 @@ class Scanner:
             tx = extract.OCR()
             if tx is not None:
                 text += tx
+        print(text)
+        print(f"{GREEN}Ok{RESET}")
+        return text
+
+    def scanAsLongImg(self):
+        file = self.input_file
+        from .longImg import pdf_2L_Img
+        LImg = pdf_2L_Img(file)
+        from .OCRTextExtractor import ExtractText
+        text = ExtractText(LImg)
         print(text)
         print(f"{GREEN}Ok{RESET}")
         return text
