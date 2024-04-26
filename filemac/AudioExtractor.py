@@ -3,6 +3,7 @@ import sys
 from moviepy.editor import VideoFileClip
 import logging
 import logging.handlers
+from .colors import RED, RESET, DCYAN, DYELLOW
 ###############################################################################
 logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
 logger = logging.getLogger(__name__)
@@ -20,7 +21,7 @@ class ExtractAudio:
                 files_to_process.append(self.input_file)
             elif os.path.isdir(self.input_file):
                 if os.listdir(self.input_file) is None:
-                    print("Cannot work with empty folder")
+                    print(f"{RED}Cannot work with empty folder{RESET}")
                     sys.exit(1)
                 for file in os.listdir(self.input_file):
                     file_path = os.path.join(self.input_file, file)
@@ -36,7 +37,7 @@ class ExtractAudio:
         try:
             video_list = self.preprocess()
             for input_video in video_list:
-                print("\033[1;33mExtracting..\033[1;36m")
+                print(F"{DYELLOW}Extracting..{DCYAN}")
                 video = VideoFileClip(input_video)
                 audio = video.audio
                 basename, _ = os.path.splitext(input_video)

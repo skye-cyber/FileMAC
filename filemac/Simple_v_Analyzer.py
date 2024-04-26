@@ -1,6 +1,7 @@
 import sys
 import cv2
 import numpy as np
+from .colors import DYELLOW, RESET, DCYAN, DGREEN
 
 
 class SA:
@@ -12,13 +13,13 @@ class SA:
         try:
             # Read the video file
             cap = cv2.VideoCapture(self.video)
-            print("\033[1;33mInitializing..\033[0m")
+            print(f"{DYELLOW}Initializing..{RESET}")
             # Initialize variables
             frame_count = 0
             total_area = 0
             duration = 0
 
-            print("\033[1;36mWorking on it")
+            print(f"{DCYAN}mWorking on it{RESET}")
             while True:
                 ret, frame = cap.read()
 
@@ -44,9 +45,9 @@ class SA:
             cv2.destroyAllWindows()
 
             # Print results
-            print(f"Total Frames: \033[1;32m{frame_count}\033[0m")
-            print(f"Average Frame Area: \033[1;32m{total_area / frame_count}\033[0m")
-            print(f"Duration: \033[1;32m{duration}\033[0m seconds")
+            print(f"Total Frames: {DGREEN}{frame_count}{RESET}")
+            print(f"Average Frame Area: {DGREEN}{total_area / frame_count}{RESET}")
+            print(f"Duration: {DGREEN}{duration}{RESET} seconds")
         except KeyboardInterrupt:
             print("\nExiting")
             sys.exit(1)

@@ -16,9 +16,11 @@ if os.name == "posix":
     DBLUE = '\033[1;94m'
     MAGENTA = '\033[95m'
     DMAGENTA = '\033[1;95m'
+    FMAGENTA = '\033[3;95m'
     CYAN = '\033[96m'
     DCYAN = '\033[1;96m'
     ICYAN = '\033[3;96m'
+    BBWHITE = '\033[5;97;1m'
 
 elif os.name == "nt":
     RESET = Style.RESET_ALL
@@ -32,9 +34,11 @@ elif os.name == "nt":
     DBLUE = Fore.BLUE
     MAGENTA = Fore.LIGHTMAGENTA_EX
     DMAGENTA = Fore.MAGENTA
+    FMAGENTA = Fore.LIGHTMAGENTA_EX
     CYAN = Fore.LIGHTCYAN_EX
     DCYAN = Fore.CYAN
     ICYAN = Fore.WHITE
+    BWHITE = Fore.WHITE
 
-#return RESET, RED, DRED, GREEN, DGREEN, YELLOW, DYELLOW, BLUE, DBLUE,
-#MAGENTA, DMAGENTA, CYAN, DCYAN
+# return RESET, RED, DRED, GREEN, DGREEN, YELLOW, DYELLOW, BLUE, DBLUE,
+# MAGENTA, DMAGENTA, CYAN, DCYAN
