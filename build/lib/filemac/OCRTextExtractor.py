@@ -5,6 +5,8 @@ import pytesseract
 from PIL import Image
 import logging
 import logging.handlers
+from .colors import (RESET, RED, DGREEN, BBWHITE, DYELLOW, CYAN,
+                     FMAGENTA)
 ###############################################################################
 logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
 logger = logging.getLogger(__name__)
@@ -28,7 +30,7 @@ class ExtractText:
             files_to_process.append(self.input_file)
         elif os.path.isdir(self.input_file):
             if os.listdir(self.input_file) is None:
-                print("Cannot work with empty folder")
+                print(f"{RED}Cannot work with empty folder{RESET}")
                 sys.exit(1)
             for file in os.listdir(self.input_file):
                 file_path = os.path.join(self.input_file, file)
@@ -48,7 +50,7 @@ class ExtractText:
             '''Load image using OpenCV'''
             img = cv2.imread(image_path)
 
-            logger.info(f"\033[2;95mprocessing {image_path}...\033[0m")
+            logger.info(f"{FMAGENTA}processing {image_path}...{RESET}")
 
             try:
                 '''Preprocess image for better OCR results'''
@@ -63,24 +65,24 @@ class ExtractText:
 
                 '''Remove extra whitespaces and newlines
                 text = ' '.join(text.split()).strip()'''
-                logger.info("\033[36mFound:\n\033[0m")
+                logger.info(F"{CYAN}Found:\n{RESET}")
                 print(text)
                 current_path = os.getcwd()
                 file_path = os.path.join(current_path, OCR_file)
                 ''' Save the extracted text to specified file '''
-                logger.info("\033[1;92mGenerating text file for the extracted \
-text..\033[0m")
+                logger.info(f"{DGREEN}Generating text file for the extracted \
+text..{RESET}")
 
                 with open(file_path, 'w') as file:
                     file.write(text)
                 logger.info(
-                    f"File saved as \033[1;93m{OCR_file}\033[0m:")
+                    f"File saved as {DYELLOW}{OCR_file}{RESET}:")
                 '''If there are multiple candidate images for text extraction,
                 wait for key press before proceeding to the next
                 image otherwise don't wait
                 size = [i for i in enumerate(image_list)]'''
                 if len(image_list) >= 2:
-                    input("\033[5;97mPress Enter to continue\033[0m")
+                    input(F"{BBWHITE}Press Enter to continue{RESET}")
             except KeyboardInterrupt:
                 print("\nExiting")
                 sys.exit(0)
@@ -89,11 +91,11 @@ text..\033[0m")
             except IOError as e:
                 logger.error(
                     f"Could not write to output file '{OCR_file}'. \
-Reason: {str(e)}\033[0m")
+Reason: {str(e)}{RESET}")
             except Exception as e:
                 logger.error(f"Error: {type(e).__name__}: {str(e)}")
             except Exception as e:
-                logger.error(f"Error:>>\033[31m{e}\033[0m")
+                logger.error(f"Error:>>{RED}{e}{RESET}")
             return text
 
         for image_path in image_list:

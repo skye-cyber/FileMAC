@@ -40,7 +40,7 @@ class LImage:
     @staticmethod
     def pdf_2L_Img(pdf_file):
         try:
-            print(f"{YELLOW}Read pdf ..{RESET}")
+            print(f"{DYELLOW}Read pdf{RESET}")
             images = convert_from_path(pdf_file)
             out_img = pdf_file[:-4] + '.png'
             heights = [img.size[1] for img in images]
@@ -56,12 +56,13 @@ class LImage:
                 y_offset += img.size[1]
             print(f"{DYELLOW}Save dest: {DMAGENTA}{out_img}{RESET}")
             new_im.save(out_img)
-            print(f"{DGREEN}Done{RESET}")
+            print(f"{DGREEN}Success😇✅{RESET}")
             return out_img
         except FileNotFoundError:
             print(f"{RED}File not found!{RESET}")
         except KeyboardInterrupt:
-            print("\nExiting")
+            print("\nQuit❕")
             sys.exit()
         except Exception as e:
             print(e)
+            sys.exit(1)

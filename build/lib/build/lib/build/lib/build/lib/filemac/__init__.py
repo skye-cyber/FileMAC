@@ -1,0 +1,1 @@
+from .fmac import main

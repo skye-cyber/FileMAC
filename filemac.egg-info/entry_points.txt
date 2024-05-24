@@ -1,2 +1,4 @@
 [console_scripts]
+FILEMAC = filemac:main
+Filemac = filemac:main
 filemac = filemac:main

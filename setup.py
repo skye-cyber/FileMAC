@@ -36,8 +36,11 @@ setup(
 
     entry_points={
         "console_scripts": [
-            "filemac=filemac:main"
-        ]},
+            "filemac=filemac:main",
+            "Filemac=filemac:main",
+            "FILEMAC=filemac:main",
+        ],
+    },
 
 
     python_requires=">=3.6",
@@ -81,6 +84,4 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
     ],
-
-
 )

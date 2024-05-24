@@ -121,7 +121,7 @@ def main():
 
     parser.add_argument(
         "--resize_image", help=f"change size of an image compress/decompress \
-        example {DYELLOW}filemac --resize_image example.png -t png {RESET}")
+        example {DYELLOW}filemac --resize_image example.png -t_size 2mb -t png {RESET}")
 
     parser.add_argument("-t_size", help="used in combination with resize_image \
                         to specify target image size")
@@ -142,7 +142,7 @@ def main():
     parser.add_argument(
         "-SALI", "--scanAsLong_Image", help=f"Scan {CYAN}[doc, docx, pdf]\
         {RESET} file and extract text,-> very effective\
-                    example {DYELLOW}filemac - -scanAsImg example.pdf {RESET}")
+                    example {DYELLOW}filemac --scanAsImg example.pdf {RESET}")
 
     parser.add_argument("--OCR", help=f"Extract text from an image.\
         example {DYELLOW}filemac --OCR image.png{RESET}")
