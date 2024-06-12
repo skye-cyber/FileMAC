@@ -1,8 +1,11 @@
 LICENSE
 MANIFEST.ini
 README.md
+README.md~
 setup.py
+setup.py~
 version.txt
+version.txt~
 .github/workflows/python-publish.yml
 __pycache__/Analyzer.cpython-311.pyc
 __pycache__/AudioExtractor.cpython-311.pyc
@@ -41,3 +44,4 @@ filemac/__pycache__/converter.cpython-311.pyc
 filemac/__pycache__/formats.cpython-311.pyc
 tets/dd.py
 tets/test.py
+tets/__pycache__/dd.cpython-311.pyc

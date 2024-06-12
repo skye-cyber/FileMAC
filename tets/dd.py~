@@ -18,7 +18,7 @@ def xls2csv(xls_file):
         csv_reader = csv.reader(xls_file, dialect='excel')
         for row in csv_reader:
             # csv_writer = csv.writer(csv_reader [, dialect='excel'])
-            csv.writer(_out_, row, dialect="excel")
+            csv.writer(_o, row, dialect="excel")
 
             # print(f"Row {current_row}/{total_rows} \{percentage:.1f}%", end="\r")
 

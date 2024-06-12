@@ -31,7 +31,7 @@ if os.name == "posix":
     CYAN = '\033[96m'  # Normal cyan
     DCYAN = '\033[1;96m'  # Deep CYAN
     FCYAN = '\033[2;96m'  # Faint cyan
-    ICYAN = '\033[3;96m'  # Indented CYAN
+    ICYAN = '\033[3;96m'  # Indented cyan
 
     BWHITE = '\033[1m'  # Bold white
     BBWHITE = '\033[5;97;1m'  # Bold Blinking white

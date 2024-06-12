@@ -30,7 +30,7 @@ try:
                                     text = page.extract_text()
                                     with open(master_file, 'a') as fl:
                                         fl.write(text).strip()'''
-                            scan = Scanner(__file__path)
+                                                        scan = Scanner(__file__path)
                             text = scan.scanAsLongImg()
                             text = text.strip()
                             with open(master_file, 'a') as fl:

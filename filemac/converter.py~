@@ -531,7 +531,7 @@ lines {RESET}", end="\n")
                 for i in range(101):
                     print(f"Progress: {i}%", end="\r")
                 '''Save the DataFrame to CSV'''
-                df.to_csv(csv_file, index=False)
+                df.to_csv(csv_file, index=True)
                 print(F"{DMAGENTA} Conversion successful{RESET}")
 
             except KeyboardInterrupt:
