@@ -25,7 +25,7 @@ if os.name == "posix":
     BLUE = '\033[94m'  # Normal BLUE
     DBLUE = '\033[1;94m'  # Deep BLUE
     FBLUE = '\033[2;94m'  # Faint Blue
-    ICYAN = '\033[3;96m'  # Indented BLUE
+    IBLUE = '\033[3;96m'  # Indented BLUE
 
     MAGENTA = '\033[95m'  # Normal MAGENTA
     DMAGENTA = '\033[1;95m'  # Deep MAGENTA
@@ -46,18 +46,22 @@ elif os.name == "nt":
     RED = Fore.LIGHTRED_EX
     DRED = Fore.RED
     FRED = Fore.RED
+    IRED = Fore.RED
 
     GREEN = Fore.LIGHTGREEN_EX
     DGREEN = Fore.GREEN
     FGREEN = Fore.GREEN
+    IGREEN = Fore.GREEN
 
     YELLOW = Fore.LIGHTYELLOW_EX
     FYELLOW = Fore.YELLOW
     DYELLOW = Fore.YELLOW
+    IYELLOW = Fore.YELLOW
 
     BLUE = Fore.LIGHTBLUE_EX
     DBLUE = Fore.BLUE
     FBLUE = Fore.BLUE
+    1BLUE = Fore.BLUE
 
     MAGENTA = Fore.LIGHTMAGENTA_EX
     DMAGENTA = Fore.MAGENTA

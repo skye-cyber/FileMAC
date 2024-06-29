@@ -46,18 +46,22 @@ elif os.name == "nt":
     RED = Fore.LIGHTRED_EX
     DRED = Fore.RED
     FRED = Fore.RED
+    IRED = Fore.RED
 
     GREEN = Fore.LIGHTGREEN_EX
     DGREEN = Fore.GREEN
     FGREEN = Fore.GREEN
+    IGREEN = Fore.GREEN
 
     YELLOW = Fore.LIGHTYELLOW_EX
     FYELLOW = Fore.YELLOW
     DYELLOW = Fore.YELLOW
+    IYELLOW = Fore.YELLOW
 
     BLUE = Fore.LIGHTBLUE_EX
     DBLUE = Fore.BLUE
     FBLUE = Fore.BLUE
+    IBLUE = Fore.BLUE
 
     MAGENTA = Fore.LIGHTMAGENTA_EX
     DMAGENTA = Fore.MAGENTA
