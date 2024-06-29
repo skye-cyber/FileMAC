@@ -20,20 +20,20 @@ logger = logging.getLogger(__name__)
 
 
 class ExtractText:
-    def __init__(self, input_file):
-        self.input_file = input_file
+    def __init__(self, input_obj):
+        self.input_obj = input_obj
 
     def preprocess(self):
         files_to_process = []
 
-        if os.path.isfile(self.input_file):
-            files_to_process.append(self.input_file)
-        elif os.path.isdir(self.input_file):
-            if os.listdir(self.input_file) is None:
+        if os.path.isfile(self.input_obj):
+            files_to_process.append(self.input_obj)
+        elif os.path.isdir(self.input_obj):
+            if os.listdir(self.input_obj) is None:
                 print(f"{RED}Cannot work with empty folder{RESET}")
                 sys.exit(1)
-            for file in os.listdir(self.input_file):
-                file_path = os.path.join(self.input_file, file)
+            for file in os.listdir(self.input_obj):
+                file_path = os.path.join(self.input_obj, file)
                 if os.path.isfile(file_path):
                     files_to_process.append(file_path)
 
@@ -41,10 +41,8 @@ class ExtractText:
 
     def OCR(self):
         image_list = self.preprocess()
-        ls = ['png', 'jpg']
         image_list = [
-            item for item in image_list if any(item.lower().endswith(ext)
-                                               for ext in ls)]
+            item for item in image_list if item.split('.')[-1].lower() in ['png', 'jpg', 'jpeg']]
 
         def ocr_text_extraction(image_path):
             '''Load image using OpenCV'''
@@ -81,8 +79,10 @@ text..{RESET}")
                 wait for key press before proceeding to the next
                 image otherwise don't wait
                 size = [i for i in enumerate(image_list)]'''
+
                 if len(image_list) >= 2:
                     input(F"{BBWHITE}Press Enter to continue{RESET}")
+                return text
             except KeyboardInterrupt:
                 print("\nExiting")
                 sys.exit(0)
@@ -96,8 +96,9 @@ Reason: {str(e)}{RESET}")
                 logger.error(f"Error: {type(e).__name__}: {str(e)}")
             except Exception as e:
                 logger.error(f"Error:>>{RED}{e}{RESET}")
-            return text
 
+        # _file_list_ = [None]
         for image_path in image_list:
             OCR_file = image_path[:-4] + ".txt"
-            ocr_text_extraction(image_path)
+            return ocr_text_extraction(image_path)
+            # _file_list_.append(OCR_file)

@@ -6,7 +6,7 @@ import sys
 from pdf2image import convert_from_path
 from PIL import Image  # ImageSequence
 
-from .colors import DCYAN, DGREEN, DMAGENTA, DYELLOW, RED, RESET, YELLOW
+from .colors import (DCYAN, DGREEN, DMAGENTA, DBLUE, DYELLOW, RED, RESET)
 from .converter import MakeConversion
 
 
@@ -51,7 +51,8 @@ class LImage:
             new_im = Image.new('RGB', (max_width, total_height))
 
             y_offset = 0
-            for img in images:
+            for i, img in enumerate(images):
+                print(f"{DBLUE}{i}{RESET}", end='\r')
                 new_im.paste(img, (0, y_offset))
                 y_offset += img.size[1]
             print(f"{DYELLOW}Save dest: {DMAGENTA}{out_img}{RESET}")

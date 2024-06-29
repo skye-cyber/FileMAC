@@ -1,6 +1,7 @@
 #############################################################################
 import logging
 import logging.handlers
+import math
 # import math
 import os
 import re
@@ -9,7 +10,7 @@ import subprocess
 import sys
 # import time
 import traceback
-import math
+
 import cv2
 import pandas as pd
 import pydub
@@ -32,10 +33,13 @@ from pydub import AudioSegment
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate
 
-from .colors import (BLUE, CYAN, DBLUE, DCYAN, DGREEN, DMAGENTA, DRED, DYELLOW,
-                     GREEN, ICYAN, MAGENTA, RED, RESET, YELLOW, BWHITE)
-from .formats import (SUPPORTED_AUDIO_FORMATS, SUPPORTED_IMAGE_FORMATS,
-                      SUPPORTED_VIDEO_FORMATS)
+from .colors import (BLUE, BWHITE, CYAN, DBLUE, DCYAN, DGREEN, DMAGENTA, DRED,
+                     DYELLOW, FCYAN, FMAGENTA, GREEN, ICYAN, MAGENTA, RED,
+                     RESET, YELLOW, IGREEN)
+from .formats import (SUPPORTED_AUDIO_FORMATS, SUPPORTED_AUDIO_FORMATS_DIRECT,
+                      SUPPORTED_IMAGE_FORMATS, SUPPORTED_VIDEO_FORMATS,
+                      Video_codecs)
+from .m4a_converter import _m4a_main_
 
 # import pygame
 # from aspose.words import Document as aspose_document
@@ -95,7 +99,7 @@ class MakeConversion:
         word_list = self.preprocess()
 
         word_list = [
-            item for item in word_list if any(item.lower().endswith(ext) for ext in _ext_word)]
+            item for item in word_list if item.split('.')[-1].lower() in ("doc", "docx")]
         for word_file in word_list:
 
             pdf_file_dir = os.path.dirname(word_file)
@@ -207,8 +211,8 @@ class MakeConversion:
 ###############################################################################
     def word_to_pptx(self):
         word_list = self.preprocess()
-        word_list = [item for item in word_list if item.lower().endswith(
-            "docx") or item.lower().endswith("doc")]
+        word_list = [item for item in word_list if item.split(
+            '.')[-1].lower() in ("doc", "docx")]
 
         for word_file in word_list:
 
@@ -260,8 +264,8 @@ class MakeConversion:
 
     def word_to_txt(self):
         word_list = self.preprocess()
-        word_list = [item for item in word_list if os.path.splitext(
-            item)[-1][1:].lower() in list(_ext_word)]
+        word_list = [item for item in word_list if item.split(
+            '.')[-1].lower() in ("dox", "docx")]
 
         for file_path in word_list:
             ext = os.path.splitext(file_path)[-1][1:]
@@ -331,8 +335,8 @@ to {txt_file}: {e}")
 ###############################################################################
     def ppt_to_word(self):
         ppt_list = self.preprocess()
-        ppt_list = [item for item in ppt_list if item.lower().endswith(
-            "pptx") or item.lower().endswith("ppt")]
+        ppt_list = [item for item in ppt_list if item.split(
+            '.')[-1].lower() in ("ppt", "pptx")]
         for file_path in ppt_list:
             ext = os.path.splitext(file_path)[-1][1:]
             word_file = (os.path.splitext(file_path)[
@@ -348,7 +352,7 @@ to {txt_file}: {e}")
                 for slide in presentation.slides:
                     _slide_count_ += 1
                     print(
-                        F"INFO\tSlide {DBLUE}{_slide_count_}{RESET}/{len(presentation.slides)}{RESET}", end='\r')
+                        F"INFO\t Slide {DBLUE}{_slide_count_}{RESET}/{len(presentation.slides)}{RESET}", end='\r')
                     for shape in slide.shapes:
                         if shape.has_text_frame:
                             text_frame = shape.text_frame
@@ -430,8 +434,8 @@ to {txt_file}: {e}")
     def convert_xls_to_word(self):
         xls_list = self.preprocess()
 
-        xls_list = [item for item in xls_list if any(
-            item.lower().endswith(ext) for ext in _ext_xls)]
+        xls_list = [item for item in xls_list if item.split(
+            '.')[-1].lower() in ("xls", "xlsx")]
 
         print(F"{DGREEN}Initializing conversion sequence{RESET}")
 
@@ -519,8 +523,7 @@ lines {RESET}", end="\n")
         xls_list = self.preprocess()
 
         xls_list = [
-            item for item in xls_list if any(item.lower().endswith(ext)
-                                             for ext in _ext_xls)]
+            item for item in xls_list if item.split('.')[-1].lower() in ("xls", "xlsx")]
         for xls_file in xls_list:
             ext = os.path.splitext(xls_file)[-1][1:]
             csv_file = (os.path.splitext(xls_file)[
@@ -551,12 +554,10 @@ lines {RESET}", end="\n")
     def convert_xlsx_to_database(self):
         xlsx_list = self.preprocess()
         xlsx_list = [
-            item for item in xlsx_list if any(item.lower().endswith(ext)
-                                              for ext in _ext_xls)]
+            item for item in xlsx_list if item.split('.')[-1].lower() in ("xls", "xlsx")]
         for xlsx_file in xlsx_list:
-            ext = os.path.splitext(xlsx_file)[-1][1:]
             sqlfile = (os.path.splitext(xlsx_file)[
-                       0] + ".sql") if ext in list(_ext_xls) else None
+                       0] + ".sql") if (xlsx_file.split('.')[0]) in ("xls", "xlsx") else None
             try:
                 db_file = input(
                     F"{DBLUE}Please enter desired sql filename: {RESET}")
@@ -596,14 +597,10 @@ lines {RESET}", end="\n")
 # Create image objects from given files
 ###############################################################################
     def doc2image(self, outf="png"):
-        outf_list = ['png', 'jpg']
-        if outf not in outf_list:
-            outf = "png"
+        outf = "png" if outf not in ('png', 'jpg') else outf
         path_list = self.preprocess()
-        ls = ["pdf", "doc", "docx"]
         file_list = [
-            item for item in path_list if any(item.lower().endswith(ext)
-                                              for ext in ls)]
+            item for item in path_list if item.split('.')[-1].lower() in ("pdf", "doc", "docx")]
         imgs = []
         for file in file_list:
             if file.lower().endswith("pdf"):
@@ -614,12 +611,13 @@ lines {RESET}", end="\n")
                 # Save each image to a file
                 fname = file[:-4]
                 print(f"{YELLOW}Target images{BLUE} {len(images)}{RESET}")
+
                 for i, image in enumerate(images):
                     print(f"{DBLUE}{i}{RESET}", end="\r")
                     yd = f"{fname}_{i+1}.{outf}"
                     image.save(yd)
                     imgs.append(yd)
-            print(f"{GREEN}Ok{RESET}")
+            print(f"\n{GREEN}Ok{RESET}")
 
         return imgs
 
@@ -668,7 +666,7 @@ class Scanner:
             with open(out_f, 'w') as f:
                 f.write(text)
 
-            print(F"{DGREEN}Ok{RESET}")
+            print(F"\n{DGREEN}Ok{RESET}")
 
     def scanAsImgs(self):
         file = self.input_file
@@ -679,11 +677,32 @@ class Scanner:
         text = ''
         for i in img_objs:
             extract = ExtractText(i)
-            tx = extract.OCR()
-            if tx is not None:
-                text += tx
+            _text = extract.OCR()
+
+            if _text is not None:
+                text += _text
+                with open(f"{self.input_file[:-4]}_filemac.txt", 'a') as _writer:
+                    _writer.write(text)
+
+        def _cleaner_():
+            print(f"{FMAGENTA}Clean")
+            for obj in img_objs:
+                if os.path.exists(obj):
+                    print(obj, end='\r')
+                    os.remove(obj)
+                txt_file = f"{obj[:-4]}.txt"
+                if os.path.exists(txt_file):
+                    print(f"{FCYAN}{txt_file}{RESET}", end='\r')
+                    os.remove(txt_file)
+
+        # Do clean up
+        _cleaner_()
+        from .overwrite import clear_screen
+        clear_screen()
+        print(f"{DGREEN}{IGREEN}Full Text{RESET}")
         print(text)
-        print(f"{GREEN}Ok{RESET}")
+        print(f"{BWHITE}Text File ={IGREEN}{self.input_file[:-4]}_filemac.txt{RESET}")
+        print(f"{GREEN}Ok✅{RESET}")
         return text
 
     def scanAsLongImg(self):
@@ -763,10 +782,12 @@ class FileSynthesis:
             logger.info(f"{DYELLOW}Checkpoint file found{RESET}")
             with open(checkpoint_file, 'r') as f:
                 start_chunk = int(f.read())
-            logger.info(f"{DYELLOW}Resuming from chunk{DBLUE} {start_chunk}{RESET}")
+            logger.info(
+                f"{DYELLOW}Resuming from chunk{DBLUE} {start_chunk}{RESET}")
         try:
             if not os.path.exists(_tmp_folder_):
-                logger.info(f"{DYELLOW}Create temporary directory = {DBLUE}{_tmp_folder_}{RESET}")
+                logger.info(
+                    f"{DYELLOW}Create temporary directory = {DBLUE}{_tmp_folder_}{RESET}")
                 os.mkdir(_tmp_folder_)
 
             # print(f"{DYELLOW}Get initial net speed..{RESET}")# st = speedtest.Speedtest()  # get initial network speed# st.get_best_server()# download_speed: float = st.download()  # Keep units as bytes# logger.info( f"{GREEN} Conversion to mp3 sequence initialized start\speed {CYAN}{download_speed/1_000_000:.2f}Kbps{RESET}")
@@ -806,14 +827,16 @@ class FileSynthesis:
                     logger.error(f"Connection error: {e}")
                     # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
-                        print(f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
+                        print(
+                            f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
                     # Increament the attempts
                     attempt += 1
                 # Exponential backoff for retries
                 except requests.exceptions.HTTPError as e:
                     logger.error(f"HTTP error: {e.status_code} - {e.reason}")
                     for _sec_ in range(2 ** attempt, 0, -1):
-                        print(f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
+                        print(
+                            f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
                     # Increament the attempts
                     attempt += 1
                 except requests.exceptions.RequestException as e:
@@ -821,36 +844,44 @@ class FileSynthesis:
 
                     # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
-                        print(f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
+                        print(
+                            f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
                     # Increament the attempts
                     attempt += 1
 
                 except (ConnectionError, ConnectionAbortedError, ConnectionRefusedError, ConnectionResetError) as e:
-                    logger.error(f'Error during conversion attempt {attempt+1}/{max_retries}: {e}')
+                    logger.error(
+                        f'Error during conversion attempt {attempt+1}/{max_retries}: {e}')
                     # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
-                        print(f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
+                        print(
+                            f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
                         # Increament the attempts
                         attempt += 1
 
                 # Handle all other types of exceptions
                 except Exception as e:
-                    logger.error(f'{DRED} Error during conversion attempt {attempt+1}/{max_retries}:{e}{RESET}')
+                    logger.error(
+                        f'{DRED} Error during conversion attempt {attempt+1}/{max_retries}:{e}{RESET}')
 
                     tb = traceback.extract_tb(sys.exc_info()[2])
-                    logger.info("\n".join([f"  > {line}" for line in map(str, tb)]))
+                    logger.info(
+                        "\n".join([f"  > {line}" for line in map(str, tb)]))
                     # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
-                        print(f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
+                        print(
+                            f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
                     # Increament the attempts
                     attempt += 1
 
-                else:
-                    print(f"{RED}Maximum retries reached. Unable to complete the operation.{RESET}")
+                else:  # *****#### if
+                    print(
+                        f"{FMAGENTA}Conversion success✅. \n  {FCYAN}INFO\t Create masterfile{RESET}")
                     break  # Exit the retry loop if successful
 
             else:
-                print(f"{RED}Maximum retries reached. Unable to complete the operation after {DMAGENTA} {max_retries} attempts.{RESET}")
+                print(
+                    f"{RED}Maximum retries reached. Unable to complete the operation after {DMAGENTA} {max_retries} attempts.{RESET}")
                 sys.exit(2)
 
         finally:
@@ -979,30 +1010,25 @@ class VideoConverter:
             print(F"{DYELLOW}Initializing conversion..{RESET}")
 
             for file in input_list:
-                if out_f.upper() in SUPPORTED_VIDEO_FORMATS:
+                if out_f.upper() in Video_codecs.keys():
                     _, ext = os.path.splitext(file)
                     output_filename = _ + '.' + out_f.lower()
-                    print(output_filename)
+                    # print(output_filename)
+                elif out_f.upper() in SUPPORTED_VIDEO_FORMATS and not out_f.upper() in Video_codecs.keys():
+                    print(
+                        f"{RED}Unsupported output format --> Pending Implementation{RESET}")
+                    sys.exit(1)
                 else:
                     print(f"{RED}Unsupported output format{RESET}")
                     sys.exit(1)
-                format_codec = {
-                    "MP4": "mpeg4",
-                    "AVI": "rawvideo",
-                    # "OGV": "avc",
-                    "WEBM": "libvpx",
-                    "MOV": "mpeg4",
-                    "MKV": "MPEG4",
-                    "FLV": "flv"
-                    # "WMV": "WMV"
-                }
+
                 '''Load the video file'''
-                print(f"{DBLUE}oad file{RESET}")
+                print(f"{DBLUE}Load file{RESET}")
                 video = VideoFileClip(file)
                 '''Export the video to a different format'''
                 print(f"{DMAGENTA}Converting file to {output_filename}{RESET}")
                 video.write_videofile(
-                    output_filename, codec=format_codec[out_f])
+                    output_filename, codec=Video_codecs[out_f])
                 '''Close the video file'''
                 print(f"{DGREEN}Done{RESET}")
                 video.close()
@@ -1047,22 +1073,35 @@ class AudioConverter:
             input_list = [item for item in input_list if any(
                 item.lower().endswith(ext) for ext in SUPPORTED_AUDIO_FORMATS)]
             print(F"{DYELLOW}Initializing conversion..{RESET}")
+
+            def wav_redudancy():
+                # Load the mp3 file using Pydub
+                audio = pydub.AudioSegment.from_file(file, fmt)
+                # Export the audio to a temporary file in wav format (ffmpeg can convert from wav to m4a)
+                audio.export("temp.wav", format="wav")
+
             for file in input_list:
-                if out_f.lower() in SUPPORTED_AUDIO_FORMATS:
+                if out_f.lower() in SUPPORTED_AUDIO_FORMATS_DIRECT:
                     _, ext = os.path.splitext(file)
                     output_filename = _ + '.' + out_f
+                    fmt = ext[1:]
+                    # print(fmt, out_f)
+                    audio = pydub.AudioSegment.from_file(file, fmt)
+                    print(f"{DMAGENTA}Converting to {output_filename}{RESET}")
+                    audio.export(output_filename, format=out_f)
+                    # new_audio = pydub.AudioSegment.from_file('output_audio.')
+                    print(f"{DGREEN}Done{RESET}")
+
+                elif file[-3:].lower() == 'm4a' or out_f.lower() == "m4a":
+                    _m4a_main_(file, out_f)
+
+                elif out_f.lower() in SUPPORTED_AUDIO_FORMATS and not SUPPORTED_AUDIO_FORMATS_DIRECT:
+                    print("Pending Implemantation For the format")
+
                 else:
                     print(F"{RED}Unsupported output format{RESET}")
                     sys.exit(1)
-                fmt = ext[1:]
-                print(fmt, out_f)
-                audio = pydub.AudioSegment.from_file(file, fmt)
-                print(f"{DMAGENTA}Converting to {output_filename}{RESET}")
-                audio.export(output_filename, format=out_f)
-                # new_audio = pydub.AudioSegment.from_file('output_audio.')
-                print(f"{DGREEN}Done{RESET}")
-                # play(new_audio)
-                # new_audio.close()
+
         except KeyboardInterrupt:
             print("\nQuit❕")
             sys.exit(1)
@@ -1105,13 +1144,12 @@ class ImageConverter:
         try:
             input_list = self.preprocess()
             out_f = self.out_format.upper()
-
             input_list = [item for item in input_list if any(
-                item.lower().endswith(ext) for ext in SUPPORTED_IMAGE_FORMATS[out_f])]
+                item.lower().endswith(ext) for ext in SUPPORTED_IMAGE_FORMATS.values())]
+
             for file in input_list:
-                print(file)
                 if out_f.upper() in SUPPORTED_IMAGE_FORMATS:
-                    _, ext = os.path.splitext(file)
+                    _ = os.path.splitext(file)[0]
                     output_filename = _ + \
                         SUPPORTED_IMAGE_FORMATS[out_f].lower()
                 else:
@@ -1126,16 +1164,23 @@ class ImageConverter:
                 '''Save the PIL image to a different format: '''
                 print(f"\033[1;36mSaving image as {output_filename}{RESET}")
                 pil_img.save(output_filename, out_f)
-                print(f"{DGREEN}Done{RESET}")
+                print(f"{DGREEN}Done ✅{RESET}")
                 '''Load the image back into OpenCV: '''
-                print(f"{DMAGENTA}Load and display image{RESET}")
-                opencv_img = cv2.imread(output_filename)
+                # print(f"{DMAGENTA}Load and display image{RESET}")
+                # opencv_img = cv2.imread(output_filename)
                 '''Display the images: '''
-                cv2.imshow('OpenCV Image', opencv_img)
-                # pil_img.show()
+                # cv2.imshow('OpenCV Image', opencv_img)
+                # opencv_img.show()
                 '''Wait for the user to press a key and close the windows: '''
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
         except KeyboardInterrupt:
             print("\nQuit❕")
             sys.exit(1)
+        except AssertionError:
+            print("Assertion failed.")
+        except KeyError:
+            print(
+                f"{RED}ERROR:\tPending Implementation for{ICYAN} {out_f} {BWHITE}format{RESET}")
+        except Exception as e:
+            print(f"{RED}{e}{RESET}")
