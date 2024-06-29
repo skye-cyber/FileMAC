@@ -8,7 +8,8 @@ import sys
 
 from . import handle_warnings
 from .AudioExtractor import ExtractAudio
-from .colors import (CYAN, DYELLOW, RED, RESET, FYELLOW, FBLUE, DCYAN, FMAGENTA)
+from .colors import (CYAN, DCYAN, DYELLOW, FBLUE, FCYAN, FMAGENTA, FYELLOW,
+                     RED, RESET)
 from .converter import (AudioConverter, FileSynthesis, ImageConverter,
                         MakeConversion, Scanner, VideoConverter)
 from .formats import (SUPPORTED_AUDIO_FORMATS_SHOW, SUPPORTED_DOC_FORMATS,
@@ -147,66 +148,66 @@ def main():
 
     parser.add_argument(
         "--convert_doc", help=f"Converter document file(s) to different format ie pdf_to_docx.\
-       example {DYELLOW}filemac --convert_doc example.docx -t pdf{RESET}")
+       example: {DYELLOW}filemac --convert_doc example.docx -t pdf{RESET}")
 
     parser.add_argument(
         "--convert_audio", help=f"Convert audio file(s) to and from different format ie mp3 to wav\
-        example {DYELLOW}filemac --convert_audio example.mp3 -t wav{RESET}")
+        example: {DYELLOW}filemac --convert_audio example.mp3 -t wav{RESET}")
 
     parser.add_argument(
         "--convert_video", help=f"Convert video file(s) to and from different format ie mp4 to mkv.\
-        example {DYELLOW}filemac --convert_video example.mp4 -t mkv{RESET}")
+        example: {DYELLOW}filemac --convert_video example.mp4 -t mkv{RESET}")
 
     parser.add_argument(
         "--convert_image", help=f"Convert image file(s) to and from different format ie png to jpg.\
-        example {DYELLOW}filemac --convert_image example.jpg -t png{RESET}")
+        example: {DYELLOW}filemac --convert_image example.jpg -t png{RESET}")
 
     parser.add_argument(
 
         "--convert_doc2image", help=f"Convert documents to images ie png to jpg.\
-        example {DYELLOW}filemac --convert_doc2image example.pdf -t png{RESET}")
+        example: {DYELLOW}filemac --convert_doc2image example.pdf -t png{RESET}")
 
     parser.add_argument("-xA", "--extract_audio",
                         help=f"Extract audio from a video.\
-                        example {DYELLOW}filemac -xA example.mp4 {RESET}")
+                        example: {DYELLOW}filemac -xA example.mp4 {RESET}")
 
     parser.add_argument("-iso", "--isolate", help=f"Specify file types to isolate\
-                        for conversion, only works if directory is provided as input for the convert_doc argument {DYELLOW}filemac --convert_doc /home/user/Documents/ -isolate pdf -t txt{RESET}")
+                        for conversion, only works if directory is provided as input for the {FCYAN}convert_doc{RESET} argument example: {DYELLOW}filemac --convert_doc /home/user/Documents/ --isolate pdf -t txt{RESET}")
 
     parser.add_argument(
         "-Av", "--Analyze_video", help=f"Analyze a given video.\
-        example {DYELLOW}filemac --analyze_video example.mp4 {RESET}")
+        example: {DYELLOW}filemac --analyze_video example.mp4 {RESET}")
 
     parser.add_argument("-t", "--target_format",
                         help="Target format for conversion (optional)")
 
     parser.add_argument(
         "--resize_image", help=f"change size of an image compress/decompress \
-        example {DYELLOW}filemac --resize_image example.png -t_size 2mb -t png {RESET}")
+        example: {DYELLOW}filemac --resize_image example.png -t_size 2mb -t png {RESET}")
 
     parser.add_argument("-t_size", help="used in combination with resize_image \
                         to specify target image size")
 
     parser.add_argument(
         "-S", "--scan", help=f"Scan pdf file and extract text\
-                        example {DYELLOW}filemac --scan example.pdf {RESET}")
+                        example: {DYELLOW}filemac --scan example.pdf {RESET}")
 
     parser.add_argument(
 
         "-doc2L", "--doc_long_image", help=f"Convert pdf file to long image\
-                        example {DYELLOW}filemac --doc_long_image example.pdf {RESET}")
+                        example: {DYELLOW}filemac --doc_long_image example.pdf {RESET}")
 
     parser.add_argument(
-        "-SA", "--scanAsImg", help=f"Scan pdf file and extract text\
-                        example {DYELLOW}filemac --scanAsImg example.pdf {RESET}")
+        "-SA", "--scanAsImg", help=f"Convert pdf to image then extract text\
+                        example: {DYELLOW}filemac --scanAsImg example.pdf {RESET}")
 
     parser.add_argument(
         "-SALI", "--scanAsLong_Image", help=f"Scan {CYAN}[doc, docx, pdf]\
-        {RESET} file and extract text,-> very effective\
-                    example {DYELLOW}filemac --scanAsImg example.pdf {RESET}")
+        {RESET} file and extract text by first converting them to long image,-> very effective\
+                    example: {DYELLOW}filemac --scanAsImg example.pdf {RESET}")
 
     parser.add_argument("--OCR", help=f"Extract text from an image.\
-        example {DYELLOW}filemac --OCR image.png{RESET}")
+        example: {DYELLOW}filemac --OCR image.png{RESET}")
 
     args = parser.parse_args()
 
@@ -215,9 +216,10 @@ def main():
     if args.convert_doc == 'help':
         print(SUPPORTED_DOC_FORMATS)
         sys.exit(1)
-    if args.convert_doc:
+    if args.convert_doc and args.target_format is not None:
         if os.path.isdir(args.convert_doc):
-            conv = _DIR_CONVERSION_(args.convert_doc, args.target_format, args.isolate)
+            conv = _DIR_CONVERSION_(
+                args.convert_doc, args.target_format, args.isolate)
             conv._unbundle_dir_()
 
         elif os.path.isfile(args.convert_doc):
@@ -226,7 +228,7 @@ def main():
 
 
 # Call function to handle video conversion inputs before begining conversion
-    elif args.convert_video:
+    elif args.convert_video and args.target_format is not None:
         if args.convert_video == 'help':
             print(SUPPORTED_VIDEO_FORMATS_SHOW)
             sys.exit(1)
@@ -237,6 +239,9 @@ def main():
     elif args.convert_image:
         if args.convert_image == 'help':
             print(SUPPORTED_IMAGE_FORMATS_SHOW)
+            sys.exit(1)
+        if args.target_format is None:
+            print(f"{RED}Please provide output format specified by{CYAN} '-t'{RESET}")
             sys.exit(1)
         conv = ImageConverter(args.convert_image, args.target_format)
         conv.convert_image()
@@ -252,7 +257,7 @@ def main():
         conv.doc2image(args.target_format)
 
 # Call function to handle audio conversion inputs before begining conversion
-    elif args.convert_audio:
+    elif args.convert_audio and args.target_format is not None:
         if args.convert_audio == 'help':
             print(SUPPORTED_AUDIO_FORMATS_SHOW)
             sys.exit(1)

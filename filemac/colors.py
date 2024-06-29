@@ -10,18 +10,22 @@ if os.name == "posix":
     RED = '\033[91m'  # Normal RED
     DRED = '\033[1;91m'  # Deep RED
     FRED = '\033[2;91m'  # Faint red
+    IRED = '\033[3;91m'  # Indented RED
 
     GREEN = '\033[92m'  # Normal green
     DGREEN = '\033[1;92m'  # Deep green
     FGREEN = '\033[2;92m'  # Faint green
+    IGREEN = '\033[3;92m'  # Indented GREEN
 
     YELLOW = '\033[93m'  # Normal yellow
     DYELLOW = '\033[1;93m'  # Deep YELLOW
     FYELLOW = '\033[2;93m'  # Faint YELLOW
+    IYELLOW = '\033[3;93m'  # Indented YELLOW
 
     BLUE = '\033[94m'  # Normal BLUE
     DBLUE = '\033[1;94m'  # Deep BLUE
     FBLUE = '\033[2;94m'  # Faint Blue
+    IBLUE = '\033[3;96m'  # Indented BLUE
 
     MAGENTA = '\033[95m'  # Normal MAGENTA
     DMAGENTA = '\033[1;95m'  # Deep MAGENTA

@@ -64,7 +64,7 @@ class Compress_Size:
             new_height = int(original_size[1] * scale_factor)
 
             return new_width, new_height
-        except KeyboardInterrupt:
+                except KeyboardInterrupt:
             print("\nQuit⏹️")
             sys.exit(1)
         except KeyError:

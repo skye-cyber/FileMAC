@@ -100,5 +100,5 @@ Reason: {str(e)}{RESET}")
         # _file_list_ = [None]
         for image_path in image_list:
             OCR_file = image_path[:-4] + ".txt"
-            return ocr_text_extraction(image_path)
+            ocr_text_extraction(image_path)
             # _file_list_.append(OCR_file)

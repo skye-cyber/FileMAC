@@ -1,6 +1,6 @@
 # multimedia_cli/formats.py
-from .colors import (CYAN, DBLUE, DMAGENTA, DYELLOW, FCYAN, FYELLOW, IMAGENTA,
-                     RESET)
+from .colors import (CYAN, DBLUE, DMAGENTA, DYELLOW, FYELLOW, IMAGENTA
+FCYAN, RESET)
 
 SUPPORTED_DOC_FORMATS = f"""
 |---------------------------------------------------------------------------
