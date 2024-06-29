@@ -61,7 +61,7 @@ elif os.name == "nt":
     BLUE = Fore.LIGHTBLUE_EX
     DBLUE = Fore.BLUE
     FBLUE = Fore.BLUE
-    1BLUE = Fore.BLUE
+    IBLUE = Fore.BLUE
 
     MAGENTA = Fore.LIGHTMAGENTA_EX
     DMAGENTA = Fore.MAGENTA
