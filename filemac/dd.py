@@ -1,55 +1,33 @@
-from pptx import Presentation
-from docx import Document
-import sys
+import argparse
 
+# Create the main parser
+parser = argparse.ArgumentParser(description="Example of subparsers with argparse")
 
-def pptx(ppt_file):
-    try:
-        print("Create Doument Tablet")
-        presentation = Presentation(ppt_file)
-        document = Document()
-        _out_ = ppt_file.split('.')[0] + "docx"
-        _slide_count_ = 0
-        for slide in presentation.slides:
-            _slide_count_ += 1
-            print(f"INFO\t Slide {_slide_count_}/{len(presentation.slides)}", end='\r')
-            for shape in slide.shapes:
-                if shape.has_text_frame:
-                    text_frame = shape.text_frame
-                    for paragraph in text_frame.paragraphs:
-                        new_paragraph = document.add_paragraph()
-                        for run in paragraph.runs:
-                            new_run = new_paragraph.add_run(run.text)
-                            # Preserve bold formatting
-                            new_run.bold = run.font.bold
-                            # Preserve italic formatting
-                            new_run.italic = run.font.italic
-                            # Preserve underline formatting
-                            new_run.underline = run.font.underline
-                            # Preserve font name
-                            new_run.font.name = run.font.name
-                            # Preserve font size
-                            new_run.font.size = run.font.size
-                            try:
-                                # Preserve font color
-                                new_run.font.color.rgb = run.font.color.rgb
-                            except AttributeError:
-                                # Ignore error and continue without
-                                # setting the font color
-                                pass
-                    # Add a new paragraph after each slide
-                    document.add_paragraph()
-        document.save(_out_)
-    except FileNotFoundError as e:
-        print(e)
+# Add subparsers
+subparsers = parser.add_subparsers(dest='command', help='Sub-command help')
 
-    except KeyboardInterrupt:
-        print("\nQuit!")
-        sys.exit(1)
+# Create a subparser for the "parent" command
+parent_parser = subparsers.add_parser('parent', help='Parent command help')
 
-    except Exception as e:
-        print(e)
-        pass
+# Add arguments to the parent command
+parent_parser.add_argument('--parent-arg1', type=int, help='Parent argument 1')
+parent_parser.add_argument('--parent-arg2', type=str, help='Parent argument 2')
 
+# Create a subparser for the "child" command under the "parent" command
+child_parser = parent_parser.add_subparsers(dest='subcommand', help='Sub-command under parent')
+child_parser_1 = child_parser.add_parser('child1', help='Child 1 command help')
+child_parser_2 = child_parser.add_parser('child2', help='Child 2 command help')
 
-pptx(ppt_file="/home/skye/Software Engineering/Y1/SEM2/Data comm. networks/pdfs/10Data communication lecture 10.pptx")
+# Add arguments to the child commands
+child_parser_1.add_argument('--child1-arg1', type=str, help='Child 1 argument 1')
+child_parser_1.add_argument('--child1-arg2', type=int, help='Child 1 argument 2')
+
+child_parser_2.add_argument('--child2-arg1', type=bool, help='Child 2 argument 1')
+child_parser_2.add_argument('--child2-arg2', type=float, help='Child 2 argument 2')
+
+# Parse the arguments
+args = parser.parse_args()
+
+# Print the arguments
+print(args)
+

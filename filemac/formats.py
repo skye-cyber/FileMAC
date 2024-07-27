@@ -20,10 +20,6 @@ SUPPORTED_DOC_FORMATS = f"""
 """
 
 
-def p():
-    print(SUPPORTED_DOC_FORMATS)
-
-
 # Add supported input and output formats for each media type
 SUPPORTED_AUDIO_FORMATS = ["wav",  # Waveform Audio File Format
                            "mp3",  # MPEG Audio Layer III

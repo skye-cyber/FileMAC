@@ -1,7 +1,0 @@
-import os
-
-obj = "input.hg.txt"
-txt_file = f"{os.path.splitext(obj)[:-1]}_filemac.txt"
-print(txt_file)
-
-

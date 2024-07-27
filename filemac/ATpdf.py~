@@ -1,0 +1,62 @@
+from docx import Document
+from docx.shared import Pt, RGBColor
+
+
+def AdvancedT2word:
+    def __init__(self, obj, out_obj=None):
+        self.obj = obj
+        self.out_obj = obj_obj
+        if self.out_obj is None:
+
+    def text_to_word(text_file, output_file):
+        # Create a new Document
+        doc = Document()
+
+        # Define formatting for headings and body text
+        heading_styles = {
+            # Heading 1
+            1: {'font_size': Pt(16), 'font_color': RGBColor(0, 0, 255)},
+            # Heading 2
+            2: {'font_size': Pt(14), 'font_color': RGBColor(0, 0, 200)},
+            # Heading 3
+            3: {'font_size': Pt(12), 'font_color': RGBColor(0, 0, 150)},
+        }
+
+        body_font_name = 'Arial'
+        body_font_size = Pt(12)
+        body_font_color = RGBColor(0, 0, 0)  # Black color
+
+        # Open the text file and read content
+        with open(text_file, 'r') as file:
+            lines = file.readlines()
+
+        for line in lines:
+            # Determine heading level or body text
+            if line.startswith('# '):
+                level = line.count('#')
+                level = min(level, 3)  # Support up to 3 levels of headings
+                style = heading_styles.get(level, heading_styles[1])
+                p = doc.add_paragraph()
+                # Remove '#' and extra space
+                run = p.add_run(line[level+1:].strip())
+                run.font.size = style['font_size']
+                run.font.color.rgb = style['font_color']
+                p.style = f'Heading{level}'
+            else:
+                p = doc.add_paragraph()
+                run = p.add_run(line.strip())
+                run.font.name = body_font_name
+                run.font.size = body_font_size
+                run.font.color.rgb = body_font_color
+
+        # Save the document
+        doc.save(output_file)
+
+
+if __name__ == "__main__":
+    input_text_file = 'example.txt'
+    output_word_file = 'output.docx'
+
+    # Call the function
+    text_to_word(input_text_file, output_word_file)
+    print(f"Text file converted to Word document: {output_word_file}")

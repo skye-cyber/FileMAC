@@ -64,7 +64,7 @@ class ExtractText:
                 '''Remove extra whitespaces and newlines
                 text = ' '.join(text.split()).strip()'''
                 logger.info(F"{CYAN}Found:\n{RESET}")
-                print(text)
+                # print(text)
                 current_path = os.getcwd()
                 file_path = os.path.join(current_path, OCR_file)
                 ''' Save the extracted text to specified file '''
@@ -94,11 +94,12 @@ text..{RESET}")
 Reason: {str(e)}{RESET}")
             except Exception as e:
                 logger.error(f"Error: {type(e).__name__}: {str(e)}")
-            except Exception as e:
                 logger.error(f"Error:>>{RED}{e}{RESET}")
+            # except Exception as e:
+            # logger.error(f"Error:>>{RED}{e}{RESET}")
 
         # _file_list_ = [None]
         for image_path in image_list:
             OCR_file = image_path[:-4] + ".txt"
-            ocr_text_extraction(image_path)
+            return ocr_text_extraction(image_path)
             # _file_list_.append(OCR_file)

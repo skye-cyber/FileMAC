@@ -208,6 +208,8 @@ def main():
 
     parser.add_argument("--OCR", help=f"Extract text from an image.\
         example: {DYELLOW}filemac --OCR image.png{RESET}")
+    parser.add_argument("--AudioJoin", "-AJ", help="Join Audio files into one master file")
+    parser.add_argument_group("--advanced_text2word", "-ATW", help="Convert Text to word by specifying headings, color, font_size, font_name")
 
     args = parser.parse_args()
 
@@ -299,6 +301,18 @@ def main():
     elif args.Analyze_video:
         analyzer = SA(args.Analyze_video)
         analyzer.SimpleAnalyzer()
+
+# Call joinaudio script
+    elif args.AudioJoin:
+        from .JoinAudios import JoinAudios
+        joiner = JoinAudios(args.AudioJoin)
+        joiner.worker()
+
+# Call Advanced text to word converter
+    elif args.ATW:
+        from .ATWord import AdvancedT2word
+        init = AdvancedT2word()
+        init.text_to_word()
 
 
 if __name__ == "__main__":

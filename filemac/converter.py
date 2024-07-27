@@ -8,9 +8,9 @@ import re
 import sqlite3
 import subprocess
 import sys
-# import time
-import traceback
 
+# import time
+# import traceback
 import cv2
 import pandas as pd
 import pydub
@@ -34,8 +34,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate
 
 from .colors import (BLUE, BWHITE, CYAN, DBLUE, DCYAN, DGREEN, DMAGENTA, DRED,
-                     DYELLOW, FCYAN, FMAGENTA, GREEN, ICYAN, MAGENTA, RED,
-                     RESET, YELLOW, IGREEN)
+                     DYELLOW, FCYAN, FMAGENTA, GREEN, ICYAN, IGREEN, MAGENTA,
+                     RED, RESET, YELLOW)
 from .formats import (SUPPORTED_AUDIO_FORMATS, SUPPORTED_AUDIO_FORMATS_DIRECT,
                       SUPPORTED_IMAGE_FORMATS, SUPPORTED_VIDEO_FORMATS,
                       Video_codecs)
@@ -701,7 +701,8 @@ class Scanner:
         clear_screen()
         print(f"{DGREEN}{IGREEN}Full Text{RESET}")
         print(text)
-        print(f"{BWHITE}Text File ={IGREEN}{self.input_file[:-4]}_filemac.txt{RESET}")
+        print(
+            f"{BWHITE}Text File ={IGREEN}{self.input_file[:-4]}_filemac.txt{RESET}")
         print(f"{GREEN}Ok✅{RESET}")
         return text
 
@@ -718,6 +719,9 @@ class Scanner:
         print(text)
         print(f"{GREEN}Ok{RESET}")
         return text
+
+
+'''Definition of audiofying class'''
 
 
 class FileSynthesis:
@@ -747,7 +751,6 @@ class FileSynthesis:
         # Create a list to store files
         ogg_files = []
         # loop through the directory while adding the ogg files to the list
-        print(files)
         for filename in files:
             print(f"Join {DBLUE}{len(files)}{RESET} files")
             # if filename.endswith('.ogg'):
@@ -763,7 +766,7 @@ class FileSynthesis:
         combined_ogg.export(output_file + "_master.ogg", format='ogg')
         print(F"{DGREEN}Master file:Ok                                                                             {RESET}")
 
-    def Synthesise(self, text: str, output_file: str, CHUNK_SIZE: int = 10_000, _tmp_folder_: str = 'tmp_dir', max_retries: int = 10) -> None:
+    def Synthesise(self, text: str, output_file: str, CHUNK_SIZE: int = 10_000, _tmp_folder_: str = 'tmp_dir', max_retries: int = 30) -> None:
         """Converts given text to speech using Google Text-to-Speech API."""
         out_ls = []
         # Define directories and other useful variables for genrating output_file and checkpoint_file
@@ -779,11 +782,19 @@ class FileSynthesis:
         start_chunk = 0
         # Check if there is any checkpoint record in chekpoint file for resumption
         if os.path.exists(checkpoint_file):
-            logger.info(f"{DYELLOW}Checkpoint file found{RESET}")
+            logger.info(f"{DYELLOW}Found a Checkpoint file{RESET}")
             with open(checkpoint_file, 'r') as f:
                 start_chunk = int(f.read())
             logger.info(
                 f"{DYELLOW}Resuming from chunk{DBLUE} {start_chunk}{RESET}")
+
+            # multiply by chunk size to get resume chunk position
+            resume_chunk_pos = start_chunk * 10_000
+
+        # if the checkpoint_file is missing, set resume_chunk_pos to 0(start chunk)
+        else:
+            resume_chunk_pos = start_chunk
+
         try:
             if not os.path.exists(_tmp_folder_):
                 logger.info(
@@ -799,10 +810,11 @@ class FileSynthesis:
                     '''Split input text into smaller parts and generate
                     individual gTTS objects'''
 
-                    counter = start_chunk
-                    for ch, i in enumerate(range(start_chunk, len(text), CHUNK_SIZE)):
+                    counter = math.ceil(
+                        resume_chunk_pos/10_000) if resume_chunk_pos != 0 else 0
+                    for ch, i in enumerate(range(resume_chunk_pos, len(text), CHUNK_SIZE)):
                         logger.info(
-                            f"{BWHITE}Chunk {DBLUE}{i}{RESET}/{math.ceil(len(text)/CHUNK_SIZE)}")
+                            f"{BWHITE}Chunk {DBLUE}{counter}{RESET}/{math.ceil(len(text)/CHUNK_SIZE)}")
                         chunk = text[i:i+CHUNK_SIZE]
 
                         if os.path.exists(f"{_full_output_path_}_{counter}.ogg"):
@@ -813,7 +825,7 @@ class FileSynthesis:
 
                         tts = gTTS(text=chunk, lang='en', slow=False)
                         tts.save(output_filename)
-                        # Update checkpoint file
+                        # Update checkpoint file only and only when the current chunk has reached its conclusion, otherwise checkpoint file chunkremains unchanges
                         with open(checkpoint_file, 'w') as f:
                             f.write(str(counter))
 
@@ -823,8 +835,8 @@ class FileSynthesis:
                     '''Handle any network related issue gracefully'''
 
                 # Handle connectivity/network error
-                except requests.exceptions.ConnectionError as e:
-                    logger.error(f"Connection error: {e}")
+                except requests.exceptions.ConnectionError:
+                    logger.error(f"{DRED}Connection Error{RESET}")
                     # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
                         print(
@@ -849,9 +861,9 @@ class FileSynthesis:
                     # Increament the attempts
                     attempt += 1
 
-                except (ConnectionError, ConnectionAbortedError, ConnectionRefusedError, ConnectionResetError) as e:
+                except (ConnectionError, ConnectionAbortedError, ConnectionRefusedError, ConnectionResetError):
                     logger.error(
-                        f'Error during conversion attempt {attempt+1}/{max_retries}: {e}')
+                        f'{RED}Connection at attempt {CYAN}{attempt+1}/{max_retries}{RESET}')
                     # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
                         print(
@@ -862,11 +874,11 @@ class FileSynthesis:
                 # Handle all other types of exceptions
                 except Exception as e:
                     logger.error(
-                        f'{DRED} Error during conversion attempt {attempt+1}/{max_retries}:{e}{RESET}')
+                        f'{DMAGENTA}{attempt+1}/{max_retries}:{DRED}{e}{RESET}')
 
-                    tb = traceback.extract_tb(sys.exc_info()[2])
-                    logger.info(
-                        "\n".join([f"  > {line}" for line in map(str, tb)]))
+                    # tb = traceback.extract_tb(sys.exc_info()[2])
+                    # logger.info("\n".join([f"  > {line}" for line in map(str, tb)]))
+
                     # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
                         print(
@@ -877,7 +889,13 @@ class FileSynthesis:
                 else:  # *****#### if
                     print(
                         f"{FMAGENTA}Conversion success✅. \n  {FCYAN}INFO\t Create masterfile{RESET}")
-                    break  # Exit the retry loop if successful
+                    # Combine generated gTTS objects
+                    if len(out_ls) > 1:
+                        # FileSynthesis.join_audios(out_ls, output_file)
+                        from .JoinAudios import JoinAudios
+                        joiner = JoinAudios(out_ls, masterfile=output_file)
+                        joiner.worker()
+                    break  # Exit the retry loop if successfull
 
             else:
                 print(
@@ -885,12 +903,8 @@ class FileSynthesis:
                 sys.exit(2)
 
         finally:
-            # Combine generated gTTS objects
-            if len(out_ls) >= 1:
-                FileSynthesis.join_audios(out_ls, output_file)
-
             # st = speedtest.Speedtest()
-            logger.info(f"{DGREEN}Success✅{DGREEN}")
+            pass
             # print("Get final speed ...")
             # logger.info(f"{YELLOW}Final Network Speed: {st.download()/(10**6):.2f} Kbps{RESET}")
 

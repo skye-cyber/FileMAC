@@ -74,7 +74,7 @@ elif os.name == "nt":
     FCYAN = Fore.CYAN
 
     BWHITE = Fore.WHITE
-    BWHITE = Fore.WHITE
+    BBWHITE = Fore.WHITE
 
 # return RESET, RED, DRED, GREEN, DGREEN, YELLOW, DYELLOW, BLUE, DBLUE,
 # MAGENTA, DMAGENTA, CYAN, DCYAN
