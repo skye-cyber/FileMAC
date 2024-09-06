@@ -14,20 +14,20 @@ def sri():
 
         result = subprocess.run(
                         ['dpkg', '-l', 'speedtest-cli'], stdout=subprocess.PIPE, text=True)
-        if result.returncode != 0:
+        '''if result.returncode != 0:
             print("Requirement speedtest-cli -> installing")
-            subprocess.run(['sudo', 'apt', 'install', 'speedtest-cli'])
+            subprocess.run(['sudo', 'apt', 'install', 'speedtest-cli'])'''
 
 
-DESCRIPTION = 'Open source Python CLI toolkit for conversion, manipulation, Analysis'
-EXCLUDE_FROM_PACKAGES = ["build", "dist", "test"]
+DESCRIPTION = 'Open source Python CLI toolkit for conversion, manipulation, Analysis of files (All major file operations)'
+EXCLUDE_FROM_PACKAGES = ["build", "dist", "test", "src"]
 
 sri()
 
 setup(
     name="filemac",
     author='wambua',
-    author_email='wambuamwiky2001@gmail.com',
+    author_email='swskye17@gmail.com',
     version=open("version.txt").read(),
     packages=find_namespace_packages(exclude=EXCLUDE_FROM_PACKAGES),
     description=DESCRIPTION,

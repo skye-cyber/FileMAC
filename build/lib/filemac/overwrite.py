@@ -1,3 +1,4 @@
+"""Clear the screen using ctypes in windows and os.system('clear') in unix systems"""
 import os
 import ctypes
 

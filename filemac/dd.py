@@ -1,33 +1,9 @@
-import argparse
+import sys
 
-# Create the main parser
-parser = argparse.ArgumentParser(description="Example of subparsers with argparse")
 
-# Add subparsers
-subparsers = parser.add_subparsers(dest='command', help='Sub-command help')
+def getargs(kwargs):
+    print(kwargs[1:])
 
-# Create a subparser for the "parent" command
-parent_parser = subparsers.add_parser('parent', help='Parent command help')
 
-# Add arguments to the parent command
-parent_parser.add_argument('--parent-arg1', type=int, help='Parent argument 1')
-parent_parser.add_argument('--parent-arg2', type=str, help='Parent argument 2')
-
-# Create a subparser for the "child" command under the "parent" command
-child_parser = parent_parser.add_subparsers(dest='subcommand', help='Sub-command under parent')
-child_parser_1 = child_parser.add_parser('child1', help='Child 1 command help')
-child_parser_2 = child_parser.add_parser('child2', help='Child 2 command help')
-
-# Add arguments to the child commands
-child_parser_1.add_argument('--child1-arg1', type=str, help='Child 1 argument 1')
-child_parser_1.add_argument('--child1-arg2', type=int, help='Child 1 argument 2')
-
-child_parser_2.add_argument('--child2-arg1', type=bool, help='Child 2 argument 1')
-child_parser_2.add_argument('--child2-arg2', type=float, help='Child 2 argument 2')
-
-# Parse the arguments
-args = parser.parse_args()
-
-# Print the arguments
-print(args)
-
+xp = sys.argv
+getargs(xp)

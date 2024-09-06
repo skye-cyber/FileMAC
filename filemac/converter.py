@@ -59,21 +59,23 @@ logger = logging.getLogger(__name__)
 
 class MakeConversion:
 
-    '''Initialize the class'''
+    '''Implementation for all file conversions'''
 
     def __init__(self, input_file):
         self.input_file = input_file
 
-    '''Check input object whether it's a file or a directory if a file append
+    def preprocess(self):
+
+        '''Check input object whether it`s a file or a directory if a file append
     the file to a set and return it otherwise append directory full path
     content to the set and return the set file. The returned set will be
     evaluated in the next step as required on the basis of requested operation
     For every requested operation, the output file if any is automatically
-    generated on the basis of the input filename and saved in the sam
-    directory as the input file
+    generated on the basis of the input filename and saved in the same
+    directory as the input file.
+    Exit if the folder is empty
     '''
 
-    def preprocess(self):
         try:
             files_to_process = []
 
@@ -92,10 +94,12 @@ class MakeConversion:
         except Exception as e:
             print(e)
 
-###############################################################################
-# Convert word file to pdf document (docx)
-###############################################################################
     def word_to_pdf(self):
+        ###############################################################################
+        '''Convert word file to pdf document (docx)
+        ->Check if running on Linux
+        ->Use subprocess to run the dpkg and grep commands'''
+        ###############################################################################
         word_list = self.preprocess()
 
         word_list = [
@@ -113,34 +117,45 @@ class MakeConversion:
                     result = subprocess.run(
                         ['dpkg', '-l', 'libreoffice'], stdout=subprocess.PIPE, text=True)
                     if result.returncode != 0:
-                        print(
-                            "Please install libreoffice to use this functionality !")
-                        sys.exit(1)
+                        logger.exception(f"{RED}Libreoffice not found !{RESET}")
+                        print(f"{CYAN}Initiating critical redundacy measure !{RESET}")
+                        self.word2pdf_extra(word_file)
                     subprocess.run(
-                        ['soffice', '--convert-to', 'pdf', word_file, '--outdir', pdf_file_dir])
+                        ['soffice', '--convert-to', 'pdf',
+                         word_file, '--outdir', pdf_file_dir])
 
                     print(
                         f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}")
                     return pdf_file
 
                 elif os.name == "nt":
-                    try:
-                        from docx2pdf import convert
-                    except ImportError:
-                        print("Run pip install docx2pdf for this function to work")
-                        sys.exit(1)
-                    convert(word_file, pdf_file)
-                    print(
-                        f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}")
+                    self.word2pdf_extra(word_file)
                     return pdf_file
 
             except Exception as e:
                 print(f"Error converting {word_file} to {pdf_file}: {e}")
 
-###############################################################################
-# Convert pdf file to word document (docx)
-###############################################################################
+    @staticmethod
+    def word2pdf_extra(obj, outf=None):
+        '''For window users since it requires Microsoft word to be installed'''
+        if obj.split('.')[-1] not in {'doc', 'docx'}:
+            print(f"{RED}File is not a word file{RESET}")
+            sys.exit(1)
+        pdf_file = os.path.splitext(obj)[0] + '.pdf' if outf is None else outf
+        try:
+            from docx2pdf import convert
+            convert(obj, pdf_file)
+            print(F"{GREEN}Conversion ✅{RESET}")
+            sys.exit(0)
+        except ImportError:
+            print(f"{RED}docx2pdf Not found. {CYAN}Run pip install docx2pdf{RESET}")
+        except Exception as e:
+            logger.error(e)
+
     def pdf_to_word(self):
+        ###############################################################################
+        """Convert pdf file to word document (docx)"""
+        ###############################################################################
         pdf_list = self.preprocess()
         pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
         for pdf_file in pdf_list:
@@ -160,11 +175,15 @@ class MakeConversion:
                 logger.info(f'{DRED}All conversion attempts have failed: \
 {e}{RESET}')
 
-###############################################################################
-# Convert text file(s) to pdf document (docx)
-###############################################################################
     def txt_to_pdf(self):
-        """Convert a .txt file to a PDF."""
+        ###############################################################################
+        """Convert text file(s) to pdf document (docx)
+        ->Read the contents of the input .txt file
+        ->Initialize the PDF document
+        ->Create a story to hold the elements of the PDF
+        ->Iterate through each line in the input .txt file and add it to the PDF
+        ->Build and write the PDF document"""
+        ###############################################################################
         txt_list = self.preprocess()
         _list_ = [item for item in txt_list if item.lower().endswith("txt")]
         for _file_ in _list_:
@@ -206,10 +225,16 @@ class MakeConversion:
             logger.info(f"{MAGENTA}New file is {CYAN}{_pdf_}{RESET}")
             print(f"\n{DGREEN}Success👨‍💻✅{RESET}")
 
-###############################################################################
-# Convert word file(s) to pptx document (pptx/ppt)
-###############################################################################
     def word_to_pptx(self):
+        ###############################################################################
+        """Convert word file(s) to pptx document (pptx/ppt)
+        -> Load the Word document
+        ->Create a new PowerPoint presentation
+        ->Iterate through each paragraph in the Word document
+        ->Create a new slide in the PowerPoint presentation
+        ->Add the paragraph text to the slide
+        """
+        ###############################################################################
         word_list = self.preprocess()
         word_list = [item for item in word_list if item.split(
             '.')[-1].lower() in ("doc", "docx")]
@@ -258,11 +283,10 @@ class MakeConversion:
             except Exception as e:
                 logger.error(e)
 
-###############################################################################
-# Convert word file to txt file'''
-###############################################################################
-
     def word_to_txt(self):
+        ###############################################################################
+        """Convert word file to txt file"""
+        ###############################################################################
         word_list = self.preprocess()
         word_list = [item for item in word_list if item.split(
             '.')[-1].lower() in ("dox", "docx")]
@@ -297,10 +321,12 @@ class MakeConversion:
                     log_file.write(f"Couldn't convert {file_path} to {txt_file}:\
 REASON->{e}")
 
-###############################################################################
-# Convert pdf file to text file
-###############################################################################
     def pdf_to_txt(self):
+
+        ###############################################################################
+        """Convert pdf file to text file"""
+        ###############################################################################
+
         pdf_list = self.preprocess()
         pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
         for file_path in pdf_list:
@@ -330,10 +356,12 @@ to {txt_file}: {e}")
                     log_file.write(
                         f"Error converting {file_path} to {txt_file}: {e}\n")
 
-###############################################################################
-# Convert ppt file to word document
-###############################################################################
     def ppt_to_word(self):
+        ###############################################################################
+        """Convert ppt file to word document
+    ->Preserves bold formatting
+    """
+        ###############################################################################
         ppt_list = self.preprocess()
         ppt_list = [item for item in ppt_list if item.split(
             '.')[-1].lower() in ("ppt", "pptx")]
@@ -389,10 +417,15 @@ to {txt_file}: {e}")
                     log_file.write(
                         f"\n❌Oops something went astray{RED}{e}{RESET}")
 
-###############################################################################
-# Convert text file to word
-###############################################################################
     def text_to_word(self):
+
+        ###############################################################################
+        """Convert text file to word
+    ->Read the text file
+    ->Filter out non-XML characters
+    ->Create a new Word document
+    ->Add the filtered text content to the document"""
+        ###############################################################################
         flist = self.preprocess()
         flist = [item for item in flist if item.lower().endswith("txt")]
         for file_path in flist:
@@ -428,10 +461,13 @@ to {txt_file}: {e}")
                     log_file.write(
                         f"\n❌Oops something went astray{RED}{e}{RESET}")
 
-###############################################################################
-# Convert xlsx file(s) to word file(s)
-###############################################################################
     def convert_xls_to_word(self):
+        ###############################################################################
+        """Convert xlsx file(s) to word file(s)
+    ->Read the XLS file using pandas
+    ->Create a new Word document
+    ->Iterate over the rows of the dataframe and add them to the Word document"""
+        ###############################################################################
         xls_list = self.preprocess()
 
         xls_list = [item for item in xls_list if item.split(
@@ -474,11 +510,14 @@ to {txt_file}: {e}")
             except Exception as e:
                 print(f"{RED}Oops Conversion failed:❕{RESET}", str(e))
 
-###############################################################################
-    '''Convert xlsx/xls file/files to text file format'''
-###############################################################################
-
     def convert_xls_to_text(self):
+
+        ###############################################################################
+        '''Convert xlsx/xls file/files to text file format
+    ->Read the XLS file using pandas
+    ->Convert the dataframe to plain text
+    ->Write the plain text to the output file'''
+        ###############################################################################
         xls_list = self.preprocess()
 
         xls_list = [
@@ -515,11 +554,12 @@ lines {RESET}", end="\n")
             except Exception as e:
                 print("Oops Conversion failed:", str(e))
 
-###############################################################################
-    '''Convert xlsx/xls file to csv(comma seperated values) format'''
-###############################################################################
-
     def convert_xlsx_to_csv(self):
+        ###############################################################################
+        '''Convert xlsx/xls file to csv(comma seperated values) format
+        ->Load the Excel file
+        ->Save the DataFrame to CSV'''
+        ###############################################################################
         xls_list = self.preprocess()
 
         xls_list = [
@@ -547,11 +587,14 @@ lines {RESET}", end="\n")
             except Exception as e:
                 print(e)
 
-###############################################################################
-# Convert xlsx file(s) to sqlite
-###############################################################################
-
     def convert_xlsx_to_database(self):
+        ###############################################################################
+        """Convert xlsx file(s) to sqlite
+        ->Read the Excel file into a pandas DataFrame
+        ->Create a connection to the SQLite database
+        ->Insert the DataFrame into a new table in the database
+        ->Close the database connection"""
+        ###############################################################################
         xlsx_list = self.preprocess()
         xlsx_list = [
             item for item in xlsx_list if item.split('.')[-1].lower() in ("xls", "xlsx")]
@@ -593,10 +636,10 @@ lines {RESET}", end="\n")
             except Exception as e:
                 logger.error(f"{e}")
 
-###############################################################################
-# Create image objects from given files
-###############################################################################
     def doc2image(self, outf="png"):
+        ###############################################################################
+        """Create image objects from given files"""
+        ###############################################################################
         outf = "png" if outf not in ('png', 'jpg') else outf
         path_list = self.preprocess()
         file_list = [
@@ -623,7 +666,8 @@ lines {RESET}", end="\n")
 
 
 class Scanner:
-
+    """Implementation of scanning to extract data from pdf files and images
+    input_file -> file to be scanned pdf,image"""
     def __init__(self, input_file):
         self.input_file = input_file
 
@@ -640,9 +684,12 @@ class Scanner:
 
         return files_to_process
 
-    def scanPDF(self):
+    def scanPDF(self, obj=None):
+        """Obj- object for scanning where the object is not a list"""
         pdf_list = self.preprocess()
         pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
+        if obj:
+            pdf_list = [obj]
 
         for pdf in pdf_list:
             out_f = pdf[:-3] + 'txt'
@@ -707,6 +754,7 @@ class Scanner:
         return text
 
     def scanAsLongImg(self):
+        """Convert the pdf to long image for scanning - text extraction"""
         file = self.input_file
         from .longImg import LImage
         LI = LImage(file)
@@ -716,16 +764,14 @@ class Scanner:
         # fpath = file.split('.')[0] + '.png'
         tx = ExtractText(fl)
         text = tx.OCR()
-        print(text)
-        print(f"{GREEN}Ok{RESET}")
+        if text is not None:
+            print(text)
+            print(f"{GREEN}Ok{RESET}")
         return text
 
 
-'''Definition of audiofying class'''
-
-
 class FileSynthesis:
-
+    '''Definition of audiofying class'''
     def __init__(self, input_file):
         self.input_file = input_file
         # self.CHUNK_SIZE = 20_000

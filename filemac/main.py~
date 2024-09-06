@@ -8,7 +8,7 @@ import sys
 
 from . import handle_warnings
 from .AudioExtractor import ExtractAudio
-from .colors import (CYAN, DCYAN, DYELLOW, FBLUE, FCYAN, FMAGENTA, FYELLOW,
+from .colors import (CYAN, DCYAN, DYELLOW, BLUE, FBLUE, FCYAN, MAGENTA, FMAGENTA, FYELLOW,
                      RED, RESET)
 from .converter import (AudioConverter, FileSynthesis, ImageConverter,
                         MakeConversion, Scanner, VideoConverter)
@@ -18,14 +18,14 @@ from .formats import (SUPPORTED_AUDIO_FORMATS_SHOW, SUPPORTED_DOC_FORMATS,
 from .image_op import Compress_Size
 from .OCRTextExtractor import ExtractText
 from .Simple_v_Analyzer import SA
+from .pdf_Page_Extractor import _entry
 
-# from .formats import SUPPORTED_INPUT_FORMATS, SUPPORTED_OUTPUT_FORMATS
 handle_warnings
 logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
 logger = logging.getLogger(__name__)
 
-'''If the input file in convert_doc argument is a directory, walk throught the directory and
-converter all the surported files to the target format'''
+"""If the input file in convert_doc argument is a directory, walk throught the directory and
+converter all the surported files to the target format"""
 
 
 class _DIR_CONVERSION_:
@@ -64,8 +64,8 @@ class _DIR_CONVERSION_:
             pass
 
 
-'''Class to handle document conversions based on their extensions and te targt
-output fdocument format'''
+"""Class to handle document conversions based on their extensions and te targt
+output fdocument format"""
 
 
 class Eval:
@@ -139,12 +139,12 @@ class Eval:
             logger.error(e)
 
 
-'''Define main functions to create commandline arguments for different operations'''
+"""Define main functions to create commandline arguments for different operations"""
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Multimedia Element Operations")
+        description="Multimedia Element Operations", epilog=f"{BLUE}When using {MAGENTA}-SALI{BLUE} long images have maximum height that can be processed{RESET}")
 
     parser.add_argument(
         "--convert_doc", help=f"Converter document file(s) to different format ie pdf_to_docx.\
@@ -208,8 +208,30 @@ def main():
 
     parser.add_argument("--OCR", help=f"Extract text from an image.\
         example: {DYELLOW}filemac --OCR image.png{RESET}")
-    parser.add_argument("--AudioJoin", "-AJ", help="Join Audio files into one master file")
-    parser.add_argument("--advanced_text2word", "-ATW", help="Convert Text to word by specifying headings, color, font_size, font_name")
+
+    '''Audio join  arguements'''
+    # Accept 0 or more arguements
+    parser.add_argument("--AudioJoin", "-AJ", nargs='*', help="Join Audio files into one master file")
+
+    ''''arguements for Advanced text to word conversion'''
+    # Accepts 0 or more values
+    parser.add_argument('-AT2W', "--Atext2word", help=f'Advanced Text to word conversion i.e:\{DYELLOW}filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}')
+
+    # Add arguments that must accompany the "obj" command
+    parser.add_argument('--font_size', type=int, default=12, help=F'Font size to be used default: \
+                            {CYAN}12{RESET}')
+    parser.add_argument('--font_name', type=str, default="Times New Roman", help=f"Font name default: \
+                            {CYAN}Times New Roman{RESET}")
+
+    '''Alternative sequence args, critical redundancy measure'''
+    parser.add_argument('--use_extras', action='store_true', help=f"Use alternative conversion method: Overides\
+                        default method i.e: {DYELLOW}filemac --convert_doc example.docx --use_extras -t pdf{RESET}")
+
+    '''Pdf join arguements'''
+    parser.add_argument("--pdfjoin", '-pj', nargs='+', help="Join Pdf file to one file")
+    parser.add_argument("--order", type=str, default='AAB', help=f"Order of pages when joining the pdf use: {DYELLOW}filemac\
+                        -pj help for more details{RESET}")
+    parser.add_argument('--extract_pages', '-XP', nargs=+, help=f"Extract given pages from pdf: {DYELLOW}filemac --extract_pages file.pdf 6 10{RESET} for one page: {DYELLOW}filemac --extract_pages file.pdf 5{RESET}")
 
     args = parser.parse_args()
 
@@ -219,6 +241,8 @@ def main():
         print(SUPPORTED_DOC_FORMATS)
         sys.exit(1)
     if args.convert_doc and args.target_format is not None:
+        if args.use_extras:
+            MakeConversion.word2pdf_extra(args.convert_doc)
         if os.path.isdir(args.convert_doc):
             conv = _DIR_CONVERSION_(
                 args.convert_doc, args.target_format, args.isolate)
@@ -309,10 +333,28 @@ def main():
         joiner.worker()
 
 # Call Advanced text to word converter
-    elif args.ATW:
-        from .ATWord import AdvancedT2word
-        init = AdvancedT2word()
+    elif args.Atext2word:
+        from .AT2Word import AdvancedT2word
+        init = AdvancedT2word(args.Atext2word, None, args.font_size, args.font_name)
         init.text_to_word()
+
+# call for pdf join implementation
+    elif args.pdfjoin:
+        from .combinepdf import pdfmaster
+        '''if len(args.pdfjoin) > 2 and args.order in {'AAB', 'BBA', 'AA', 'BB'}:
+            init = pdfmaster(args.pdfjoin)
+            init.controller()'''
+
+        if args.pdfjoin[0].lower().strip() == 'help':
+            from .combinepdf import helpmaster
+            opts, helper, example = helpmaster()
+            print(f"{opts}\n {helper}\n {example}")
+            sys.exit(0)
+
+        init = pdfmaster(args.pdfjoin, None, None, args.order)
+        init.controller()
+    elif args.extract_pages:
+        init = _entry(args.extract_pages)
 
 
 if __name__ == "__main__":

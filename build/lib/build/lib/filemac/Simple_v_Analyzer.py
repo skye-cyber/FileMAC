@@ -1,3 +1,4 @@
+"""A basic/simple file analyzer"""
 import sys
 import cv2
 import numpy as np
@@ -6,10 +7,19 @@ from .colors import DYELLOW, RESET, DCYAN, DGREEN
 
 class SA:
 
+    """Video - video object subject for analysis
+    return video`s: duration, total_area and frame_count"""
+
     def __init__(self, video):
         self.video = video
 
     def SimpleAnalyzer(self):
+
+        """Read the video file/obj
+        Increase frame count and accumulate area
+        Calculate current frame duration
+        Display the resulting frame"""
+
         try:
             # Read the video file
             cap = cv2.VideoCapture(self.video)
@@ -19,7 +29,7 @@ class SA:
             total_area = 0
             duration = 0
 
-            print(f"{DCYAN}mWorking on it{RESET}")
+            print(f"{DCYAN}Working on it{RESET}")
             while True:
                 ret, frame = cap.read()
 
@@ -48,6 +58,7 @@ class SA:
             print(f"Total Frames: {DGREEN}{frame_count}{RESET}")
             print(f"Average Frame Area: {DGREEN}{total_area / frame_count}{RESET}")
             print(f"Duration: {DGREEN}{duration}{RESET} seconds")
+            return frame_count, total_area, duration
         except KeyboardInterrupt:
             print("\nExiting")
             sys.exit(1)

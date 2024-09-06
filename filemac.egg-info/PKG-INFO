@@ -1,9 +1,9 @@
 Metadata-Version: 2.1
 Name: filemac
-Version: 1.0.6
-Summary: Open source Python CLI toolkit for conversion, manipulation, Analysis
+Version: 1.0.8
+Summary: Open source Python CLI toolkit for conversion, manipulation, Analysis of files (All major file operations)
 Author: wambua
-Author-email: wambuamwiky2001@gmail.com
+Author-email: swskye17@gmail.com
 License: GPL v3
 Keywords: file-conversion,file-analysis,file-manipulation,ocr,image-conversion
 Classifier: Environment :: Console
@@ -20,6 +20,25 @@ Classifier: Programming Language :: Python :: 3.11
 Requires-Python: >=3.6
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: argparse
+Requires-Dist: pdfminer.six
+Requires-Dist: python-docx
+Requires-Dist: python-pptx
+Requires-Dist: gTTS
+Requires-Dist: pypandoc
+Requires-Dist: pydub
+Requires-Dist: requests
+Requires-Dist: Pillow
+Requires-Dist: pandas
+Requires-Dist: opencv-python
+Requires-Dist: pytesseract
+Requires-Dist: PyPDF2
+Requires-Dist: pdf2docx
+Requires-Dist: requests
+Requires-Dist: moviepy
+Requires-Dist: reportlab
+Requires-Dist: numpy
+Requires-Dist: pdf2image
 
 # fconverter
 A python file `conversion`, `manipulation`, `Analysis` toolkit

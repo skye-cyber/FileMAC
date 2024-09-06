@@ -1,10 +1,9 @@
 '''
-    ////////   ///  ///      /////////   ///////  //////    //////   ////////
+....    ////////   ///  ///      /////////   ///////  //////    //////   ////////
    //         ///  ///      //          //    // //  //   //    // ///
   /////////  ///  ///      ////////    //     ///   //   //----//  //
  //         ///  //////// //_____     //           //   //    //   //////////
-'''
-"""
+
 Converter document file(s) to different format ie pdf_to_docx.
     example filemac --convert_doc example.docx -t pdf
 
@@ -37,6 +36,6 @@ Scan [doc, docx, pdf]
 
 Extract text from an image.
         example filemac --OCR image.png
-"""
+'''
 
-from .fmac import main
+from .main import main
