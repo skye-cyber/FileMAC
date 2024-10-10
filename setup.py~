@@ -3,7 +3,7 @@ import os
 import subprocess
 from setuptools import find_namespace_packages, setup
 
-
+os.
 def sri():
     if os.name == 'posix':
         result = subprocess.run(
@@ -27,7 +27,7 @@ sri()
 setup(
     name="filemac",
     author='wambua',
-    author_email='swskye1@gmail.com',
+    author_email='swskye17@gmail.com',
     version=open("version.txt").read(),
     packages=find_namespace_packages(exclude=EXCLUDE_FROM_PACKAGES),
     description=DESCRIPTION,

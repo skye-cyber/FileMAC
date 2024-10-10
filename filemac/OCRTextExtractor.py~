@@ -6,7 +6,7 @@ import sys
 import cv2
 import pytesseract
 from PIL import Image
-
+from rich.progress import Progress
 from .colors import BBWHITE, DGREEN, DYELLOW, FMAGENTA, RED, RESET
 
 ###############################################################################
@@ -58,7 +58,7 @@ class ExtractText:
             '''Load image using OpenCV'''
             img = cv2.imread(image_path)
 
-            logger.info(f"{FMAGENTA}processing {image_path}...{RESET}")
+            # logger.info(f"{FMAGENTA}processing {image_path}...{RESET}")
 
             try:
                 '''Preprocess image for better OCR results'''
@@ -78,13 +78,11 @@ class ExtractText:
                 current_path = os.getcwd()
                 file_path = os.path.join(current_path, OCR_file)
                 ''' Save the extracted text to specified file '''
-                logger.info(f"{DGREEN}Generating text file for the extracted \
-text..{RESET}")
+                # logger.info(f"{DGREEN}Generating text file for the extracted text..{RESET}")
 
                 with open(file_path, 'w') as file:
                     file.write(text)
-                logger.info(
-                    f"File saved as {DYELLOW}{OCR_file}{RESET}:")
+                # logger.info(f"File saved as {DYELLOW}{OCR_file}{RESET}:")
                 '''If there are multiple candidate images for text extraction,
                 wait for key press before proceeding to the next
                 image otherwise don't wait
@@ -109,7 +107,13 @@ Reason: {str(e)}{RESET}")
             # logger.error(f"Error:>>{RED}{e}{RESET}")
 
         # _file_list_ = [None]
-        for image_path in image_list:
-            OCR_file = image_path[:-4] + ".txt"
-            return ocr_text_extraction(image_path)
-            # _file_list_.append(OCR_file)
+        if len(image_list) >= 1:
+            with Progress() as progress:
+                task = progress.add_task("[magenta] Extracting")
+                for image_path in image_list:
+                    OCR_file = image_path[:-4] + ".txt"
+                    return ocr_text_extraction(image_path)
+                    task.update(task, advance=1)
+                    # _file_list_.append(OCR_file)
+        else
+

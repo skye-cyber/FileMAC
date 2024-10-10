@@ -2,36 +2,30 @@
 import logging
 import logging.handlers
 import math
-# import math
 import os
 import re
 import sqlite3
 import subprocess
 import sys
 
-# import time
-# import traceback
 import cv2
 import pandas as pd
 import pydub
 import PyPDF2
-# import pytesseract
 import requests
-# import speedtest
 from docx import Document
-# from pydub.playback import play
 from gtts import gTTS
-# from PyPDF2 import PdfFileReader
 from moviepy.editor import VideoFileClip
+from openpyxl import load_workbook
 from pdf2docx import parse
-# import pdfminer.high_level
-# from typing import Iterable
 from pdf2image import convert_from_path
 from PIL import Image
 from pptx import Presentation
 from pydub import AudioSegment
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate
+from rich.progress import Progress
+from tqdm import tqdm
 
 from .colors import (BLUE, BWHITE, CYAN, DBLUE, DCYAN, DGREEN, DMAGENTA, DRED,
                      DYELLOW, FCYAN, FMAGENTA, GREEN, ICYAN, IGREEN, MAGENTA,
@@ -65,7 +59,6 @@ class MakeConversion:
         self.input_file = input_file
 
     def preprocess(self):
-
         '''Check input object whether it`s a file or a directory if a file append
     the file to a set and return it otherwise append directory full path
     content to the set and return the set file. The returned set will be
@@ -117,11 +110,14 @@ class MakeConversion:
                     result = subprocess.run(
                         ['dpkg', '-l', 'libreoffice'], stdout=subprocess.PIPE, text=True)
                     if result.returncode != 0:
-                        logger.exception(f"{RED}Libreoffice not found !{RESET}")
-                        print(f"{CYAN}Initiating critical redundacy measure !{RESET}")
+                        logger.exception(
+                            f"{RED}Libreoffice not found !{RESET}")
+                        print(
+                            f"{CYAN}Initiating critical redundacy measure !{RESET}")
                         self.word2pdf_extra(word_file)
                     subprocess.run(
-                        ['soffice', '--convert-to', 'pdf', word_file, '--outdir', pdf_file_dir])
+                        ['soffice', '--convert-to', 'pdf',
+                         word_file, '--outdir', pdf_file_dir])
 
                     print(
                         f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}")
@@ -147,7 +143,8 @@ class MakeConversion:
             print(F"{GREEN}Conversion ✅{RESET}")
             sys.exit(0)
         except ImportError:
-            print(f"{RED}docx2pdf Not found. {CYAN}Run pip install docx2pdf{RESET}")
+            print(f"{RED}docx2pdf Not found. {
+                  CYAN}Run pip install docx2pdf{RESET}")
         except Exception as e:
             logger.error(e)
 
@@ -310,6 +307,7 @@ class MakeConversion:
                     logger.info(
                         f"{DMAGENTA}Conversion of file to txt success{RESET}")
 
+                return txt_file
             except KeyboardInterrupt:
                 print("\nQuit❕⌨️")
                 sys.exit()
@@ -348,14 +346,112 @@ REASON->{e}")
                 logger.info(f"{MAGENTA}New file is {CYAN}{txt_file}{RESET}")
                 logger.info(f"{DGREEN}Success👨‍💻✅{RESET}")
             except Exception as e:
-                logger.error(
-                    f"Oops somethin went astray while converting {file_path} \
-to {txt_file}: {e}")
+                logger.error(f"{RED}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
                     log_file.write(
                         f"Error converting {file_path} to {txt_file}: {e}\n")
 
+    def pptx_to_txt(self, dest=None):
+        ###############################################################################
+        """Convert ppt file to tetx document"""
+        ###############################################################################
+        ppt_list = self.preprocess()
+        ppt_list = [item for item in ppt_list if item.split(
+            '.')[-1].lower() in ("ppt", "pptx")]
+        try:
+            for file_path in ppt_list:
+
+                ext = os.path.splitext(file_path)[-1][1:]
+
+                txt_file = (os.path.splitext(file_path)[0]) + ".txt"
+
+                file_path = os.path.abspath(file_path)
+
+                if ext == 'ppt':
+                    file_path = self.convert_ppt_to_pptx(
+                        file_path)  # First convert the ppt to pptx
+
+                presentation = Presentation(file_path)
+
+                logger.info(F"Slide count ={DMAGENTA} {
+                            len(presentation.slides)}{RESET}")
+
+                _slide_count_ = 0
+
+                with Progress() as progress:
+
+                    task = progress.add_task(
+                        "[magenta]Preparing..", total=len(presentation.slides))
+
+                    for slide in presentation.slides:
+
+                        _slide_count_ += 1
+                        # progress.console.print(F"Slide {_slide_count_}/{len(presentation.slides)}", end='\n')
+
+                        for shape in slide.shapes:
+                            if shape.has_text_frame:
+                                text_frame = shape.text_frame
+
+                                for paragraph in text_frame.paragraphs:
+                                    # Create a paragraph in the Word document if it contains text
+                                    # Ensure text exists
+                                    if any(run.text.strip() for run in paragraph.runs):
+
+                                        for run in paragraph.runs:
+                                            text = run.text.strip()
+                                            if text and text != ' ':
+
+                                                with open(txt_file, 'a') as fl:
+                                                    fl.write(text)
+                                                    # return txt_file
+
+                        progress.update(task, advance=1)
+
+                    if dest == "text":
+                        with open(txt_file, "r") as fl:
+                            text_buffer = fl.read()
+                        print(text_buffer)
+                        return text_buffer
+
+                logger.info(f"{MAGENTA}New file is {CYAN}{txt_file}{RESET}")
+                logger.info(f"{DGREEN}Success👨‍💻✅{RESET}")
+        except Exception as e:
+            logger.error(f"\n❌Oops! {RED}{e}{RESET}")
+
+    @staticmethod
+    def convert_ppt_to_pptx(obj: os.PathLike):
+        import platform
+        try:
+            if obj.endswith('ppt'):
+                if platform.system() in ('Linux', 'MacOS') or os.name == 'posix':
+                    subprocess.run(
+                        ['soffice', '--headless', '--convert-to', 'pptx', obj])
+                    return os.path.splitext(obj)[0] + ".pptx"
+                elif platform.system() in ('Windows') or os.name == 'nt':
+                    import win32com.client
+                    powerpoint = win32com.client.Dispatch(
+                        "PowerPoint.Application")
+                    powerpoint.Visible = 1
+                    ppt = powerpoint.Presentations.Open(obj)
+                    pptx_file = os.path.splitext(obj)[0] + ".pptx"
+                    ppt.SaveAs(pptx_file, 24)  # 24 is the format for pptx
+                    ppt.Close()
+                    powerpoint.Quit()
+                    return pptx_file
+            else:
+                print(F"{RED}Unable to identify the system{RESET}")
+        except KeyboardInterrupt:
+            print("\nQuit!")
+            exit(1)
+        except Exception as e:
+            logger.error(f"{RED}{e}{RESET}")
+
     def ppt_to_word(self):
+        from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+        from docx.shared import Pt
+        from docx.shared import RGBColor as docxRGBColor
+        from pptx.dml.color import RGBColor as pptxRGBColor
+
         ###############################################################################
         """Convert ppt file to word document
     ->Preserves bold formatting
@@ -370,51 +466,79 @@ to {txt_file}: {e}")
                          0] + ".docx") if ext in list(_ext_ppt_) else None
             try:
                 logger.info(f"{DYELLOW}Create Doument Tablet{RESET}")
+                file_path = os.path.abspath(file_path)
+                if ext == 'ppt':
+                    file_path = self.convert_ppt_to_pptx(
+                        file_path)  # First convert the ppt to pptx
                 presentation = Presentation(file_path)
                 document = Document()
-
                 logger.info(
                     F"Slide count ={DMAGENTA} {len(presentation.slides)}{RESET}")
                 _slide_count_ = 0
-                for slide in presentation.slides:
-                    _slide_count_ += 1
-                    print(
-                        F"INFO\t Slide {DBLUE}{_slide_count_}{RESET}/{len(presentation.slides)}{RESET}", end='\r')
-                    for shape in slide.shapes:
-                        if shape.has_text_frame:
-                            text_frame = shape.text_frame
-                            for paragraph in text_frame.paragraphs:
-                                new_paragraph = document.add_paragraph()
-                                for run in paragraph.runs:
-                                    new_run = new_paragraph.add_run(run.text)
-                                    # Preserve bold formatting
-                                    new_run.bold = run.font.bold
-                                    # Preserve italic formatting
-                                    new_run.italic = run.font.italic
-                                    # Preserve underline formatting
-                                    new_run.underline = run.font.underline
-                                    # Preserve font name
-                                    new_run.font.name = run.font.name
-                                    # Preserve font size
-                                    new_run.font.size = run.font.size
-                                    try:
-                                        # Preserve font color
-                                        new_run.font.color.rgb = run.font.color.rgb
-                                    except AttributeError:
-                                        # Ignore error and continue without
-                                        # setting the font color
-                                        pass
-                            # Add a new paragraph after each slide
-                            document.add_paragraph()
+                with Progress() as progress:
+                    task = progress.add_task(
+                        "[magenta]Preparing..", total=len(presentation.slides))
+                    for slide in presentation.slides:
+                        _slide_count_ += 1
+                        # progress.console.print(F"Slide {_slide_count_}/{len(presentation.slides)}", end='\n')
+                        slide_text = ""
+                        for shape in slide.shapes:
+                            if shape.has_text_frame:
+                                text_frame = shape.text_frame
+
+                                for paragraph in text_frame.paragraphs:
+                                    # Create a paragraph in the Word document if it contains text
+                                    # Ensure text exists
+                                    if any(run.text.strip() for run in paragraph.runs):
+                                        # print("Has text")
+                                        new_paragraph = document.add_paragraph()
+
+                                        # Set general paragraph properties
+                                        new_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY  # Justify text
+                                        new_paragraph.space_after = Pt(6)
+                                        new_paragraph.space_before = Pt(6)
+                                        new_paragraph.line_spacing = 1.15
+
+                                        for run in paragraph.runs:
+                                            if run.text.strip():
+                                                slide_text += run.text  # Only add non-empty text runs
+                                                # print(run.text.strip(), end='\n')
+                                                new_run = new_paragraph.add_run(
+                                                    run.text)
+
+                                                # Preserve bold, italic, underline, font name, and size
+                                                new_run.bold = run.font.bold
+                                                new_run.italic = run.font.italic
+                                                new_run.underline = run.font.underline
+                                                new_run.font.name = run.font.name
+                                                new_run.font.size = run.font.size
+
+                                                # Preserve font color
+                                                try:
+                                                    if run.font.color and run.font.color.rgb:
+                                                        pptx_color = run.font.color.rgb
+                                                        # If the color is white (255, 255, 255), change it to black (0, 0, 0)
+                                                        if pptx_color == pptxRGBColor(255, 255, 255):
+                                                            new_run.font.color.rgb = docxRGBColor(
+                                                                0, 0, 0)  # Black
+                                                        else:
+                                                            # Assign color properly to the Word run
+                                                            new_run.font.color.rgb = docxRGBColor(
+                                                                pptx_color[0], pptx_color[1], pptx_color[2])
+                                                except AttributeError:
+                                                    pass
+
+                        progress.update(task, advance=1)
                 document.save(word_file)
-                logger.info(f"\n{MAGENTA}New file is {CYAN}{word_file}{RESET}")
+                logger.info(f"{MAGENTA}New file is {CYAN}{word_file}{RESET}")
                 logger.info(f"{DGREEN}Success👨‍💻✅{RESET}")
+                return word_file
             except Exception as e:
                 logger.error(
-                    f"\n❌Oops something went awry {RED}{e}{RESET}")
+                    f"\n❌Oops! {RED}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
                     log_file.write(
-                        f"\n❌Oops something went astray{RED}{e}{RESET}")
+                        f"\n❌Oops! {RED}{e}{RESET}")
 
     def text_to_word(self):
 
@@ -523,7 +647,7 @@ to {txt_file}: {e}")
             item for item in xls_list if any(item.lower().endswith(ext)
                                              for ext in _ext_xls)]
         print(F"{DGREEN}Initializing conversion sequence{RESET}")
-        for xls_file in xls_list:
+        for xls_file in tqdm(xls_list):
             ext = os.path.splitext(xls_file)[-1][1:]
             txt_file = (os.path.splitext(xls_file)[
                         0] + ".txt") if ext in list(_ext_xls) else None
@@ -563,7 +687,7 @@ lines {RESET}", end="\n")
 
         xls_list = [
             item for item in xls_list if item.split('.')[-1].lower() in ("xls", "xlsx")]
-        for xls_file in xls_list:
+        for xls_file in tqdm(xls_list):
             ext = os.path.splitext(xls_file)[-1][1:]
             csv_file = (os.path.splitext(xls_file)[
                         0] + ".csv") if ext in list(_ext_xls) else None
@@ -586,6 +710,45 @@ lines {RESET}", end="\n")
             except Exception as e:
                 print(e)
 
+    def convert_csv_to_xlsx(self):
+        csv_list = self.preprocess()
+        csv_list = [
+            item for item in csv_list if item.split('.')[-1].lower() in ("csv")]
+
+        with Progress() as progress:
+            task = progress.add_task("[cyan]Coverting", total=len(csv_list))
+            for file in csv_list:
+                file_name = file[:-3] + 'xlsx'
+                df = pd.read_csv(file)
+                # excel engines ('openpyxl' or 'xlsxwriter')
+                df.to_excel(file_name, engine='openpyxl', index=False)
+
+                # Load the workbook and the sheet
+                workbook = load_workbook(file_name)
+                sheet = workbook.active
+
+                # print("Adjust Columns")
+                for column in sheet.columns:
+                    max_length = 0
+                    column_letter = column[0].column_letter
+
+                    max_length = max(len(str(cell.value)) for cell in column)
+                    '''for cell in column:
+                        try:
+                            if len(str(cell.value)) > max_length:
+                                max_length = len(cell.value)
+
+                        except Exception:
+                            pass
+                    '''
+
+                    adjusted_width = (max_length + 2)
+                    sheet.column_dimensions[column_letter].width = adjusted_width
+
+                # Save the workbook
+                workbook.save(file_name)
+                progress.update(task, advance=1)
+
     def convert_xlsx_to_database(self):
         ###############################################################################
         """Convert xlsx file(s) to sqlite
@@ -597,7 +760,7 @@ lines {RESET}", end="\n")
         xlsx_list = self.preprocess()
         xlsx_list = [
             item for item in xlsx_list if item.split('.')[-1].lower() in ("xls", "xlsx")]
-        for xlsx_file in xlsx_list:
+        for xlsx_file in tqdm(xlsx_list):
             sqlfile = (os.path.splitext(xlsx_file)[
                        0] + ".sql") if (xlsx_file.split('.')[0]) in ("xls", "xlsx") else None
             try:
@@ -654,12 +817,15 @@ lines {RESET}", end="\n")
                 fname = file[:-4]
                 print(f"{YELLOW}Target images{BLUE} {len(images)}{RESET}")
 
-                for i, image in enumerate(images):
-                    print(f"{DBLUE}{i}{RESET}", end="\r")
-                    yd = f"{fname}_{i+1}.{outf}"
-                    image.save(yd)
-                    imgs.append(yd)
-            print(f"\n{GREEN}Ok{RESET}")
+                with Progress() as progress:
+                    task = progress.add_task("[magenta]Generating images ", total=len(images))
+                    for i, image in enumerate(images):
+                        # print(f"{DBLUE}{i}{RESET}", end="\r")
+                        yd = f"{fname}_{i+1}.{outf}"
+                        image.save(yd)
+                        imgs.append(yd)
+                        progress.update(task, advance=1)
+                # print(f"\n{GREEN}Ok{RESET}")
 
         return imgs
 
@@ -667,6 +833,7 @@ lines {RESET}", end="\n")
 class Scanner:
     """Implementation of scanning to extract data from pdf files and images
     input_file -> file to be scanned pdf,image"""
+
     def __init__(self, input_file):
         self.input_file = input_file
 
@@ -721,14 +888,18 @@ class Scanner:
         # print(img_objs)
         from .OCRTextExtractor import ExtractText
         text = ''
-        for i in img_objs:
-            extract = ExtractText(i)
-            _text = extract.OCR()
 
-            if _text is not None:
-                text += _text
-                with open(f"{self.input_file[:-4]}_filemac.txt", 'a') as _writer:
-                    _writer.write(text)
+        with Progress() as progress:
+            task = progress.add_task("[magenta]Extracting text", totsl=len(img_objs))
+            for i in img_objs:
+                extract = ExtractText(i)
+                _text = extract.OCR()
+
+                if _text is not None:
+                    text += _text
+                    with open(f"{self.input_file[:-4]}_filemac.txt", 'a') as _writer:
+                        _writer.write(text)
+                progress.update(task, advance=1)
 
         def _cleaner_():
             print(f"{FMAGENTA}Clean")
@@ -771,6 +942,7 @@ class Scanner:
 
 class FileSynthesis:
     '''Definition of audiofying class'''
+
     def __init__(self, input_file):
         self.input_file = input_file
         # self.CHUNK_SIZE = 20_000
@@ -811,20 +983,34 @@ class FileSynthesis:
         combined_ogg.export(output_file + "_master.ogg", format='ogg')
         print(F"{DGREEN}Master file:Ok                                                                             {RESET}")
 
-    def Synthesise(self, text: str, output_file: str, CHUNK_SIZE: int = 10_000, _tmp_folder_: str = 'tmp_dir', max_retries: int = 30) -> None:
+    def Synthesise(self, text: str, output_file: str, CHUNK_SIZE: int = 1_000, _tmp_folder_: str = 'tmp_dir', max_retries: int = 30) -> None:
         """Converts given text to speech using Google Text-to-Speech API."""
-        out_ls = []
+        from rich.progress import (BarColumn, Progress, SpinnerColumn,
+                                   TextColumn)
+
         # Define directories and other useful variables for genrating output_file and checkpoint_file
         out_dir = os.path.split(output_file)[0]
+
         _file_ = os.path.split(output_file)[1]
+
+        if os.path.exists(os.path.join(out_dir, _tmp_folder_)):
+            query = input(f"{DBLUE}Remove the {os.path.join(
+                out_dir, _tmp_folder_)} directory (y/n)?{RESET} ").lower() in ('y', 'yes')
+            import shutil
+            if query:
+                shutil.rmtree(os.path.join(out_dir, _tmp_folder_))
+
         _full_output_path_ = os.path.join(out_dir, _tmp_folder_, _file_)
+
         # Create a checkpoint_file for conversion resumption if need be
         _check_file = os.path.splitext(_file_)[0] + '.ch'
+
         _check_dir_path_ = os.path.join(out_dir, _tmp_folder_, _check_file)
+
         checkpoint_file = _check_dir_path_
 
-        # Initialize start chank
-        start_chunk = 0
+        start_chunk = 0  # Initialize start chank
+
         # Check if there is any checkpoint record in chekpoint file for resumption
         if os.path.exists(checkpoint_file):
             logger.info(f"{DYELLOW}Found a Checkpoint file{RESET}")
@@ -834,7 +1020,7 @@ class FileSynthesis:
                 f"{DYELLOW}Resuming from chunk{DBLUE} {start_chunk}{RESET}")
 
             # multiply by chunk size to get resume chunk position
-            resume_chunk_pos = start_chunk * 10_000
+            resume_chunk_pos = start_chunk * 1_000
 
         # if the checkpoint_file is missing, set resume_chunk_pos to 0(start chunk)
         else:
@@ -846,100 +1032,165 @@ class FileSynthesis:
                     f"{DYELLOW}Create temporary directory = {DBLUE}{_tmp_folder_}{RESET}")
                 os.mkdir(_tmp_folder_)
 
-            # print(f"{DYELLOW}Get initial net speed..{RESET}")# st = speedtest.Speedtest()  # get initial network speed# st.get_best_server()# download_speed: float = st.download()  # Keep units as bytes# logger.info( f"{GREEN} Conversion to mp3 sequence initialized start\speed {CYAN}{download_speed/1_000_000:.2f}Kbps{RESET}")
-
             logger.info(f"{DYELLOW}Start conversion{RESET}")
+
+            total_chunks = math.ceil(len(text) / CHUNK_SIZE)
+
+            counter = math.ceil(resume_chunk_pos /
+                                CHUNK_SIZE) if resume_chunk_pos != 0 else 0
+
             attempt = 0
+
             while attempt <= max_retries:
                 try:
-                    '''Split input text into smaller parts and generate
-                    individual gTTS objects'''
+                    # Initialize progress bar for the overall process
+                    with Progress(
+                        SpinnerColumn(),  # Indeterminate spinner for chunk progress
+                        TextColumn("[green]Processing"),
+                        BarColumn(),
+                        TextColumn(
+                            "[progress.percentage]{task.percentage:>3.1f}%"),
+                    ) as progress:
 
-                    counter = math.ceil(
-                        resume_chunk_pos/10_000) if resume_chunk_pos != 0 else 0
-                    for ch, i in enumerate(range(resume_chunk_pos, len(text), CHUNK_SIZE)):
-                        logger.info(
-                            f"{BWHITE}Chunk {DBLUE}{counter}{RESET}/{math.ceil(len(text)/CHUNK_SIZE)}")
-                        chunk = text[i:i+CHUNK_SIZE]
+                        overall_task = progress.add_task(
+                            "Overall Progress [magenta]Total", total=total_chunks)
 
-                        if os.path.exists(f"{_full_output_path_}_{counter}.ogg"):
-                            output_filename = f"{_full_output_path_}_{counter+1}.ogg"
-                        else:
-                            output_filename = f"{_full_output_path_}_{counter}.ogg"
-                        counter += 1
+                        # Resume progress bar to the point of last progress
+                        progress.update(overall_task, completed=counter)
 
-                        tts = gTTS(text=chunk, lang='en', slow=False)
-                        tts.save(output_filename)
-                        # Update checkpoint file only and only when the current chunk has reached its conclusion, otherwise checkpoint file chunkremains unchanges
-                        with open(checkpoint_file, 'w') as f:
-                            f.write(str(counter))
+                        for i in range(resume_chunk_pos, len(text), CHUNK_SIZE):
 
-                    # Remove checkpoint file as processing is complete
-                    if os.path.exists(checkpoint_file):
-                        os.remove(checkpoint_file)
-                    '''Handle any network related issue gracefully'''
+                            chunk = text[i:i + CHUNK_SIZE]
 
-                # Handle connectivity/network error
-                except requests.exceptions.ConnectionError:
+                            if os.path.exists(f"{_full_output_path_}_{counter}.ogg"):
+
+                                if counter == start_chunk:
+                                    print(f"{CYAN}Chunk vs file confict: {
+                                          BLUE}Resolving{RESET}")
+                                    os.remove(f"{_full_output_path_}_{
+                                              counter}.ogg")
+                                    output_filename = f"{
+                                        _full_output_path_}_{counter}.ogg"
+
+                                # Remove empty file
+                                elif os.path.getsize(f"{_full_output_path_}_{counter}.ogg") != 0:
+                                    os.remove(f"{_full_output_path_}_{
+                                              counter}.ogg")
+                                    output_filename = f"{
+                                        _full_output_path_}_{counter}.ogg"
+
+                                else:
+                                    output_filename = f"{
+                                        _full_output_path_}_{counter+1}.ogg"
+
+                            else:
+                                output_filename = f"{
+                                    _full_output_path_}_{counter}.ogg"
+
+                            progress.console.print(f"Processing chunk {
+                                                   counter + 1}/{total_chunks}\n", end="\r")
+
+                            tts = gTTS(text=chunk, lang='en', slow=False)
+
+                            tts.save(output_filename)
+
+                            # Update checkpoint file after saving each chunk
+                            with open(checkpoint_file, 'w') as f:
+                                f.write(str(counter + 1))
+
+                            counter += 1
+
+                            # Update the overall progress
+                            progress.update(overall_task, advance=1)
+
+                        # Remove checkpoint file as processing is complete
+                        if os.path.exists(checkpoint_file):
+                            os.remove(checkpoint_file)
+
+                except FileNotFoundError:
+                    raise
+
+                except requests.exceptions.ConnectionError:  # Handle connectivity/network error
                     logger.error(f"{DRED}Connection Error{RESET}")
+
                     # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
                         print(
+                            # Increament the attempts
                             f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
-                    # Increament the attempts
+
                     attempt += 1
-                # Exponential backoff for retries
-                except requests.exceptions.HTTPError as e:
+
+                    # Read chunk from FileSynthesis
+                    if os.path.exists(checkpoint_file):
+                        with open(checkpoint_file, 'r') as f:
+                            resume_chunk_pos = int(f.read()) * 1_000
+
+                except requests.exceptions.HTTPError as e:  # Exponential backoff for retries
                     logger.error(f"HTTP error: {e.status_code} - {e.reason}")
                     for _sec_ in range(2 ** attempt, 0, -1):
                         print(
                             f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
-                    # Increament the attempts
+
                     attempt += 1
+
+                    if os.path.exists(checkpoint_file):
+                        with open(checkpoint_file, 'r') as f:
+                            resume_chunk_pos = int(f.read()) * 1_000
+
                 except requests.exceptions.RequestException as e:
                     logger.error(f"{e}")
 
-                    # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
                         print(
                             f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
-                    # Increament the attempts
+
                     attempt += 1
+
+                    if os.path.exists(checkpoint_file):
+                        with open(checkpoint_file, 'r') as f:
+                            resume_chunk_pos = int(f.read()) * 1_000
 
                 except (ConnectionError, ConnectionAbortedError, ConnectionRefusedError, ConnectionResetError):
                     logger.error(
                         f'{RED}Connection at attempt {CYAN}{attempt+1}/{max_retries}{RESET}')
-                    # Exponential backoff for retries
+
                     for _sec_ in range(2 ** attempt, 0, -1):
                         print(
                             f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
-                        # Increament the attempts
+
                         attempt += 1
 
-                # Handle all other types of exceptions
-                except Exception as e:
+                    if os.path.exists(checkpoint_file):
+                        with open(checkpoint_file, 'r') as f:
+                            resume_chunk_pos = int(f.read()) * 1_000
+
+                except Exception as e:  # Handle all other types of exceptions
                     logger.error(
                         f'{DMAGENTA}{attempt+1}/{max_retries}:{DRED}{e}{RESET}')
 
-                    # tb = traceback.extract_tb(sys.exc_info()[2])
-                    # logger.info("\n".join([f"  > {line}" for line in map(str, tb)]))
-
-                    # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
                         print(
                             f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
-                    # Increament the attempts
+
                     attempt += 1
 
-                else:  # *****#### if
+                    if os.path.exists(checkpoint_file):
+                        with open(checkpoint_file, 'r') as f:
+                            resume_chunk_pos = int(f.read()) * 1_000
+
+                else:
                     print(
                         f"{FMAGENTA}Conversion success✅. \n  {FCYAN}INFO\t Create masterfile{RESET}")
-                    # Combine generated gTTS objects
-                    if len(out_ls) > 1:
-                        # FileSynthesis.join_audios(out_ls, output_file)
+
+                    if len(os.listdir(_tmp_folder_)) > 2:  # Combine generated gTTS objects
+
                         from .JoinAudios import JoinAudios
-                        joiner = JoinAudios(out_ls, masterfile=output_file)
+
+                        joiner = JoinAudios(
+                            _tmp_folder_, masterfile=output_file)
                         joiner.worker()
+
                     break  # Exit the retry loop if successfull
 
             else:
@@ -948,10 +1199,7 @@ class FileSynthesis:
                 sys.exit(2)
 
         finally:
-            # st = speedtest.Speedtest()
             pass
-            # print("Get final speed ...")
-            # logger.info(f"{YELLOW}Final Network Speed: {st.download()/(10**6):.2f} Kbps{RESET}")
 
     @staticmethod
     def pdf_to_text(pdf_path):
@@ -1005,27 +1253,34 @@ class FileSynthesis:
 
     def audiofy(self):
         input_list = self.preprocess()
-        ls = {"pdf", "docx", "doc", "txt"}
+        ls = ("pdf", "docx", "doc", "txt", "ppt", "pptx")
         input_list = [
             item for item in input_list if item.lower().endswith(tuple(ls))]
+
         for input_file in input_list:
+            output_file = os.path.split(input_file)[-1].split('.')[0] + '.ogg'
+
             if input_file.endswith('.pdf'):
                 text = FileSynthesis.pdf_to_text(input_file)
-                output_file = input_file[:-4]
 
             elif input_file.lower().endswith(tuple(_ext_word)):
-
                 text = FileSynthesis.docx_to_text(input_file)
-                output_file = input_file[:-5]
 
             elif input_file.endswith('.txt'):
+                print("GGOOLL")
                 text = FileSynthesis.text_file(input_file)
-                output_file = input_file[:-4]
+
+            elif input_file.split('.')[-1] in ("ppt", "pptx"):
+                conv = MakeConversion(input_file)
+                word = conv.ppt_to_word()
+                conv = MakeConversion(word)
+                text = FileSynthesis.text_file(conv.word_to_txt())
 
             else:
                 logger.error('Unsupported file format. Please provide \
 a PDF, txt, or Word document.')
                 sys.exit(1)
+
             try:
                 FileSynthesis.Synthesise(None, text, output_file)
             except KeyboardInterrupt:
@@ -1068,7 +1323,7 @@ class VideoConverter:
                 item.upper().endswith(ext) for ext in SUPPORTED_VIDEO_FORMATS)]
             print(F"{DYELLOW}Initializing conversion..{RESET}")
 
-            for file in input_list:
+            for file in tqdm(input_list):
                 if out_f.upper() in Video_codecs.keys():
                     _, ext = os.path.splitext(file)
                     output_filename = _ + '.' + out_f.lower()
@@ -1139,7 +1394,7 @@ class AudioConverter:
                 # Export the audio to a temporary file in wav format (ffmpeg can convert from wav to m4a)
                 audio.export("temp.wav", format="wav")
 
-            for file in input_list:
+            for file in tqdm(input_list):
                 if out_f.lower() in SUPPORTED_AUDIO_FORMATS_DIRECT:
                     _, ext = os.path.splitext(file)
                     output_filename = _ + '.' + out_f
@@ -1206,7 +1461,7 @@ class ImageConverter:
             input_list = [item for item in input_list if any(
                 item.lower().endswith(ext) for ext in SUPPORTED_IMAGE_FORMATS.values())]
 
-            for file in input_list:
+            for file in tqdm(input_list):
                 if out_f.upper() in SUPPORTED_IMAGE_FORMATS:
                     _ = os.path.splitext(file)[0]
                     output_filename = _ + \

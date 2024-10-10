@@ -1,9 +1,4 @@
-import sys
-
-
-def getargs(kwargs):
-    print(kwargs[1:])
-
-
-xp = sys.argv
-getargs(xp)
+import platform
+ff = "hello.txt"
+print(platform.system())
+print(ff[:-3] + "pdf")

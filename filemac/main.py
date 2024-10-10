@@ -118,6 +118,15 @@ class Eval:
             elif self.file.split('.')[-1].lower() in ("ppt", "pptx"):
                 if self.outf.lower() in ("doc", "docx", "word"):
                     conv.ppt_to_word()
+                elif self.outf.lower() in ("text", "txt"):
+                    word = conv.ppt_to_word()
+                    conv = MakeConversion(word)
+                    conv.word_to_txt()
+                elif self.outf.lower() in ("pptx"):
+                    conv.convert_ppt_to_pptx(self.file)
+                elif self.outf.lower() in ("audio", "ogg", "mp3", "wav"):
+                    conv = FileSynthesis(self.file)
+                    conv.audiofy()
                 else:
                     print(F"{RED}Unsupported output format❌{RESET}")
 
@@ -132,6 +141,10 @@ class Eval:
                 else:
                     print(F"{RED}Unsupported output format❌{RESET}")
 
+            elif self.file.lower().endswith('csv'):
+                if self.outf.lower() in ('xls', 'xlsx', 'excel'):
+                    conv.convert_csv_to_xlsx()
+
             else:
                 print(f"{DYELLOW}Unsupported Conversion type❌{RESET}")
                 pass
@@ -139,10 +152,8 @@ class Eval:
             logger.error(e)
 
 
-"""Define main functions to create commandline arguments for different operations"""
-
-
 def main():
+    """Define main functions to create commandline arguments for different operations"""
     parser = argparse.ArgumentParser(
         description="Multimedia Element Operations", epilog=f"{BLUE}When using {MAGENTA}-SALI{BLUE} long images have maximum height that can be processed{RESET}")
 
@@ -214,8 +225,7 @@ def main():
     parser.add_argument("--AudioJoin", "-AJ", nargs='*', help="Join Audio files into one master file")
 
     ''''arguements for Advanced text to word conversion'''
-    # Accepts 0 or more values
-    parser.add_argument('-AT2W', "--Atext2word", help=f'Advanced Text to word conversion i.e:\{DYELLOW}filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}')
+    parser.add_argument('-AT2W', "--Atext2word", help=f'Advanced Text to word conversion i.e:{DYELLOW}filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}')
 
     # Add arguments that must accompany the "obj" command
     parser.add_argument('--font_size', type=int, default=12, help=F'Font size to be used default: \
@@ -227,14 +237,16 @@ def main():
     parser.add_argument('--use_extras', action='store_true', help=f"Use alternative conversion method: Overides\
                         default method i.e: {DYELLOW}filemac --convert_doc example.docx --use_extras -t pdf{RESET}")
 
-    '''Pdf join arguements'''
+    '''Pdf join arguements--> Accepts atleast 1 arguement'''
     parser.add_argument("--pdfjoin", '-pj', nargs='+', help="Join Pdf file to one file")
     parser.add_argument("--order", type=str, default='AAB', help=f"Order of pages when joining the pdf use: {DYELLOW}filemac\
                         -pj help for more details{RESET}")
     parser.add_argument('--extract_pages', '-XP', nargs='+', help=f"Extract given pages from pdf: {DYELLOW}filemac --extract_pages file.pdf 6 10{RESET} for one page: {DYELLOW}filemac --extract_pages file.pdf 5{RESET}")
 
-    args = parser.parse_args()
+    parser.add_argument("--manipulate_audio", "-MA", action="store_true", help=f"Change audio voice/apply effects/reduce noise{DYELLOW}-MA --help for options{RESET}")
 
+    # Use parse_known_args to allow unknown arguments (for later tunneling)
+    args = parser.parse_args()
 
 # Call function to handle document conversion inputs before begining conversion
     if args.convert_doc == 'help':
@@ -355,6 +367,17 @@ def main():
         init.controller()
     elif args.extract_pages:
         init = _entry(args.extract_pages)
+
+    elif args.manipulate_audio:
+        print("implementation underway")
+        exit(1)
+        command = []
+        subcommand = input(f":{DYELLOW}")
+        # command = [val for val in subcommand.split(' ')]
+        while ';' not in str(subcommand):
+            command.append(subcommand)
+            subcommand = input(f":{DYELLOW}")
+        print(tuple(command))
 
 
 if __name__ == "__main__":
