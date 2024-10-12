@@ -107,9 +107,8 @@ class MakeConversion:
             pdf_file = os.path.splitext(word_file)[0] + '.pdf'
 
             try:
-                print(
-                    f'{BLUE}Converting: {RESET}{word_file} {BLUE}to {RESET}{pdf_file}')
                 if os.name == 'posix':  # Check if running on Linux
+                    print(f'{BLUE}Converting: {RESET}{word_file} {BLUE}to {RESET}{pdf_file}')
                     # Use subprocess to run the dpkg and grep commands
                     result = subprocess.run(
                         ['dpkg', '-l', 'libreoffice'], stdout=subprocess.PIPE, text=True)
@@ -137,20 +136,26 @@ class MakeConversion:
     @staticmethod
     def word2pdf_extra(obj, outf=None):
         '''For window users since it requires Microsoft word to be installed'''
-        if obj.split('.')[-1] not in {'doc', 'docx'}:
-            logger.error(f"{RED}File is not a word file{RESET}")
-            sys.exit(1)
-        pdf_file = os.path.splitext(obj)[0] + '.pdf' if outf is None else outf
-        try:
-            from docx2pdf import convert
-            convert(obj, pdf_file)
-            print(F"{GREEN}Conversion ✅{RESET}")
-            sys.exit(0)
-        except ImportError:
-            logger.warning(f"{RED}docx2pdf Not found. {
-                  CYAN}Run pip install docx2pdf{RESET}")
-        except Exception as e:
-            logger.error(e)
+        for file in obj:
+            if file.split('.')[-1] not in ('doc', 'docx'):
+                logger.error(f"{RED}File is not a word file{RESET}")
+                sys.exit(1)
+            pdf_file = os.path.splitext(file)[0] + '.pdf' if outf is None else outf
+            try:
+                if not os.path.isfile(file):
+                    print(f"The file {obj} does not exist or is not a valid file.")
+                    sys.exit('Exit!')
+                logger.info(f'{BLUE}Converting: {RESET}{file} {BLUE}to {RESET}{pdf_file}')
+                from docx2pdf import convert
+                convert(file, pdf_file)
+                print(F"{GREEN}Conversion ✅{RESET}")
+                sys.exit(0)
+            except ImportError:
+                logger.warning(f"{RED}docx2pdf Not found. {
+                    CYAN}Run pip install docx2pdf{RESET}")
+            except Exception as e:
+                raise
+                logger.error(e)
 
     def pdf_to_word(self):
         ###############################################################################
@@ -297,7 +302,7 @@ class MakeConversion:
                         0] + ".txt") if ext in list(_ext_word) else "output.txt"
 
             try:
-                logger.info(f"{DYELLOW}Create Doument Tablet{RESET}")
+                logger.info(f"{BLUE}Create Doument Tablet{RESET}")
                 doc = Document(file_path)
 
                 with open(txt_file, 'w', encoding='utf-8') as f:
@@ -309,15 +314,15 @@ class MakeConversion:
                         print(
                             f"Par:{BLUE}{Par}/{len(doc.paragraphs)}{RESET}", end='\r')
                     logger.info(
-                        f"{DMAGENTA}Conversion of file to txt success{RESET}")
+                        f"{MAGENTA}Conversion of file to txt success{RESET}")
 
+                logger.info(f"File: {GREEN}{txt_file}{RESET}")
                 return txt_file
             except KeyboardInterrupt:
                 print("\nQuit❕⌨️")
                 sys.exit()
             except Exception as e:
-                logger.error(
-                    f"Dear user something went amiss while attempting the conversion:\n {e}")
+                logger.error(f"{RED}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
                     log_file.write(f"Couldn't convert {file_path} to {txt_file}:\
 REASON->{e}")

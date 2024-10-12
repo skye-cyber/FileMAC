@@ -19,11 +19,17 @@ def sri():
             subprocess.run(['sudo', 'apt', 'install', 'speedtest-cli'])'''
 
 
+def dos_req():
+    if os.name == 'posix':
+        subprocess.run(
+                        ['pip', 'install', 'pdf2docx'], stdout=subprocess.PIPE, text=True)
+
+
 DESCRIPTION = 'Open source Python CLI toolkit for conversion, manipulation, Analysis of files (All major file operations)'
 EXCLUDE_FROM_PACKAGES = ["build", "dist", "test", "src"]
 
 sri()
-
+dos_req()
 setup(
     name="filemac",
     author='wambua',
@@ -95,5 +101,6 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
 )
