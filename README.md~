@@ -33,7 +33,7 @@ Replace `[options]` with the appropriate command-line options based on the funct
 
 ## Available Options
 
-- `1`:  --convert_doc         ->doc* inter-conversion + tts
+- `1`:  --convert_doc         (doc* inter-conversion + tts)
 - `2`:  --convert_audio
 - `3`:  --convert_video
 - `4`:  --convert_image
@@ -44,9 +44,9 @@ Replace `[options]` with the appropriate command-line options based on the funct
 - `10`: --extract_audio
 - `11`: --Analyze_video
 - `12`: --resize_image
-- `13`: --doc_long_image      #####->convert pdf/doc/docx to long image
-- `14`: --scanAsImg           #####->scan text from pdf
-- `15`: --scanAsLong_Image    #####->scan text from pdf
+- `13`: --doc_long_image      (convert pdf/doc/docx to long image)
+- `14`: --scanAsImg           (scan text from pdf)
+- `15`: --scanAsLong_Image    ->scan text from pdf)
 - `15`: --AudioJoin
 - `15`: --extract_pages
 - `15`: --manipulate_audio
