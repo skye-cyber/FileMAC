@@ -17,3 +17,15 @@ moviepy
 reportlab
 numpy
 pdf2image
+openpyxl
+rich
+tqdm
+ffmpeg-python
+librosa
+python-magic
+matplotlib
+numpy
+soundfile
+SpeechRecognition
+colorama
+scipy

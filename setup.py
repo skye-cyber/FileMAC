@@ -68,7 +68,7 @@ setup(
         'rich',
         'tqdm',
         'ffmpeg-python',
-        'librosa,'
+        'librosa',
         'python-magic',
         'matplotlib',
         'numpy',

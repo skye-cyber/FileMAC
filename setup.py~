@@ -68,13 +68,14 @@ setup(
         'rich',
         'tqdm',
         'ffmpeg-python',
-        'librosa,'
+        'librosa,',
         'python-magic',
         'matplotlib',
         'numpy',
         'soundfile',
         'SpeechRecognition',
-        'colorama',scipy'
+        'colorama',
+        'scipy'
         ],
 
     include_package_data=True,
