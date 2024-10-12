@@ -33,14 +33,24 @@ Replace `[options]` with the appropriate command-line options based on the funct
 
 ## Available Options
 
-- `1`:  --convert_doc.
-- `2`:  --convert_audio.
-- `3`:  --convert_video.
-- `4`:  --convert_image.
-- `5`: --extract_audio.
-- `6`: --Analyze_video
-- `7`: --OCR
-
+- `1`:  --convert_doc         ->doc* inter-conversion + tts
+- `2`:  --convert_audio
+- `3`:  --convert_video
+- `4`:  --convert_image
+- `5`:  --extract_audio
+- `6`:  --Analyze_video
+- `8`:  --OCR
+- `9`:  --convert_doc2image
+- `10`: --extract_audio
+- `11`: --Analyze_video
+- `12`: --resize_image
+- `13`: --doc_long_image      ->convert pdf/doc/docx to long image
+- `14`: --scanAsImg           ->scan text from pdf
+- `15`: --scanAsLong_Image    ->scan text from pdf
+- `15`: --AudioJoin
+- `15`: --extract_pages
+- `15`: --manipulate_audio
+- `15`: --pdfjoin
 ## Examples
 
 1. Example command 1:
@@ -51,19 +61,19 @@ Replace `[options]` with the appropriate command-line options based on the funct
         ``Supported formats For document conversion``
              `1`.  PDF to DOCX
              `2`.  PDF to TXT
-             `3`.  PDF to Audio
+             `3`.  PDF to Audio(ogg,mp3,wav..*)
              `4`.  DOCX to PDF
              `5`.  DOCX to pptx
              `6`.  DOCX to TXT
-             `7`.  DOCX to Audio
+             `7`.  DOCX to Audio(ogg,mp3,wav..*)
              `8`.  TXT to PDF
              `9`.  TXT to DOCX
-             `10`' TXT to Audio
+             `10`' TXT to Audio(ogg,mp3,wav..*)
              `11`. PPTX to DOCX
              `12`. XLSX to Sql
              `13`. XLSX to CSV
              `14`. XLSX to TXT
-             `15`.  XLSX to DOCX
+             `15`. XLSX to DOCX
 
   This promt parses convert_doc signifying that the inteded operation id document conversion then parses ```example.docx``` as the input file(file path can also be provided) to be converted to format ```pdf```.
 the output file assumes the base name of the input file but the extension conforms to the parsed format```pdf```
