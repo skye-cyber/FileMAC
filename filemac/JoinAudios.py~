@@ -107,7 +107,7 @@ class JoinAudios:
                 query = input(f"{DBLUE}Remove the directory ?(y/n)").lower() in ('y', 'yes')
                 if query:
                     shutil.rmtree(self.obj)
-                    """
+            """
         except KeyboardInterrupt:
             print("\nQuit!")
             sys.exit(1)

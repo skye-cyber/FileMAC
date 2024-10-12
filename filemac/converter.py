@@ -28,7 +28,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate
 from rich.progress import Progress
 from rich.errors import MarkupError
-from tqdm import tqdm, gui
+from tqdm import tqdm
 from typing import Union, List
 # from pathlib import Path
 from .colors import (BLUE, BWHITE, CYAN, DBLUE, DCYAN, DGREEN, DMAGENTA, DRED,

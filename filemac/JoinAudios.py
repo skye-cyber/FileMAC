@@ -1,7 +1,7 @@
 import os
 import re
 import sys
-import shutil
+# import shutil
 from pydub import AudioSegment
 from rich.progress import Progress
 from .colors import (BLUE, BWHITE, DBLUE, DCYAN, DGREEN, DYELLOW,

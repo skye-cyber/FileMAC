@@ -3,7 +3,7 @@ import os
 import subprocess
 from setuptools import find_namespace_packages, setup
 
-os.
+
 def sri():
     if os.name == 'posix':
         result = subprocess.run(
@@ -63,7 +63,18 @@ setup(
         'moviepy',
         'reportlab',
         'numpy',
-        'pdf2image'
+        'pdf2image',
+        'openpyxl',
+        'rich',
+        'tqdm',
+        'ffmpeg-python',
+        'librosa,'
+        'python-magic',
+        'matplotlib',
+        'numpy',
+        'soundfile',
+        'SpeechRecognition',
+        'colorama',scipy'
         ],
 
     include_package_data=True,

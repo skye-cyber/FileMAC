@@ -1043,7 +1043,7 @@ class FileSynthesis:
 
                     for i in range(resume_chunk_pos, len(text), CHUNK_SIZE):
 
-                        print(f"Processing: chunk {MAGENTA}{counter + 1}/{total_chunks} {DCYAN}{counter/total_chunks*100:.2f}%{RESET}\n", end="\r")
+                        print(f"Processing: chunk {MAGENTA}{counter}/{total_chunks} {DCYAN}{counter/total_chunks*100:.2f}%{RESET}\n", end="\r")
                         chunk = text[i:i + CHUNK_SIZE]
                         # print(chunk)
                         if os.path.exists(f"{_full_output_path_}_{counter}.ogg"):

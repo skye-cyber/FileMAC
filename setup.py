@@ -63,7 +63,19 @@ setup(
         'moviepy',
         'reportlab',
         'numpy',
-        'pdf2image'
+        'pdf2image',
+        'openpyxl',
+        'rich',
+        'tqdm',
+        'ffmpeg-python',
+        'librosa,'
+        'python-magic',
+        'matplotlib',
+        'numpy',
+        'soundfile',
+        'SpeechRecognition',
+        'colorama',
+        'scipy'
         ],
 
     include_package_data=True,
