@@ -102,10 +102,12 @@ class JoinAudios:
             # Export the combined ogg to new mp3 file or ogg file
             combined_ogg.export(masterfile, format=_format)
             print(F"{DGREEN}Master file:Ok🤏")
+            """
             if self.isdir:
                 query = input(f"{DBLUE}Remove the directory ?(y/n)").lower() in ('y', 'yes')
                 if query:
                     shutil.rmtree(self.obj)
+            """
         except KeyboardInterrupt:
             print("\nQuit!")
             sys.exit(1)

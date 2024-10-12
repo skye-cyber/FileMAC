@@ -7,12 +7,14 @@ import re
 import sqlite3
 import subprocess
 import sys
-
+import shutil
+import json
 import cv2
 import pandas as pd
 import pydub
 import PyPDF2
 import requests
+from threading import Thread, Lock
 from docx import Document
 from gtts import gTTS
 from moviepy.editor import VideoFileClip
@@ -25,8 +27,10 @@ from pydub import AudioSegment
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate
 from rich.progress import Progress
-from tqdm import tqdm
-
+from rich.errors import MarkupError
+from tqdm import tqdm, gui
+from typing import Union, List
+# from pathlib import Path
 from .colors import (BLUE, BWHITE, CYAN, DBLUE, DCYAN, DGREEN, DMAGENTA, DRED,
                      DYELLOW, FCYAN, FMAGENTA, GREEN, ICYAN, IGREEN, MAGENTA,
                      RED, RESET, YELLOW)
@@ -134,7 +138,7 @@ class MakeConversion:
     def word2pdf_extra(obj, outf=None):
         '''For window users since it requires Microsoft word to be installed'''
         if obj.split('.')[-1] not in {'doc', 'docx'}:
-            print(f"{RED}File is not a word file{RESET}")
+            logger.error(f"{RED}File is not a word file{RESET}")
             sys.exit(1)
         pdf_file = os.path.splitext(obj)[0] + '.pdf' if outf is None else outf
         try:
@@ -143,7 +147,7 @@ class MakeConversion:
             print(F"{GREEN}Conversion ✅{RESET}")
             sys.exit(0)
         except ImportError:
-            print(f"{RED}docx2pdf Not found. {
+            logger.warning(f"{RED}docx2pdf Not found. {
                   CYAN}Run pip install docx2pdf{RESET}")
         except Exception as e:
             logger.error(e)
@@ -442,7 +446,7 @@ REASON->{e}")
                 print(F"{RED}Unable to identify the system{RESET}")
         except KeyboardInterrupt:
             print("\nQuit!")
-            exit(1)
+            sys.exit(1)
         except Exception as e:
             logger.error(f"{RED}{e}{RESET}")
 
@@ -943,22 +947,9 @@ class Scanner:
 class FileSynthesis:
     '''Definition of audiofying class'''
 
-    def __init__(self, input_file):
-        self.input_file = input_file
-        # self.CHUNK_SIZE = 20_000
-
-    def preprocess(self):
-        files_to_process = []
-
-        if os.path.isfile(self.input_file):
-            files_to_process.append(self.input_file)
-        elif os.path.isdir(self.input_file):
-            for file in os.listdir(self.input_file):
-                file_path = os.path.join(self.input_file, file)
-                if os.path.isfile(file_path):
-                    files_to_process.append(file_path)
-
-        return files_to_process
+    def __init__(self, obj: Union[os.PathLike, str, List[Union[os.PathLike, str]]], resume: bool = True):
+        self.obj = obj
+        self.resume = resume
 
     @staticmethod
     def join_audios(files, output_file):
@@ -983,26 +974,33 @@ class FileSynthesis:
         combined_ogg.export(output_file + "_master.ogg", format='ogg')
         print(F"{DGREEN}Master file:Ok                                                                             {RESET}")
 
-    def Synthesise(self, text: str, output_file: str, CHUNK_SIZE: int = 1_000, _tmp_folder_: str = 'tmp_dir', max_retries: int = 30) -> None:
+    def Synthesise(self, text: str, output_file: str, CHUNK_SIZE: int = 1_000, _tmp_folder_: str = 'tmp_dir', thread_name: str = None, max_retries: int = 30) -> None:
         """Converts given text to speech using Google Text-to-Speech API."""
-        from rich.progress import (BarColumn, Progress, SpinnerColumn,
-                                   TextColumn)
+        # from rich.progress import (BarColumn, Progress, SpinnerColumn,TextColumn)
 
+        config = ConfigManager()
         # Define directories and other useful variables for genrating output_file and checkpoint_file
         out_dir = os.path.split(output_file)[0]
 
+        thread_name = f"thread_{os.path.split(output_file.split('.')[0])[-1]}"
         _file_ = os.path.split(output_file)[1]
 
-        if os.path.exists(os.path.join(out_dir, _tmp_folder_)):
-            query = input(f"{DBLUE}Remove the {os.path.join(
-                out_dir, _tmp_folder_)} directory (y/n)?{RESET} ").lower() in ('y', 'yes')
-            import shutil
-            if query:
-                shutil.rmtree(os.path.join(out_dir, _tmp_folder_))
+        _tmp_folder_ = os.path.join(out_dir, _tmp_folder_)
 
-        _full_output_path_ = os.path.join(out_dir, _tmp_folder_, _file_)
+        # Remove temporary dir if it exists, rare-cases since file names are mostly unique
+        if os.path.exists(_tmp_folder_) and self.resume is False:
+            # query = input(f"{DBLUE}Remove the {os.path.join(out_dir, _tmp_folder_)} directory (y/n)?{RESET} ").lower() in ('y', 'yes')
+            shutil.rmtree(_tmp_folder_)
 
-        # Create a checkpoint_file for conversion resumption if need be
+        # Create temporary folder to house chunks
+        if not os.path.exists(_tmp_folder_):
+            logger.info(
+                f"{DYELLOW}Create temporary directory = {DBLUE}{_tmp_folder_}{RESET}")
+            os.mkdir(_tmp_folder_)
+
+        _full_output_path_ = os.path.join(_tmp_folder_, _file_)
+
+        ''' Create a checkpoint_file for conversion resumption if need be
         _check_file = os.path.splitext(_file_)[0] + '.ch'
 
         _check_dir_path_ = os.path.join(out_dir, _tmp_folder_, _check_file)
@@ -1011,28 +1009,26 @@ class FileSynthesis:
 
         start_chunk = 0  # Initialize start chank
 
-        # Check if there is any checkpoint record in chekpoint file for resumption
+        Check if there is any checkpoint record in chekpoint file for resumption
         if os.path.exists(checkpoint_file):
             logger.info(f"{DYELLOW}Found a Checkpoint file{RESET}")
             with open(checkpoint_file, 'r') as f:
                 start_chunk = int(f.read())
             logger.info(
-                f"{DYELLOW}Resuming from chunk{DBLUE} {start_chunk}{RESET}")
+                f"{DYELLOW}Resuming from chunk{DBLUE} {start_chunk}{RESET}")'''
 
-            # multiply by chunk size to get resume chunk position
-            resume_chunk_pos = start_chunk * 1_000
+        # Read reume chunk from the configuration file
+        start_chunk = int(config.read_config_file(thread_name)) * 1_000
+        start_chunk = 0 if start_chunk is None else start_chunk
 
-        # if the checkpoint_file is missing, set resume_chunk_pos to 0(start chunk)
-        else:
-            resume_chunk_pos = start_chunk
+        ''' If chunk is not 0 multiply the chunk by the highest decimal value of the chunk size
+        else set it to 0 meaning file is being operated on for the first time
+        '''
+        resume_chunk_pos = start_chunk * 1_000 if start_chunk != 0 else start_chunk
 
         try:
-            if not os.path.exists(_tmp_folder_):
-                logger.info(
-                    f"{DYELLOW}Create temporary directory = {DBLUE}{_tmp_folder_}{RESET}")
-                os.mkdir(_tmp_folder_)
 
-            logger.info(f"{DYELLOW}Start conversion{RESET}")
+            print(f"{DYELLOW}Start thread:: {thread_name}{RESET}")
 
             total_chunks = math.ceil(len(text) / CHUNK_SIZE)
 
@@ -1044,74 +1040,50 @@ class FileSynthesis:
             while attempt <= max_retries:
                 try:
                     # Initialize progress bar for the overall process
-                    with Progress(
-                        SpinnerColumn(),  # Indeterminate spinner for chunk progress
-                        TextColumn("[green]Processing"),
-                        BarColumn(),
-                        TextColumn(
-                            "[progress.percentage]{task.percentage:>3.1f}%"),
-                    ) as progress:
 
-                        overall_task = progress.add_task(
-                            "Overall Progress [magenta]Total", total=total_chunks)
+                    for i in range(resume_chunk_pos, len(text), CHUNK_SIZE):
 
-                        # Resume progress bar to the point of last progress
-                        progress.update(overall_task, completed=counter)
+                        print(f"Processing: chunk {MAGENTA}{counter + 1}/{total_chunks} {DCYAN}{counter/total_chunks*100:.2f}%{RESET}\n", end="\r")
+                        chunk = text[i:i + CHUNK_SIZE]
+                        # print(chunk)
+                        if os.path.exists(f"{_full_output_path_}_{counter}.ogg"):
 
-                        for i in range(resume_chunk_pos, len(text), CHUNK_SIZE):
-
-                            chunk = text[i:i + CHUNK_SIZE]
-
-                            if os.path.exists(f"{_full_output_path_}_{counter}.ogg"):
-
-                                if counter == start_chunk:
-                                    print(f"{CYAN}Chunk vs file confict: {
-                                          BLUE}Resolving{RESET}")
-                                    os.remove(f"{_full_output_path_}_{
-                                              counter}.ogg")
-                                    output_filename = f"{
-                                        _full_output_path_}_{counter}.ogg"
-
-                                # Remove empty file
-                                elif os.path.getsize(f"{_full_output_path_}_{counter}.ogg") != 0:
-                                    os.remove(f"{_full_output_path_}_{
-                                              counter}.ogg")
-                                    output_filename = f"{
-                                        _full_output_path_}_{counter}.ogg"
-
-                                else:
-                                    output_filename = f"{
-                                        _full_output_path_}_{counter+1}.ogg"
-
-                            else:
+                            if counter == start_chunk:
+                                print(f"{CYAN}Chunk vs file confict: {BLUE}Resolving{RESET}")
+                                os.remove(f"{_full_output_path_}_{
+                                        counter}.ogg")
                                 output_filename = f"{
                                     _full_output_path_}_{counter}.ogg"
 
-                            progress.console.print(f"Processing chunk {
-                                                   counter + 1}/{total_chunks}\n", end="\r")
+                            # Remove empty file
+                            elif os.path.getsize(f"{_full_output_path_}_{counter}.ogg") != 0:
+                                os.remove(f"{_full_output_path_}_{
+                                        counter}.ogg")
+                                output_filename = f"{
+                                    _full_output_path_}_{counter}.ogg"
 
-                            tts = gTTS(text=chunk, lang='en', slow=False)
+                            else:
+                                output_filename = f"{
+                                    _full_output_path_}_{counter+1}.ogg"
 
-                            tts.save(output_filename)
+                        else:
+                            output_filename = f"{
+                                _full_output_path_}_{counter}.ogg"
 
-                            # Update checkpoint file after saving each chunk
-                            with open(checkpoint_file, 'w') as f:
-                                f.write(str(counter + 1))
+                        tts = gTTS(text=chunk, lang='en', slow=False)
 
-                            counter += 1
+                        tts.save(output_filename)
 
-                            # Update the overall progress
-                            progress.update(overall_task, advance=1)
+                        # Update current_chunk in the configuration
+                        config.update_config_entry(thread_name, current_chunk=counter)
 
-                        # Remove checkpoint file as processing is complete
-                        if os.path.exists(checkpoint_file):
-                            os.remove(checkpoint_file)
+                        counter += 1
 
-                except FileNotFoundError:
-                    raise
+                except FileNotFoundError as e:
+                    logger.error(f"{RED}{e}{RESET}")
 
                 except requests.exceptions.ConnectionError:  # Handle connectivity/network error
-                    logger.error(f"{DRED}Connection Error{RESET}")
+                    logger.error(f"{RED}ConnectionError{RESET}")
 
                     # Exponential backoff for retries
                     for _sec_ in range(2 ** attempt, 0, -1):
@@ -1121,10 +1093,8 @@ class FileSynthesis:
 
                     attempt += 1
 
-                    # Read chunk from FileSynthesis
-                    if os.path.exists(checkpoint_file):
-                        with open(checkpoint_file, 'r') as f:
-                            resume_chunk_pos = int(f.read()) * 1_000
+                    # Read chunk from configuration
+                    resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
 
                 except requests.exceptions.HTTPError as e:  # Exponential backoff for retries
                     logger.error(f"HTTP error: {e.status_code} - {e.reason}")
@@ -1134,12 +1104,10 @@ class FileSynthesis:
 
                     attempt += 1
 
-                    if os.path.exists(checkpoint_file):
-                        with open(checkpoint_file, 'r') as f:
-                            resume_chunk_pos = int(f.read()) * 1_000
+                    resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
 
                 except requests.exceptions.RequestException as e:
-                    logger.error(f"{e}")
+                    logger.error(f"{RED}{e}{RESET}")
 
                     for _sec_ in range(2 ** attempt, 0, -1):
                         print(
@@ -1147,13 +1115,11 @@ class FileSynthesis:
 
                     attempt += 1
 
-                    if os.path.exists(checkpoint_file):
-                        with open(checkpoint_file, 'r') as f:
-                            resume_chunk_pos = int(f.read()) * 1_000
+                    resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
 
                 except (ConnectionError, ConnectionAbortedError, ConnectionRefusedError, ConnectionResetError):
                     logger.error(
-                        f'{RED}Connection at attempt {CYAN}{attempt+1}/{max_retries}{RESET}')
+                        f'{RED}Connection at attempt{RESET}')
 
                     for _sec_ in range(2 ** attempt, 0, -1):
                         print(
@@ -1161,23 +1127,20 @@ class FileSynthesis:
 
                         attempt += 1
 
-                    if os.path.exists(checkpoint_file):
-                        with open(checkpoint_file, 'r') as f:
-                            resume_chunk_pos = int(f.read()) * 1_000
+                    resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
 
+                except MarkupError as e:
+                    logger.error(F"{RED}{e}{RESET}")
                 except Exception as e:  # Handle all other types of exceptions
                     logger.error(
-                        f'{DMAGENTA}{attempt+1}/{max_retries}:{DRED}{e}{RESET}')
+                        f'{DMAGENTA}{attempt+1}/{max_retries}:{RED}{e}{RESET}')
 
                     for _sec_ in range(2 ** attempt, 0, -1):
-                        print(
-                            f"{BWHITE}Resume in {DBLUE}{_sec_}{RESET}", end='\r')
+                        pass
 
                     attempt += 1
 
-                    if os.path.exists(checkpoint_file):
-                        with open(checkpoint_file, 'r') as f:
-                            resume_chunk_pos = int(f.read()) * 1_000
+                    resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
 
                 else:
                     print(
@@ -1190,6 +1153,8 @@ class FileSynthesis:
                         joiner = JoinAudios(
                             _tmp_folder_, masterfile=output_file)
                         joiner.worker()
+                        # Remove temporary files
+                        shutil.rmtree(_tmp_folder_)
 
                     break  # Exit the retry loop if successfull
 
@@ -1217,7 +1182,7 @@ class FileSynthesis:
                         f"Page {DBLUE}{_pg_}{RESET}/{len(pdf_reader.pages)}")
                     page = pdf_reader.pages[page_num]
                     text += page.extract_text()
-                print(F"{DGREEN}Ok{RESET}")
+                print(F"{DGREEN}Ok{RESET}\n")
                 return text
         except Exception as e:
             logger.error(
@@ -1249,43 +1214,240 @@ class FileSynthesis:
                 F"{DRED}Error converting {docx_path} to text: {e}\
 {RESET}")
 
-    '''Handle input files based on type to initialize conversion sequence'''
+    class THAudio:
+        def __init__(self, instance):
+            self.instance = instance
+            self.lock = Lock()
+            self.config = ConfigManager()
 
-    def audiofy(self):
-        input_list = self.preprocess()
-        ls = ("pdf", "docx", "doc", "txt", "ppt", "pptx")
-        input_list = [
-            item for item in input_list if item.lower().endswith(tuple(ls))]
+        def audiofy(self, num_threads=3):
+            ls = ("pdf", "docx", "doc", "txt", "ppt", "pptx")
 
-        for input_file in input_list:
+            def create_thread(item, thread_name):
+                # Create a unique temp dir for each file
+                temp_dir = f"tmp_dir_{os.path.split(item.split('.')[0])[-1]}"
+
+                # Ensure proper locking when adding config entry
+                with self.lock:
+                    # Record config entry for each item
+                    self.config.add_config_entry(thread_name, f"{item.split('.')[0]}", temp_dir, 0)
+
+                # Create and return the thread
+                return Thread(target=self.worker, args=(item, temp_dir, thread_name), name=thread_name)
+
+            threads = []
+            processed_items = 0
+
+            # Process a list of files
+            def process_batch():
+                for thread in threads:
+                    thread.start()
+                for thread in threads:
+                    thread.join()
+                threads.clear()  # Clear thread list after batch is done
+
+            # Handle files provided as a list
+            if isinstance(self.instance.obj, list):
+                for item in self.instance.obj:
+                    item = os.path.abspath(item)
+                    if os.path.isfile(item) and item.endswith(ls):
+                        thread_name = f"thread_{os.path.split(item.split('.')[0])[-1]}"
+                        thread = create_thread(item, thread_name)
+                        threads.append(thread)
+                        processed_items += 1
+
+                        # Process threads in batches of 'num_threads'
+                        if processed_items % num_threads == 0:
+                            process_batch()
+
+                # Process remaining threads in case the list isn't a perfect multiple of num_threads
+                if threads:
+                    process_batch()
+
+            # Handle a single file
+            elif os.path.isfile(self.instance.obj):
+                item = os.path.abspath(self.instance.obj)
+                if item.endswith(ls):
+                    thread_name = f"thread_{os.path.split(item.split('.')[0])[-1]}"
+                    thread = create_thread(item, thread_name)
+                    threads.append(thread)
+                    process_batch()  # Process immediately for single file
+
+            # Handle a directory of files
+            elif os.path.isdir(self.instance.obj):
+                for item in os.listdir(self.instance.obj):
+                    item = os.path.abspath(item)
+                    if os.path.isfile(item) and item.endswith(ls):
+                        thread_name = f"thread_{os.path.split(item.split('.')[0])[-1]}"
+                        thread = create_thread(item, thread_name)
+                        threads.append(thread)
+                        processed_items += 1
+
+                        # Process threads in batches
+                        if processed_items % num_threads == 0:
+                            process_batch()
+
+                # Process remaining threads
+                if threads:
+                    process_batch()
+
+        def worker(self, input_file, _temp_dir_, thread_name):
             output_file = os.path.split(input_file)[-1].split('.')[0] + '.ogg'
-
-            if input_file.endswith('.pdf'):
-                text = FileSynthesis.pdf_to_text(input_file)
-
-            elif input_file.lower().endswith(tuple(_ext_word)):
-                text = FileSynthesis.docx_to_text(input_file)
-
-            elif input_file.endswith('.txt'):
-                print("GGOOLL")
-                text = FileSynthesis.text_file(input_file)
-
-            elif input_file.split('.')[-1] in ("ppt", "pptx"):
-                conv = MakeConversion(input_file)
-                word = conv.ppt_to_word()
-                conv = MakeConversion(word)
-                text = FileSynthesis.text_file(conv.word_to_txt())
-
-            else:
-                logger.error('Unsupported file format. Please provide \
-a PDF, txt, or Word document.')
-                sys.exit(1)
+            print(f"Thread {thread_name} processing file: {input_file}")
 
             try:
-                FileSynthesis.Synthesise(None, text, output_file)
+                # Extract text based on file type
+                if input_file.endswith('.pdf'):
+                    text = FileSynthesis.pdf_to_text(input_file)
+                elif input_file.lower().endswith(tuple(_ext_word)):
+                    text = FileSynthesis.docx_to_text(input_file)
+                elif input_file.endswith('.txt'):
+                    text = FileSynthesis.text_file(input_file)
+                elif input_file.split('.')[-1] in ("ppt", "pptx"):
+                    conv = MakeConversion(input_file)
+                    word = conv.ppt_to_word()
+                    conv = MakeConversion(word)
+                    text = FileSynthesis.text_file(conv.word_to_txt())
+                else:
+                    raise ValueError('Unsupported file format. Please provide a PDF, txt, or Word document.')
+
+                # Synthesize audio using the extracted text
+                self.instance.Synthesise(text, output_file, _tmp_folder_=_temp_dir_, thread_name=thread_name)
+                print(f"Thread {thread_name} completed processing {input_file}")
+
+            except Exception as e:
+                print(f"Error in thread {thread_name}: {e}")
             except KeyboardInterrupt:
-                print("\nQuit❕")
+                print(f"Thread {thread_name} interrupted.")
                 sys.exit(1)
+
+
+class ConfigManager:
+    def __init__(self, config_path='filemac_config.json'):
+        self.config_path = config_path
+
+    def create_config_file(self, config_data):
+        """
+        Create or overwrite a configuration file to record thread names, associated file names, and current chunks.
+
+        Args:
+            config_data (list): A list of dictionaries containing thread name, associated file name, temp dir, and current chunk.
+        """
+        try:
+            # Ensure the output directory exists
+            output_dir = os.path.dirname(self.config_path)
+            if output_dir and not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+
+            # Write the configuration data to a JSON file
+            with open(self.config_path, 'w') as config_file:
+                json.dump(config_data, config_file, indent=4)
+
+            print(f"Configuration file '{self.config_path}' created successfully.")
+        except Exception as e:
+            print(f"Error creating configuration file: {e}")
+
+    def read_config_file(self, thread=None):
+        """
+        Read the configuration file and return the data or a specific thread's current chunk.
+
+        Args:
+            thread (str): The thread name to search for in the config. If None, returns the full config.
+
+        Returns:
+            dict/list: Returns a specific entry for the thread or the full configuration data.
+            None: If the file doesn't exist or thread is not found.
+        """
+        try:
+            if not os.path.exists(self.config_path):
+                print(f"Configuration file '{self.config_path}' not found.")
+                return None
+
+            with open(self.config_path, 'r') as config_file:
+                config = json.load(config_file)
+
+            if thread is None:
+                return config  # Return entire configuration
+
+            # Search for specific thread's current chunk
+            for entry in config:
+                if entry['thread_name'] == thread:
+                    return entry.get('current_chunk', None)
+
+            print(f"Entry for thread '{thread}' not found.")
+            return None
+
+        except Exception as e:
+            print(f"Error reading configuration file: {e}")
+            return None
+
+    def add_config_entry(self, thread_name, associated_file, tmp_dir, current_chunk):
+        """
+        Add a new entry to the configuration file.
+
+        Args:
+            thread_name (str): The name of the thread to be added.
+            associated_file (str): The associated file name for the thread.
+            tmp_dir (str): Temporary directory for the thread.
+            current_chunk (int): The current chunk number for the thread.
+        """
+        try:
+            # Read existing config data or create a new list if the file doesn't exist
+            config_data = self.read_config_file() or []
+
+            # Check if the thread already exists in the configuration
+            for entry in config_data:
+                if entry['thread_name'] == thread_name:
+                    print(f"Thread '{thread_name}' already exists. Use 'update_config_entry' to update it.")
+                    return
+
+            # Add the new entry
+            config_data.append({
+                "thread_name": thread_name,
+                "associated_file": associated_file,
+                "tmp_dir": tmp_dir,
+                "current_chunk": current_chunk
+            })
+
+            # Save the updated configuration
+            self.create_config_file(config_data)
+
+        except Exception as e:
+            print(f"Error adding config entry: {e}")
+
+    def update_config_entry(self, thread_name, associated_file=None, tmp_dir=None, current_chunk=None):
+        """
+        Update an existing entry in the configuration file.
+
+        Args:
+            thread_name (str): The name of the thread to update.
+            associated_file (str, optional): The updated associated file name. Defaults to None.
+            tmp_dir (str, optional): The updated temporary directory. Defaults to None.
+            current_chunk (int, optional): The updated current chunk number. Defaults to None.
+        """
+        try:
+            # Read existing config data
+            config_data = self.read_config_file() or []
+
+            # Find the entry to update
+            for entry in config_data:
+                if entry['thread_name'] == thread_name:
+                    if associated_file:
+                        entry['associated_file'] = associated_file
+                    if tmp_dir:
+                        entry['tmp_dir'] = tmp_dir
+                    if current_chunk is not None:
+                        entry['current_chunk'] = current_chunk
+
+                    # Save the updated configuration
+                    self.create_config_file(config_data)
+                    print(f"Thread '{thread_name}' updated successfully.")
+                    return
+
+            print(f"Thread '{thread_name}' not found in the configuration.")
+
+        except Exception as e:
+            print(f"Error updating config entry: {e}")
 
 
 ###############################################################################

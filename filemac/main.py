@@ -5,20 +5,22 @@ import logging
 import logging.handlers
 import os
 import sys
-
+from typing import Union, List
+# from pathlib import Path
 from . import handle_warnings
 from .AudioExtractor import ExtractAudio
-from .colors import (CYAN, DCYAN, DYELLOW, BLUE, FBLUE, FCYAN, MAGENTA, FMAGENTA, FYELLOW,
-                     RED, RESET)
+from .colors import (BLUE, CYAN, DCYAN, DYELLOW, FBLUE, FCYAN, FMAGENTA,
+                     FYELLOW, MAGENTA, RED, RESET)
 from .converter import (AudioConverter, FileSynthesis, ImageConverter,
                         MakeConversion, Scanner, VideoConverter)
-from .formats import (SUPPORTED_AUDIO_FORMATS_SHOW, SUPPORTED_DOC_FORMATS,
+from .formats import (SUPPORTED_AUDIO_FORMATS_DIRECT,
+                      SUPPORTED_AUDIO_FORMATS_SHOW, SUPPORTED_DOC_FORMATS,
                       SUPPORTED_IMAGE_FORMATS_SHOW,
                       SUPPORTED_VIDEO_FORMATS_SHOW)
 from .image_op import Compress_Size
 from .OCRTextExtractor import ExtractText
-from .Simple_v_Analyzer import SA
 from .pdf_Page_Extractor import _entry
+from .Simple_v_Analyzer import SA
 
 handle_warnings
 logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
@@ -29,10 +31,12 @@ converter all the surported files to the target format"""
 
 
 class _DIR_CONVERSION_:
-    def __init__(self, _dir_, _format_, _isolate_=None):
+    def __init__(self, _dir_, _format_, no_resume, threads, _isolate_=None):
         self._dir_ = _dir_
         self._format_ = _format_
         self._isolate_ = _isolate_
+        self.no_resume = no_resume
+        self.threads = threads
         # Handle isolation and non isolation modes distinctively
         self._ls_ = ["pdf", "docx", "doc", "xlsx", "ppt", "pptx" "xls",
                      "txt"] if _isolate_ is None else [_isolate_]
@@ -40,7 +44,10 @@ class _DIR_CONVERSION_:
             print(f"INFO\t {FMAGENTA}Isolate {DCYAN}{self._isolate_}{RESET}")
 
     def _unbundle_dir_(self):
+        if self._format_ in SUPPORTED_AUDIO_FORMATS_DIRECT:
+            return Batch_Audiofy(self._dir_, self.no_resume, self.threads)
         try:
+
             for root, dirs, files in os.walk(self._dir_):
                 for file in files:
                     _ext_ = file.split('.')[-1]
@@ -48,7 +55,8 @@ class _DIR_CONVERSION_:
                     _path_ = os.path.join(root, file)
 
                     if _ext_ in self._ls_ and os.path.exists(_path_):
-                        print(f"INFO\t {FYELLOW}Parse {FBLUE}{_path_}{RESET}")
+                        print(f"INFO\t {FYELLOW}Parse {
+                                FBLUE}{_path_}{RESET}")
                         init = Eval(_path_, self._format_)
                         init.document_eval()
 
@@ -62,6 +70,19 @@ class _DIR_CONVERSION_:
         except Exception as e:
             print(e)
             pass
+
+
+class Batch_Audiofy:
+    def __init__(self, obj: Union[os.PathLike, str, List[Union[os.PathLike, str]]], no_resume: bool, threads: int = 3):
+        self.folder = obj
+        self.no_resume = no_resume
+        self.threads = threads
+        self.worker()
+
+    def worker(self):
+        conv = FileSynthesis(self.folder, resume=self.no_resume)
+        inst = conv.THAudio(conv)
+        inst.audiofy(num_threads=self.threads)
 
 
 """Class to handle document conversions based on their extensions and te targt
@@ -158,7 +179,7 @@ def main():
         description="Multimedia Element Operations", epilog=f"{BLUE}When using {MAGENTA}-SALI{BLUE} long images have maximum height that can be processed{RESET}")
 
     parser.add_argument(
-        "--convert_doc", help=f"Converter document file(s) to different format ie pdf_to_docx.\
+        "--convert_doc", nargs='+', help=f"Converter document file(s) to different format ie pdf_to_docx.\
        example: {DYELLOW}filemac --convert_doc example.docx -t pdf{RESET}")
 
     parser.add_argument(
@@ -189,7 +210,7 @@ def main():
         "-Av", "--Analyze_video", help=f"Analyze a given video.\
         example: {DYELLOW}filemac --analyze_video example.mp4 {RESET}")
 
-    parser.add_argument("-t", "--target_format",
+    parser.add_argument("-tf", "--target_format",
                         help="Target format for conversion (optional)")
 
     parser.add_argument(
@@ -222,10 +243,12 @@ def main():
 
     '''Audio join  arguements'''
     # Accept 0 or more arguements
-    parser.add_argument("--AudioJoin", "-AJ", nargs='*', help="Join Audio files into one master file")
+    parser.add_argument("--AudioJoin", "-AJ", nargs='*',
+                        help="Join Audio files into one master file")
 
     ''''arguements for Advanced text to word conversion'''
-    parser.add_argument('-AT2W', "--Atext2word", help=f'Advanced Text to word conversion i.e:{DYELLOW}filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}')
+    parser.add_argument('-AT2W', "--Atext2word", help=f'Advanced Text to word conversion i.e:{
+                        DYELLOW}filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}')
 
     # Add arguments that must accompany the "obj" command
     parser.add_argument('--font_size', type=int, default=12, help=F'Font size to be used default: \
@@ -238,26 +261,33 @@ def main():
                         default method i.e: {DYELLOW}filemac --convert_doc example.docx --use_extras -t pdf{RESET}")
 
     '''Pdf join arguements--> Accepts atleast 1 arguement'''
-    parser.add_argument("--pdfjoin", '-pj', nargs='+', help="Join Pdf file to one file")
+    parser.add_argument("--pdfjoin", '-pj', nargs='+',
+                        help="Join Pdf file to one file")
     parser.add_argument("--order", type=str, default='AAB', help=f"Order of pages when joining the pdf use: {DYELLOW}filemac\
                         -pj help for more details{RESET}")
-    parser.add_argument('--extract_pages', '-XP', nargs='+', help=f"Extract given pages from pdf: {DYELLOW}filemac --extract_pages file.pdf 6 10{RESET} for one page: {DYELLOW}filemac --extract_pages file.pdf 5{RESET}")
+    parser.add_argument('--extract_pages', '-XP', nargs='+', help=f"Extract given pages from pdf: {
+                        DYELLOW}filemac --extract_pages file.pdf 6 10{RESET} for one page: {DYELLOW}filemac --extract_pages file.pdf 5{RESET}")
 
-    parser.add_argument("--manipulate_audio", "-MA", action="store_true", help=f"Change audio voice/apply effects/reduce noise{DYELLOW}-MA --help for options{RESET}")
+    parser.add_argument("--manipulate_audio", "-MA", action="store_true",
+                        help=f"Change audio voice/apply effects/reduce noise{DYELLOW}-MA --help for options{RESET}")
+    parser.add_argument("--no-resume", action="store_false", dest="no_resume", help=f"Don't Resume previous File operation {DYELLOW}filemac --convert_doc simpledir --no-resume{RESET}")
+    parser.add_argument('--threads', "-t", type=int, default=3, help=f"Number of threads for text to speech  {DYELLOW}filemac --convert_doc simpledir --no-resume -t 2{RESET}")
 
     # Use parse_known_args to allow unknown arguments (for later tunneling)
     args = parser.parse_args()
 
 # Call function to handle document conversion inputs before begining conversion
-    if args.convert_doc == 'help':
+    if args.convert_doc and args.convert_doc[0] == 'help':
         print(SUPPORTED_DOC_FORMATS)
         sys.exit(1)
     if args.convert_doc and args.target_format is not None:
         if args.use_extras:
             MakeConversion.word2pdf_extra(args.convert_doc)
-        if os.path.isdir(args.convert_doc):
+        if len(args.convert_doc) <= 1 and not os.path.isdir(args.convert_doc[0]) and isinstance(args.convert_doc, list):
+            Batch_Audiofy(args.convert_doc, args.no_resume, args.threads)
+        elif os.path.isdir(args.convert_doc[0]):
             conv = _DIR_CONVERSION_(
-                args.convert_doc, args.target_format, args.isolate)
+                args.convert_doc[0], args.target_format, args.no_resume, args.threads, args.isolate)
             conv._unbundle_dir_()
 
         elif os.path.isfile(args.convert_doc):
@@ -279,7 +309,8 @@ def main():
             print(SUPPORTED_IMAGE_FORMATS_SHOW)
             sys.exit(1)
         if args.target_format is None:
-            print(f"{RED}Please provide output format specified by{CYAN} '-t'{RESET}")
+            print(f"{RED}Please provide output format specified by{
+                  CYAN} '-t'{RESET}")
             sys.exit(1)
         conv = ImageConverter(args.convert_image, args.target_format)
         conv.convert_image()
@@ -347,7 +378,8 @@ def main():
 # Call Advanced text to word converter
     elif args.Atext2word:
         from .AT2Word import AdvancedT2word
-        init = AdvancedT2word(args.Atext2word, None, args.font_size, args.font_name)
+        init = AdvancedT2word(args.Atext2word, None,
+                              args.font_size, args.font_name)
         init.text_to_word()
 
 # call for pdf join implementation

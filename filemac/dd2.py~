@@ -1,0 +1,55 @@
+import threading
+import time
+
+# Global counter
+shared_counter = 0
+lock = threading.Lock()
+
+# Function for single-threaded increment
+def single_thread_increment():
+    global shared_counter
+    for _ in range(500000):  # Total increments
+        shared_counter += 1
+
+# Function for multi-threaded increment
+def multi_thread_increment(num_threads):
+    global shared_counter
+    threads = []
+
+    # Each thread will increment the counter 100,000 times
+    def increment():
+        global shared_counter  # Declare as global to modify the global variable
+        with lock:
+            for _ in range(100000):
+                shared_counter += 1
+
+    # Create and start threads
+    for _ in range(num_threads):
+        thread = threading.Thread(target=increment)
+        threads.append(thread)
+        thread.start()
+
+    # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
+
+def main():
+    # Timing the single-threaded execution
+    gl
+    start_time = time.time()
+    single_thread_increment()
+    single_duration = time.time() - start_time
+    print(f"Single-threaded execution time: {single_duration:.6f} seconds")
+    print(f"Final counter value (single-threaded): {shared_counter}")
+
+    # Reset counter for multi-threaded execution
+    shared_counter = 0
+
+    # Timing the multi-threaded execution
+    num_threads = 5
+    start_time = time.time()
+    multi_thread_increment(num_threads)
+    multi_duration = time.time() - start_time
+    print(
+        f"Multi-threaded execution time with {num_threads} threads: {multi_duration:.6f} seconds")
+    print(f"Final counter value (multi-threaded): {shared_counter}")

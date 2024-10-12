@@ -26,6 +26,9 @@ filemac/JoinAudios.py~
 filemac/OCRTextExtractor.py
 filemac/OCRTextExtractor.py~
 filemac/Simple_v_Analyzer.py
+filemac/SuAudioBot.py
+filemac/VKITPro.py
+filemac/VRKit.py
 filemac/__init__.py
 filemac/__init__.py~
 filemac/colors.py
@@ -41,6 +44,7 @@ filemac/draft.py~
 filemac/fmac.py~
 filemac/formats.py
 filemac/formats.py~
+filemac/gui_converter.py
 filemac/handle_warnings.py
 filemac/image_op.py
 filemac/image_op.py~
@@ -55,9 +59,9 @@ filemac/pdf_Page_Extractor.py
 filemac/pdfadv.py
 filemac/pdfaudio.py
 filemac/recorder.py
-filemac/videoF.py
 filemac/vosk2docx.py
 filemac/vosk_speech.py
+filemac/whisper.py
 filemac.egg-info/PKG-INFO
 filemac.egg-info/SOURCES.txt
 filemac.egg-info/dependency_links.txt
