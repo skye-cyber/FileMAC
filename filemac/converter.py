@@ -138,9 +138,10 @@ class MakeConversion:
         '''For window users since it requires Microsoft word to be installed'''
         for file in obj:
             file = os.path.abspath(file)
-            if file.split('.')[-1] not in ('doc', 'docx'):
-                logger.error(f"{RED}File is not a word file{RESET}")
-                sys.exit(1)
+            print(file.split('.')[-1] )
+            # if file.split('.')[-1] not in ('doc', 'docx'):
+              #  logger.error(f"{RED}File is not a word file{RESET}")
+               # sys.exit(1)
             pdf_file = os.path.splitext(file)[0] + '.pdf' if outf is None else outf
             try:
                 if not os.path.isfile(file):
