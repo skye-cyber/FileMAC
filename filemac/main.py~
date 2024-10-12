@@ -277,29 +277,34 @@ def main():
     args = parser.parse_args()
 
 # Call function to handle document conversion inputs before begining conversion
-    if args.convert_doc and  == 'help':
+    if args.convert_doc and args.convert_doc[0] == 'help':
         print(SUPPORTED_DOC_FORMATS)
         sys.exit(1)
+
     if args.convert_doc and args.target_format is not None:
         if args.use_extras:
             MakeConversion.word2pdf_extra(args.convert_doc)
-        if len(args.convert_doc) <= 1 and not os.path.isdir(args.convert_doc[0]) and isinstance(args.convert_doc, list):
+
+        if len(args.convert_doc) <= 1 and not os.path.isdir(args.convert_doc[0]) and isinstance(args.convert_doc, list) and args.target_format in SUPPORTED_AUDIO_FORMATS_DIRECT:
             Batch_Audiofy(args.convert_doc, args.no_resume, args.threads)
+
         elif os.path.isdir(args.convert_doc[0]):
             conv = _DIR_CONVERSION_(
                 args.convert_doc[0], args.target_format, args.no_resume, args.threads, args.isolate)
             conv._unbundle_dir_()
 
-        elif os.path.isfile(args.convert_doc):
-            ev = Eval(args.convert_doc, args.target_format)
+        elif os.path.isfile(args.convert_doc[0]):
+            print("hdhfd")
+            exit()
+            ev = Eval(args.convert_doc[0], args.target_format)
             ev.document_eval()
 
 
 # Call function to handle video conversion inputs before begining conversion
+    elif args.convert_video and args.convert_video == 'help':
+        print(SUPPORTED_VIDEO_FORMATS_SHOW)
+        sys.exit(1)
     elif args.convert_video and args.target_format is not None:
-        if args.convert_video == 'help':
-            print(SUPPORTED_VIDEO_FORMATS_SHOW)
-            sys.exit(1)
         ev = VideoConverter(args.convert_video, args.target_format)
         ev.CONVERT_VIDEO()
 # Call function to handle image conversion inputs before begining conversion
@@ -326,10 +331,10 @@ def main():
         conv.doc2image(args.target_format)
 
 # Call function to handle audio conversion inputs before begining conversion
+    if args.convert_audio == 'help':
+        print(SUPPORTED_AUDIO_FORMATS_SHOW)
+        sys.exit(1)
     elif args.convert_audio and args.target_format is not None:
-        if args.convert_audio == 'help':
-            print(SUPPORTED_AUDIO_FORMATS_SHOW)
-            sys.exit(1)
         ev = AudioConverter(args.convert_audio, args.target_format)
         ev.pydub_conv()
 

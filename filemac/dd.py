@@ -1,4 +1,4 @@
-import platform
-ff = "hello.txt"
-print(platform.system())
-print(ff[:-3] + "pdf")
+from typing import Union
+ls = ["audio", "ud"]
+vb = ['pdf', 'kff']
+print(ls, vb)
