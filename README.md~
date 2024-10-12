@@ -44,9 +44,9 @@ Replace `[options]` with the appropriate command-line options based on the funct
 - `10`: --extract_audio
 - `11`: --Analyze_video
 - `12`: --resize_image
-- `13`: --doc_long_image      ->convert pdf/doc/docx to long image
-- `14`: --scanAsImg           ->scan text from pdf
-- `15`: --scanAsLong_Image    ->scan text from pdf
+- `13`: --doc_long_image      #####->convert pdf/doc/docx to long image
+- `14`: --scanAsImg           #####->scan text from pdf
+- `15`: --scanAsLong_Image    #####->scan text from pdf
 - `15`: --AudioJoin
 - `15`: --extract_pages
 - `15`: --manipulate_audio
@@ -68,7 +68,7 @@ Replace `[options]` with the appropriate command-line options based on the funct
              `7`.  DOCX to Audio(ogg,mp3,wav..*)
              `8`.  TXT to PDF
              `9`.  TXT to DOCX
-             `10`' TXT to Audio
+             `10`' TXT to Audio(ogg,mp3,wav..*)
              `11`. PPTX to DOCX
              `12`. XLSX to Sql
              `13`. XLSX to CSV
