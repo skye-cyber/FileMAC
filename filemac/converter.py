@@ -137,6 +137,7 @@ class MakeConversion:
     def word2pdf_extra(obj, outf=None):
         '''For window users since it requires Microsoft word to be installed'''
         for file in obj:
+            file = os.path.abspath(file)
             if file.split('.')[-1] not in ('doc', 'docx'):
                 logger.error(f"{RED}File is not a word file{RESET}")
                 sys.exit(1)
