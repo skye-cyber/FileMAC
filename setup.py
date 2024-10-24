@@ -12,9 +12,9 @@ def sri():
             print("Requirement poppler-utils installing")
             subprocess.run(['sudo', 'apt', 'install', 'poppler-utils'])
 
-        result = subprocess.run(
+        '''result = subprocess.run(
                         ['dpkg', '-l', 'speedtest-cli'], stdout=subprocess.PIPE, text=True)
-        '''if result.returncode != 0:
+        if result.returncode != 0:
             print("Requirement speedtest-cli -> installing")
             subprocess.run(['sudo', 'apt', 'install', 'speedtest-cli'])'''
 
