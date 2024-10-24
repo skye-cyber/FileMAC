@@ -6,13 +6,22 @@ from .colors import BLUE, BWHITE, CYAN, DCYAN, RESET, YELLOW, MAGENTA
 
 
 class AdvancedT2word:
-    """Given obj -> Text file where:
-    '#' is used to specify formarting
-     Only three heading leavels are supported.
-    '#' Heading1,
-    '##' -> Heading2,
-    '###' -> Heading3
-out_obj -> output object(file) name: str, fsize -> font-size default = 12: int, fstyle -> font-name default = Times New Roman: str"""
+    """
+    Args:
+        obj-> input object (normally a formated text file)
+        fsize ->font-size default = 12: int
+        fstyle -> font-name default = Times New Roman: str
+        out_obj -> output object(file) name: str
+    Returns:
+        None
+
+        Given obj -> Text file where:
+        '#' is used to specify formarting
+        Only three heading leavels are supported.
+        '#' Heading1,
+        '##' -> Heading2,
+        '###' -> Heading3
+        """
     def __init__(self, obj, out_obj=None, fsize: int = 12, fstyle: str = 'Times New Roman'):
         self.obj = obj
         self.out_obj = out_obj
@@ -23,12 +32,14 @@ out_obj -> output object(file) name: str, fsize -> font-size default = 12: int, 
 
     def text_to_word(self):
 
-        """Create new document,
+        """
+        Create new document,
         heading_styles -> define formating
         Open the text file and read it line by line.
         For every line check whether it starts with '#' format specify , ommit the specifier and formart the line.
         Strip empty spaces from every line.
-        Set body font to fstyle and font size to fsize."""
+        Set body font to fstyle and font size to fsize.
+        """
 
         print(f"{BWHITE}Set Font: {CYAN}{self.fsize}{RESET}")
         print(f"{BWHITE}Set Style: {CYAN}{self.fstyle}{RESET}")
@@ -39,11 +50,13 @@ out_obj -> output object(file) name: str, fsize -> font-size default = 12: int, 
         head_font_name = self.fstyle
         heading_styles = {
             # Heading 1
-            1: {'font_size': Pt(16), 'font_color': RGBColor(126, 153, 184)},
+            1: {'font_size': Pt(18), 'font_color': RGBColor(126, 153, 184)},
             # Heading 2
-            2: {'font_size': Pt(14), 'font_color': RGBColor(0, 0, 200)},
+            2: {'font_size': Pt(16), 'font_color': RGBColor(0, 120, 212)},
             # Heading 3
-            3: {'font_size': Pt(13), 'font_color': RGBColor(0, 0, 150)},
+            3: {'font_size': Pt(14), 'font_color': RGBColor(0, 120, 212)},
+            # Heading 4
+            4: {'font_size': Pt(13), 'font_color': RGBColor(0, 120, 212)},
         }
 
         body_font_name = 'Times New Roman'
