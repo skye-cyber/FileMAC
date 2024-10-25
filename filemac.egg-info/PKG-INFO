@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: filemac
-Version: 1.1.1
+Version: 1.1.2b0
 Summary: Open source Python CLI toolkit for conversion, manipulation, Analysis of files (All major file operations)
 Author: wambua
 Author-email: swskye17@gmail.com
@@ -17,6 +17,7 @@ Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
 Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
 Requires-Python: >=3.6
 Description-Content-Type: text/markdown
 License-File: LICENSE

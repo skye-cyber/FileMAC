@@ -2,7 +2,7 @@
 import sys
 import cv2
 import numpy as np
-from .colors import DYELLOW, RESET, DCYAN, DGREEN
+from colors import DYELLOW, RESET, DCYAN, DGREEN
 import ffmpeg
 
 
@@ -19,22 +19,23 @@ class SA:
         """Fetch the original bitrate of the video file using ffmpeg."""
         try:
             probe = ffmpeg.probe(input_file)
-            print(probe)
+            print(probe.get('streams')[1])
             bitrate = None
             # Iterate over the streams and find the video stream
             for stream in probe['streams']:
                 bitrate = stream.get('bit_rate', None) if stream['codec_type'] == 'video' else None
                 aspect_ratio = stream.get("sample_aspect_ratio") if stream["sample_aspect_ratio"] else None
                 codec_name = stream.get("codec_name") if stream["codec_name"] else None
-                channels = stream.get("channels") / 1024 if stream["channels"] else None
-                print(channels)
-                encoder = stream.get("encoder") if stream["encoder"] else None
+                channels = stream.get('channels')
+
+                encoder = stream.get("encoder") if stream.get("encoder") else None
                 break
             return bitrate, aspect_ratio, codec_name, channels, encoder
         except ffmpeg.Error as e:
             raise
             print(f"Error: {e}")
         except Exception as e:
+            raise
             print(f"Error: {e}")
 
     def SimpleAnalyzer(self):
@@ -50,7 +51,7 @@ class SA:
             print(f"{DYELLOW}Initializing..{RESET}")
             # Initialize variables
             # Frame rate (fps)
-            bitrate, aspect_ratio, codec_name, size, encoder = self.get_info(self.video)
+            bitrate, aspect_ratio, codec_name, channels, encoder = self.get_info(self.video)
             frame_count = 0
             total_area = 0
             duration = 0
@@ -81,7 +82,8 @@ class SA:
             cv2.destroyAllWindows()
 
             # Print results
-            print(f"Size {DGREEN}{channels}{RESET}Kb")
+            print(f"Size {DGREEN}{size}{RESET}Kb")
+            print(f"Channels: {DGREEN}{channels}{RESET}")
             print(f"Encoder {DGREEN}{encoder}{RESET}")
             print(f"Bitrate {DGREEN}{bitrate}{RESET}")
             print(f"Aspect ratio{DGREEN}{aspect_ratio}{RESET}")
@@ -93,8 +95,9 @@ class SA:
         except KeyboardInterrupt:
             print("\nExiting")
             sys.exit(1)
+        except TypeError:
+            pass
         except Exception as e:
-            raise
             print(e)
             sys.exit(1)
 

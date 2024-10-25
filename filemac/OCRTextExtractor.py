@@ -7,7 +7,7 @@ import cv2
 import pytesseract
 from PIL import Image
 from rich.progress import Progress
-from .colors import BBWHITE, DGREEN, DYELLOW, FMAGENTA, RED, RESET
+from .colors import BBWHITE, DGREEN, DYELLOW, FMAGENTA, RED, RESET, CYAN
 
 ###############################################################################
 logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
@@ -16,17 +16,26 @@ logger = logging.getLogger(__name__)
 
 class ExtractText:
     ###############################################################################
-    '''Do OCR text extraction from a given image file and display the extracted
+    '''
+    Do OCR text extraction from a given image file and display the extracted
     text to the screen finally save it to a text file assuming the name of the input
-    file'''
+    file
+    Args:
+    input_obj -> file ie image conatinig the text
+    code -> bool, keep text formarting
+    Returns:
+    text -> Extracted text
+    '''
 
     ###############################################################################
 
-    def __init__(self, input_obj):
+    def __init__(self, input_obj, code: bool = False):
         self.input_obj = input_obj
+        self.code = code
 
     def preprocess(self):
-        '''Check input object whether it`s a file or a directory if a file append
+        '''
+    Check input object whether it`s a file or a directory if a file append
     the file to a set and return it otherwise append directory full path
     content to the set and return the set file. The returned set will be
     evaluated in the next step as required on the basis of requested operation
@@ -71,22 +80,14 @@ class ExtractText:
                 config = ("-l eng --oem 3 --psm 6")
                 text = pytesseract.image_to_string((img_pil), config=config)
 
-                '''Remove extra whitespaces and newlines
-                text = ' '.join(text.split()).strip()'''
-                # logger.info(F"{CYAN}Found:\n{RESET}")
-                # print(text)
+                text = ' '.join(text.split()).strip()
+                logger.info(F"{CYAN}Found:\n{RESET}")
+                print(text)
                 current_path = os.getcwd()
                 file_path = os.path.join(current_path, OCR_file)
-                ''' Save the extracted text to specified file '''
-                # logger.info(f"{DGREEN}Generating text file for the extracted text..{RESET}")
 
                 with open(file_path, 'w') as file:
                     file.write(text)
-                # logger.info(f"File saved as {DYELLOW}{OCR_file}{RESET}:")
-                '''If there are multiple candidate images for text extraction,
-                wait for key press before proceeding to the next
-                image otherwise don't wait
-                size = [i for i in enumerate(image_list)]'''
 
                 if len(image_list) >= 2:
                     input(F"{BBWHITE}Press Enter to continue{RESET}")

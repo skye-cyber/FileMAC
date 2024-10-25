@@ -272,6 +272,7 @@ def main():
                         help=f"Change audio voice/apply effects/reduce noise{DYELLOW}-MA --help for options{RESET}")
     parser.add_argument("--no-resume", action="store_false", dest="no_resume", help=f"Don't Resume previous File operation {DYELLOW}filemac --convert_doc simpledir --no-resume{RESET}")
     parser.add_argument('--threads', "-t", type=int, default=3, help=f"Number of threads for text to speech  {DYELLOW}filemac --convert_doc simpledir --no-resume -t 2{RESET}")
+    parser.add_argument("-c", "--code", action='store_true', help="Allows OCR extration without re-formarting maintaining currect text appearance (spacing and tabs)")
 
     # Use parse_known_args to allow unknown arguments (for later tunneling)
     args = parser.parse_args()
@@ -365,7 +366,7 @@ def main():
         conv.preprocess()
 # Call module to handle Candidate images for text extraction inputs before begining conversion
     elif args.OCR:
-        conv = ExtractText(args.OCR)
+        conv = ExtractText(args.OCR, args.code)
         conv.OCR()
 
     elif args.Analyze_video:
