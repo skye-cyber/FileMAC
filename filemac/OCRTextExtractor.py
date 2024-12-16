@@ -29,19 +29,16 @@ class ExtractText:
 
     ###############################################################################
 
-    def __init__(self, input_obj, code: bool = False):
+    def __init__(self, input_obj, no_strip: bool = False):
         self.input_obj = input_obj
-        self.code = code
+        self.no_strip = no_strip
 
     def preprocess(self):
         '''
-    Check input object whether it`s a file or a directory if a file append
-    the file to a set and return it otherwise append directory full path
-    content to the set and return the set file. The returned set will be
-    evaluated in the next step as required on the basis of requested operation
-    For every requested operation, the output file if any is automatically
-    generated on the basis of the input filename and saved in the same
-    directory as the input file.
+    Check input object (i.e a file or a directory)
+    -> if file append  the file to a set otherwise append directory full path to the set and return the set. The returned set will be
+    evaluated in the next step as required on the basis of requested operation.
+    For every requested operation, the output file if any is automatically generated and saved in respect to the input file filename and directory respectively.
     Exit if the folder is empty
     '''
 
@@ -67,8 +64,6 @@ class ExtractText:
             '''Load image using OpenCV'''
             img = cv2.imread(image_path)
 
-            # logger.info(f"{FMAGENTA}processing {image_path}...{RESET}")
-
             try:
                 '''Preprocess image for better OCR results'''
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -80,9 +75,10 @@ class ExtractText:
                 config = ("-l eng --oem 3 --psm 6")
                 text = pytesseract.image_to_string((img_pil), config=config)
 
-                text = ' '.join(text.split()).strip()
-                logger.info(F"{CYAN}Found:\n{RESET}")
-                print(text)
+                text = ' '.join(text) if self.no_strip else ' '.join(
+                    text.split()).strip()
+
+                logger.info(F"{CYAN}Found:\n{RESET, text}")
                 current_path = os.getcwd()
                 file_path = os.path.join(current_path, OCR_file)
 
@@ -104,21 +100,17 @@ Reason: {str(e)}{RESET}")
             except Exception as e:
                 logger.error(f"{type(e).__name__}: {str(e)}")
                 logger.error(f"{RED}{e}{RESET}")
-            # except Exception as e:
-            # logger.error(f"Error:>>{RED}{e}{RESET}")
 
-        # _file_list_ = [None]
         if len(image_list) >= 1:
             with Progress() as progress:
                 task = progress.add_task("[magenta] Extracting")
                 for image_path in image_list:
                     OCR_file = image_path[:-4] + ".txt"
-                    return ocr_text_extraction(image_path)
                     task.update(task, advance=1)
+                    return ocr_text_extraction(image_path)
                     # _file_list_.append(OCR_file)
         else:
             for image_path in image_list:
                 OCR_file = image_path[:-4] + ".txt"
-                return ocr_text_extraction(image_path)
                 task.update(task, advance=1)
-
+                return ocr_text_extraction(image_path)

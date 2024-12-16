@@ -1,8 +1,8 @@
-# fconverter
+# filemac
 A python file `conversion`, `manipulation`, `Analysis` toolkit
 `This is a Linux command-line interface (CLI) utility that coverts documents from one format to another,
 analyzes files, manipulates files.
-Your can also convert text file to mp3 formart using google Text to speech library (gTTS).
+Your can also convert text file to mp3 format using google Text to speech library (gTTS).`
 ## Name variations
 ```shell
    filemac -h

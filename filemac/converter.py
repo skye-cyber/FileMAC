@@ -1,20 +1,22 @@
 #############################################################################
+import json
 import logging
 import logging.handlers
 import math
 import os
 import re
+import shutil
 import sqlite3
 import subprocess
 import sys
-import shutil
-import json
+from threading import Lock, Thread
+from typing import List, Union
+
 import cv2
 import pandas as pd
 import pydub
 import PyPDF2
 import requests
-from threading import Thread, Lock
 from docx import Document
 from gtts import gTTS
 from moviepy.editor import VideoFileClip
@@ -26,10 +28,10 @@ from pptx import Presentation
 from pydub import AudioSegment
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate
-from rich.progress import Progress
 from rich.errors import MarkupError
+from rich.progress import Progress
 from tqdm import tqdm
-from typing import Union, List
+
 # from pathlib import Path
 from .colors import (BLUE, BWHITE, CYAN, DBLUE, DCYAN, DGREEN, DMAGENTA, DRED,
                      DYELLOW, FCYAN, FMAGENTA, GREEN, ICYAN, IGREEN, MAGENTA,
@@ -108,7 +110,8 @@ class MakeConversion:
 
             try:
                 if os.name == 'posix':  # Check if running on Linux
-                    print(f'{BLUE}Converting: {RESET}{word_file} {BLUE}to {RESET}{pdf_file}')
+                    print(
+                        f'{BLUE}Converting: {RESET}{word_file} {BLUE}to {RESET}{pdf_file}')
                     # Use subprocess to run the dpkg and grep commands
                     result = subprocess.run(
                         ['dpkg', '-l', 'libreoffice'], stdout=subprocess.PIPE, text=True)
@@ -141,12 +144,15 @@ class MakeConversion:
             if file.split('.')[-1] not in ('doc', 'docx'):
                 logger.error(f"{RED}File is not a word file{RESET}")
                 sys.exit(1)
-            pdf_file = os.path.splitext(file)[0] + '.pdf' if outf is None else outf
+            pdf_file = os.path.splitext(
+                file)[0] + '.pdf' if outf is None else outf
             try:
                 if not os.path.isfile(file):
-                    print(f"The file {obj} does not exist or is not a valid file.")
+                    print(
+                        f"The file {obj} does not exist or is not a valid file.")
                     sys.exit('Exit!')
-                logger.info(f'{BLUE}Converting: {RESET}{file} {BLUE}to {RESET}{pdf_file}')
+                logger.info(
+                    f'{BLUE}Converting: {RESET}{file} {BLUE}to {RESET}{pdf_file}')
                 from docx2pdf import convert
                 convert(file, pdf_file)
                 print(F"{GREEN}Conversion ✅{RESET}")
@@ -828,7 +834,8 @@ lines {RESET}", end="\n")
                 print(f"{YELLOW}Target images{BLUE} {len(images)}{RESET}")
 
                 with Progress() as progress:
-                    task = progress.add_task("[magenta]Generating images ", total=len(images))
+                    task = progress.add_task(
+                        "[magenta]Generating images ", total=len(images))
                     for i, image in enumerate(images):
                         # print(f"{DBLUE}{i}{RESET}", end="\r")
                         yd = f"{fname}_{i+1}.{outf}"
@@ -842,10 +849,16 @@ lines {RESET}", end="\n")
 
 class Scanner:
     """Implementation of scanning to extract data from pdf files and images
-    input_file -> file to be scanned pdf,image"""
+    input_file -> file to be scanned pdf,image
+    Args:
+        input_file->file to be scanned
+        no_strip-> Preserves text formating once set to True, default: False
+    Returns:
+        None"""
 
-    def __init__(self, input_file):
+    def __init__(self, input_file, no_strip: bool = False):
         self.input_file = input_file
+        self.no_strip = no_strip
 
     def preprocess(self):
         files_to_process = []
@@ -861,7 +874,7 @@ class Scanner:
         return files_to_process
 
     def scanPDF(self, obj=None):
-        """Obj- object for scanning where the object is not a list"""
+        """Obj - object for scanning where the object is not a list"""
         pdf_list = self.preprocess()
         pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
         if obj:
@@ -900,9 +913,10 @@ class Scanner:
         text = ''
 
         with Progress() as progress:
-            task = progress.add_task("[magenta]Extracting text", totsl=len(img_objs))
+            task = progress.add_task(
+                "[magenta]Extracting text", totsl=len(img_objs))
             for i in img_objs:
-                extract = ExtractText(i)
+                extract = ExtractText(i, self.no_strip)
                 _text = extract.OCR()
 
                 if _text is not None:
@@ -933,21 +947,27 @@ class Scanner:
         print(f"{GREEN}Ok✅{RESET}")
         return text
 
-    def scanAsLongImg(self):
-        """Convert the pdf to long image for scanning - text extraction"""
-        file = self.input_file
-        from .longImg import LImage
-        LI = LImage(file)
-        fl = LI.preprocess()
-        from .OCRTextExtractor import ExtractText
+    def scanAsLongImg(self) -> bool:
+        try:
+            """Convert the pdf to long image for scanning - text extraction"""
+            pdf_list = self.preprocess()
+            pdf_list = [
+                item for item in pdf_list if item.lower().endswith("pdf")]
+            from .longImg import LImage
+            from .OCRTextExtractor import ExtractText
+            for file in pdf_list:
+                LI = LImage(file)
+                fl = LI.preprocess()
 
-        # fpath = file.split('.')[0] + '.png'
-        tx = ExtractText(fl)
-        text = tx.OCR()
-        if text is not None:
-            print(text)
-            print(f"{GREEN}Ok{RESET}")
-        return text
+                # fpath = file.split('.')[0] + '.png'
+                tx = ExtractText(fl, self.no_strip)
+                text = tx.OCR()
+                if text is not None:
+                    # print(text)
+                    print(f"{GREEN}Ok{RESET}")
+            return True
+        except Exception as e:
+            print(e)
 
 
 class FileSynthesis:
@@ -1049,22 +1069,24 @@ class FileSynthesis:
 
                     for i in range(resume_chunk_pos, len(text), CHUNK_SIZE):
 
-                        print(f"Processing: chunk {MAGENTA}{counter}/{total_chunks} {DCYAN}{counter/total_chunks*100:.2f}%{RESET}\n", end="\r")
+                        print(
+                            f"Processing: chunk {MAGENTA}{counter}/{total_chunks} {DCYAN}{counter/total_chunks*100:.2f}%{RESET}\n", end="\r")
                         chunk = text[i:i + CHUNK_SIZE]
                         # print(chunk)
                         if os.path.exists(f"{_full_output_path_}_{counter}.ogg"):
 
                             if counter == start_chunk:
-                                print(f"{CYAN}Chunk vs file confict: {BLUE}Resolving{RESET}")
+                                print(
+                                    f"{CYAN}Chunk vs file confict: {BLUE}Resolving{RESET}")
                                 os.remove(f"{_full_output_path_}_{
-                                        counter}.ogg")
+                                    counter}.ogg")
                                 output_filename = f"{
                                     _full_output_path_}_{counter}.ogg"
 
                             # Remove empty file
                             elif os.path.getsize(f"{_full_output_path_}_{counter}.ogg") != 0:
                                 os.remove(f"{_full_output_path_}_{
-                                        counter}.ogg")
+                                    counter}.ogg")
                                 output_filename = f"{
                                     _full_output_path_}_{counter}.ogg"
 
@@ -1081,7 +1103,8 @@ class FileSynthesis:
                         tts.save(output_filename)
 
                         # Update current_chunk in the configuration
-                        config.update_config_entry(thread_name, current_chunk=counter)
+                        config.update_config_entry(
+                            thread_name, current_chunk=counter)
 
                         counter += 1
 
@@ -1100,7 +1123,8 @@ class FileSynthesis:
                     attempt += 1
 
                     # Read chunk from configuration
-                    resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
+                    resume_chunk_pos = int(
+                        config.read_config_file(thread_name)) * 1_000
 
                 except requests.exceptions.HTTPError as e:  # Exponential backoff for retries
                     logger.error(f"HTTP error: {e.status_code} - {e.reason}")
@@ -1110,7 +1134,8 @@ class FileSynthesis:
 
                     attempt += 1
 
-                    resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
+                    resume_chunk_pos = int(
+                        config.read_config_file(thread_name)) * 1_000
 
                 except requests.exceptions.RequestException as e:
                     logger.error(f"{RED}{e}{RESET}")
@@ -1121,7 +1146,8 @@ class FileSynthesis:
 
                     attempt += 1
 
-                    resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
+                    resume_chunk_pos = int(
+                        config.read_config_file(thread_name)) * 1_000
 
                 except (ConnectionError, ConnectionAbortedError, ConnectionRefusedError, ConnectionResetError):
                     logger.error(
@@ -1133,7 +1159,8 @@ class FileSynthesis:
 
                         attempt += 1
 
-                    resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
+                    resume_chunk_pos = int(
+                        config.read_config_file(thread_name)) * 1_000
 
                 except MarkupError as e:
                     logger.error(F"{RED}{e}{RESET}")
@@ -1146,7 +1173,8 @@ class FileSynthesis:
 
                     attempt += 1
 
-                    resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
+                    resume_chunk_pos = int(
+                        config.read_config_file(thread_name)) * 1_000
 
                 else:
                     print(
@@ -1236,7 +1264,8 @@ class FileSynthesis:
                 # Ensure proper locking when adding config entry
                 with self.lock:
                     # Record config entry for each item
-                    self.config.add_config_entry(thread_name, f"{item.split('.')[0]}", temp_dir, 0)
+                    self.config.add_config_entry(
+                        thread_name, f"{item.split('.')[0]}", temp_dir, 0)
 
                 # Create and return the thread
                 return Thread(target=self.worker, args=(item, temp_dir, thread_name), name=thread_name)
@@ -1315,11 +1344,14 @@ class FileSynthesis:
                     conv = MakeConversion(word)
                     text = FileSynthesis.text_file(conv.word_to_txt())
                 else:
-                    raise ValueError('Unsupported file format. Please provide a PDF, txt, or Word document.')
+                    raise ValueError(
+                        'Unsupported file format. Please provide a PDF, txt, or Word document.')
 
                 # Synthesize audio using the extracted text
-                self.instance.Synthesise(text, output_file, _tmp_folder_=_temp_dir_, thread_name=thread_name)
-                print(f"Thread {thread_name} completed processing {input_file}")
+                self.instance.Synthesise(
+                    text, output_file, _tmp_folder_=_temp_dir_, thread_name=thread_name)
+                print(
+                    f"Thread {thread_name} completed processing {input_file}")
 
             except Exception as e:
                 print(f"Error in thread {thread_name}: {e}")
@@ -1337,7 +1369,7 @@ class ConfigManager:
         Create or overwrite a configuration file to record thread names, associated file names, and current chunks.
 
         Args:
-            config_data (list): A list of dictionaries containing thread name, associated file name, temp dir, and current chunk.
+            config_data(list): A list of dictionaries containing thread name, associated file name, temp dir, and current chunk.
         """
         try:
             # Ensure the output directory exists
@@ -1349,7 +1381,8 @@ class ConfigManager:
             with open(self.config_path, 'w') as config_file:
                 json.dump(config_data, config_file, indent=4)
 
-            print(f"Configuration file '{self.config_path}' created successfully.")
+            print(
+                f"Configuration file '{self.config_path}' created successfully.")
         except Exception as e:
             print(f"Error creating configuration file: {e}")
 
@@ -1404,7 +1437,8 @@ class ConfigManager:
             # Check if the thread already exists in the configuration
             for entry in config_data:
                 if entry['thread_name'] == thread_name:
-                    print(f"Thread '{thread_name}' already exists. Use 'update_config_entry' to update it.")
+                    print(
+                        f"Thread '{thread_name}' already exists. Use 'update_config_entry' to update it.")
                     return
 
             # Add the new entry
@@ -1463,11 +1497,13 @@ class ConfigManager:
 
 class VideoConverter:
 
-    def __init__(self, input_file, out_format):
+    def __init__(self, input_file, out_format=None):
         self.input_file = input_file
         self.out_format = out_format
 
     def preprocess(self):
+        if self.out_format is None:
+            return None
         files_to_process = []
 
         if os.path.isfile(self.input_file):
@@ -1482,6 +1518,69 @@ class VideoConverter:
                     files_to_process.append(file_path)
 
         return files_to_process
+
+    def ffmpeg_merger(self, obj: list = None):
+        video_list = self.preprocess(), obj
+        for input_video in video_list:
+            output_file = [f"{_}_new_.{ext}" for _,
+                           ext in [input_video.split('.', 1)]][0]
+            # keep the original video quality by using -c:v copy, which avoids re-encoding.
+            subprocess.run([
+                "ffmpeg", "-i", input_video, "-i", "audio.mp3",
+                "-c:v", "copy", "-c:a", "aac", "-strict", "experimental", "output_video.mp4"
+            ])
+
+    def pydub_merger(self, obj: list = None):
+        video_list = self.preprocess() or obj
+        for input_video in video_list:
+            output_file = [f"{_}_new_.{ext}" for _,
+                           ext in [input_video.split('.', 1)]][0]
+            # Process or manipulate audio with Pydub (e.g., adjust volume)
+            audio = AudioSegment.from_file("audio.mp3")
+            audio = audio + 6  # Increase volume by 6 dB
+            audio.export("processed_audio.mp3", format="mp3")
+
+            # Merge processed audio with video using FFmpeg
+            subprocess.run([
+                "ffmpeg", "-i", input_video, "-i", "processed_audio.mp3",
+                "-c:v", "copy", "-c:a", "aac", output_file
+            ])
+
+    def cv2_merger(self, obj: list = None):
+        video_list = self.preprocess(), obj
+        for input_video in video_list:
+            # Read video and save frames (without audio)
+            cap = cv2.VideoCapture(input_video)
+
+            # Retrieve width and height from the video
+            width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            fps = int(cap.get(cv2.CAP_PROP_FPS))
+
+            # _, ext = input_video.split('.')[0]
+            # output_file = f"{_}_new{ext}"
+            output_file = [f"{_}_new_.{ext}" for _,
+                           ext in [input_video.split('.', 1)]][0]
+            # Define the VideoWriter with the video dimensions
+            out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(
+                *'mp4v'), fps, (width, height))
+
+            # Read frames from the original video and write them to the output
+            while cap.isOpened():
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                out.write(frame)
+
+            # Release resources
+            cap.release()
+            out.release()
+
+            # Merge with audio using FFmpeg
+            subprocess.run([
+                "ffmpeg", "-i", "video_no_audio.mp4", "-i", "audio.mp3",
+                "-c:v", "copy", "-c:a", "aac", "output_video.mp4"
+            ])
 
     def CONVERT_VIDEO(self):
         try:

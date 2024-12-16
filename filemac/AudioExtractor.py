@@ -53,6 +53,28 @@ class ExtractAudio:
         except Exception as e:
             print(e)
 
+    def ffmpeg_extractor(self):
+        import subprocess
+
+        video_list = self.preprocess()
+        for input_video in video_list:
+            # Extract audio
+            subprocess.run(["ffmpeg", "-i", f"{input_video}", f"{input_video.split('.')[0]}.mp3"])
+            # Merge audio and video
+            # subprocess.run(["ffmpeg", "-i", f"{input_video}", "-i", "audio.mp3", "-c:v", "copy", "-c:a", "aac", f"{input_video}"])
+
+    def pydub_extractor(self):
+        import subprocess
+
+        from pydub import AudioSegment
+        video_list = self.preprocess()
+        for input_video in video_list:
+            # Ensure FFmpeg is installed
+            subprocess.run(["ffmpeg", "-version"])
+            # Extract audio
+            video = AudioSegment.from_file(f"{input_video}")
+            video.export(f"{input_video.split('.')[0]}.mp3", format="mp3")
+
 
 if __name__ == "__main__":
     vi = ExtractAudio(

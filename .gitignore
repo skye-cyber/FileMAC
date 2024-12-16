@@ -1,1 +1,4 @@
-.aider*
+.aider/*
+.ropeproject/*
+*~
+__pycache__/*
