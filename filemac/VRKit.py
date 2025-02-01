@@ -1,11 +1,10 @@
 #!/usr/bin/python3
 import logging
-import os
 import cv2
 from colorama import Fore, Style, init
+
 # import numpy as np
 from tqdm import tqdm
-from moviepy.editor import VideoFileClip
 
 # Initialize colorama
 init(autoreset=True)
@@ -19,7 +18,7 @@ class CustomFormatter(logging.Formatter):
         logging.INFO: Fore.GREEN,
         logging.WARNING: Fore.YELLOW,
         logging.ERROR: Fore.RED,
-        logging.CRITICAL: Fore.MAGENTA
+        logging.CRITICAL: Fore.MAGENTA,
     }
 
     def format(self, record):
@@ -38,12 +37,11 @@ logger.setLevel(logging.INFO)
 
 
 def detect_missing_frames(frames):
-    ''' Implementation for missing frame detection and index them, append index
-    of missing frames to a list'''
+    """Implementation for missing frame detection and index them, append index
+    of missing frames to a list"""
     missing_frames = []
     logger.info("Index missing frames")
     for i in tqdm(range(1, len(frames) - 1), desc="Progress"):
-
         if frames[i] is None:
             missing_frames.append(i)
 
@@ -54,10 +52,10 @@ def detect_missing_frames(frames):
 
 
 def interpolate_frame(prev_frame, next_frame):
-    '''Based on number and size of missing frames use this logic to create a
-dummy frame by interpolating.
-    combine the frame before and after the missing frame and find the missing
-frame by calculating middle weight.'''
+    """Based on number and size of missing frames use this logic to create a
+    dummy frame by interpolating.
+        combine the frame before and after the missing frame and find the missing
+    frame by calculating middle weight."""
     logger.info("Interpolating")
     return cv2.addWeighted(prev_frame, 0.5, next_frame, 0.5, 0)
 
@@ -75,10 +73,12 @@ def repair_video(input_path, output_path):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
 
-    logger.info("File info:\n"
-                f"\tFrames: \033[95m{frame_count}\033[0;32m\n"
-                f"\tFrame Width: \033[0;95m{width}\033[0;32m\n"
-                f"\tFPS: \033[0;95m{fps}\033[0m")
+    logger.info(
+        "File info:\n"
+        f"\tFrames: \033[95m{frame_count}\033[0;32m\n"
+        f"\tFrame Width: \033[0;95m{width}\033[0;32m\n"
+        f"\tFPS: \033[0;95m{fps}\033[0m"
+    )
 
     frames = []
     # Remove missing frames
@@ -92,26 +92,35 @@ def repair_video(input_path, output_path):
 
     cap.release()
 
-    ''' Call function to detect missing frames and decide on the method to apply
+    """ Call function to detect missing frames and decide on the method to apply
  depending on number of missing frames. If number is larger than frame_count * 0.1
-remove the missing frames else interpolate.'''
+remove the missing frames else interpolate."""
 
     missing_frames = detect_missing_frames(frames)
-    if len(missing_frames) > frame_count * 0.1:  # Arbitrary threshold for many missing frames
+    if (
+        len(missing_frames) > frame_count * 0.1
+    ):  # Arbitrary threshold for many missing frames
         frames = [f for f in frames if f is not None]
     else:
         for i in missing_frames:
-            ''' Based on missing frame `i` find previous frame `frames[i-1]` and preceeding frame `frames[i+1]` wher both previous and preceeding are not missing. Use them to create the middle frame.'''
-            if i > 0 and i < frame_count - 1 and frames[i-1] is not None and frames[i+1] is not None:
-                frames[i] = interpolate_frame(frames[i-1], frames[i+1])
+            """ Based on missing frame `i` find previous frame `frames[i-1]` and preceeding frame `frames[i+1]` wher both previous and preceeding are not missing. Use them to create the middle frame."""
+            if (
+                i > 0
+                and i < frame_count - 1
+                and frames[i - 1] is not None
+                and frames[i + 1] is not None
+            ):
+                frames[i] = interpolate_frame(frames[i - 1], frames[i + 1])
             else:
-                '''Where ...'''
-                frames[i] = frames[i-1] if frames[i -
-                                                  1] is not None else frames[i+1]
+                """Where ..."""
+                frames[i] = (
+                    frames[i - 1] if frames[i - 1] is not None else frames[i + 1]
+                )
 
     # Create writer objectfor the frames
-    out = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(
-        *'mp4v'), fps, (width, height))
+    out = cv2.VideoWriter(
+        output_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height)
+    )
 
     # Write the new video to file
     for frame in frames:
@@ -124,6 +133,6 @@ remove the missing frames else interpolate.'''
 
 
 # Usage
-input_video_path = '/home/skye/Videos/supercar.mp4'
-output_video_path = 'output_video.mp4'
+input_video_path = "/home/skye/Videos/supercar.mp4"
+output_video_path = "output_video.mp4"
 repair_video(input_video_path, output_video_path)
