@@ -186,8 +186,9 @@ class MakeConversion:
                 print(f"{GREEN}Conversion ✅{RESET}")
                 sys.exit(0)
             except ImportError:
-                logger.warning(f"{RED}docx2pdf Not found. {
-                    CYAN}Run pip install docx2pdf{RESET}")
+                logger.warning(
+                    f"{RED}docx2pdf Not found. {CYAN}Run pip install docx2pdf{RESET}"
+                )
             except Exception as e:
                 raise
                 logger.error(e)
