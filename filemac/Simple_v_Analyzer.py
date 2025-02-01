@@ -1,4 +1,5 @@
 """A basic/simple file analyzer"""
+
 import sys
 import cv2
 import numpy as np
@@ -7,7 +8,6 @@ import ffmpeg
 
 
 class SA:
-
     """Video - video object subject for analysis
     return video`s: duration, total_area and frame_count"""
 
@@ -19,14 +19,22 @@ class SA:
         """Fetch the original bitrate of the video file using ffmpeg."""
         try:
             probe = ffmpeg.probe(input_file)
-            print(probe.get('streams')[1])
+            print(probe.get("streams")[1])
             bitrate = None
             # Iterate over the streams and find the video stream
-            for stream in probe['streams']:
-                bitrate = stream.get('bit_rate', None) if stream['codec_type'] == 'video' else None
-                aspect_ratio = stream.get("sample_aspect_ratio") if stream["sample_aspect_ratio"] else None
+            for stream in probe["streams"]:
+                bitrate = (
+                    stream.get("bit_rate", None)
+                    if stream["codec_type"] == "video"
+                    else None
+                )
+                aspect_ratio = (
+                    stream.get("sample_aspect_ratio")
+                    if stream["sample_aspect_ratio"]
+                    else None
+                )
                 codec_name = stream.get("codec_name") if stream["codec_name"] else None
-                channels = stream.get('channels')
+                channels = stream.get("channels")
 
                 encoder = stream.get("encoder") if stream.get("encoder") else None
                 break
@@ -39,7 +47,6 @@ class SA:
             print(f"Error: {e}")
 
     def SimpleAnalyzer(self):
-
         """Read the video file/obj
         Increase frame count and accumulate area
         Calculate current frame duration
@@ -51,7 +58,9 @@ class SA:
             print(f"{DYELLOW}Initializing..{RESET}")
             # Initialize variables
             # Frame rate (fps)
-            bitrate, aspect_ratio, codec_name, channels, encoder = self.get_info(self.video)
+            bitrate, aspect_ratio, codec_name, channels, encoder = self.get_info(
+                self.video
+            )
             frame_count = 0
             total_area = 0
             duration = 0
@@ -71,10 +80,10 @@ class SA:
                 duration += 1 / fps
 
                 # Display the resulting frame
-                cv2.imshow('Frame', frame)
+                cv2.imshow("Frame", frame)
 
                 # Break the loop after pressing 'q'
-                if cv2.waitKey(1) == ord('q'):
+                if cv2.waitKey(1) == ord("q"):
                     break
 
             # Release the video capture object and close all windows
@@ -82,7 +91,7 @@ class SA:
             cv2.destroyAllWindows()
 
             # Print results
-            print(f"Size {DGREEN}{size}{RESET}Kb")
+            # print(f"Size {DGREEN}{size}{RESET}Kb")
             print(f"Channels: {DGREEN}{channels}{RESET}")
             print(f"Encoder {DGREEN}{encoder}{RESET}")
             print(f"Bitrate {DGREEN}{bitrate}{RESET}")
