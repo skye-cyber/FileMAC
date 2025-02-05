@@ -3,12 +3,12 @@ import logging.handlers
 import os
 import sys
 
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 
 from .colors import DCYAN, DYELLOW, RED, RESET
 
 ###############################################################################
-logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -29,7 +29,9 @@ class ExtractAudio:
                 for file in os.listdir(self.input_file):
                     file_path = os.path.join(self.input_file, file)
                     ls = ["mp4", "mkv"]
-                    if os.path.isfile(file_path) and any(file_path.lower().endswith(ext) for ext in ls):
+                    if os.path.isfile(file_path) and any(
+                        file_path.lower().endswith(ext) for ext in ls
+                    ):
                         files_to_process.append(file_path)
 
             return files_to_process
@@ -40,7 +42,7 @@ class ExtractAudio:
         try:
             video_list = self.preprocess()
             for input_video in video_list:
-                print(F"{DYELLOW}Extracting..{DCYAN}")
+                print(f"{DYELLOW}Extracting..{DCYAN}")
                 video = VideoFileClip(input_video)
                 audio = video.audio
                 basename, _ = os.path.splitext(input_video)
@@ -59,7 +61,9 @@ class ExtractAudio:
         video_list = self.preprocess()
         for input_video in video_list:
             # Extract audio
-            subprocess.run(["ffmpeg", "-i", f"{input_video}", f"{input_video.split('.')[0]}.mp3"])
+            subprocess.run(
+                ["ffmpeg", "-i", f"{input_video}", f"{input_video.split('.')[0]}.mp3"]
+            )
             # Merge audio and video
             # subprocess.run(["ffmpeg", "-i", f"{input_video}", "-i", "audio.mp3", "-c:v", "copy", "-c:a", "aac", f"{input_video}"])
 
@@ -67,6 +71,7 @@ class ExtractAudio:
         import subprocess
 
         from pydub import AudioSegment
+
         video_list = self.preprocess()
         for input_video in video_list:
             # Ensure FFmpeg is installed
@@ -77,6 +82,5 @@ class ExtractAudio:
 
 
 if __name__ == "__main__":
-    vi = ExtractAudio(
-        "/home/skye/Music/Melody in My Mind.mp4")
+    vi = ExtractAudio("/home/skye/Music/Melody in My Mind.mp4")
     vi.moviepyextract()
