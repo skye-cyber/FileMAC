@@ -39,3 +39,4 @@ Extract text from an image.
 """
 
 from .main import main
+from ..audiobot import main as audiobot

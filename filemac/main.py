@@ -7,8 +7,7 @@ import logging.handlers
 import os
 import sys
 from typing import Union, List
-
-# from pathlib import Path
+from ..audiobot import main as audiobot
 from . import handle_warnings
 from .audiopy.Extractor import ExtractAudio
 from .colors import (
@@ -27,11 +26,12 @@ from .colors import (
 from .converter import (
     AudioConverter,
     FileSynthesis,
-    ImageConverter,
     MakeConversion,
     Scanner,
     VideoConverter,
 )
+from imagepy.converter import ImageConverter
+
 from .formats import (
     SUPPORTED_AUDIO_FORMATS_DIRECT,
     SUPPORTED_AUDIO_FORMATS_SHOW,
@@ -39,7 +39,7 @@ from .formats import (
     SUPPORTED_IMAGE_FORMATS_SHOW,
     SUPPORTED_VIDEO_FORMATS_SHOW,
 )
-from .image_op import Compress_Size
+from .imagepy.compress import Compress_Size
 from .OCR.Extractor import ExtractText
 from .pdf.Page_Extractor import _entry
 from .Simple_v_Analyzer import SA
@@ -367,8 +367,8 @@ def main():
     )
 
     parser.add_argument(
-        "--manipulate_audio",
-        "-MA",
+        "--audio_effect",
+        "-af",
         action="store_true",
         help=f"Change audio voice/apply effects/reduce noise{DYELLOW}-MA --help for options{RESET}",
     )
@@ -394,6 +394,10 @@ def main():
 
     # Use parse_known_args to allow unknown arguments (for later tunneling)
     args = parser.parse_args()
+
+    if args.audio_effect:
+        # Call audiobot subpackage to handle audio effects
+        audiobot(args)
 
     # Call function to handle document conversion inputs before begining conversion
     if args.convert_doc and args.convert_doc[0] == "help":
