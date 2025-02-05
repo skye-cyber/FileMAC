@@ -19,7 +19,7 @@ import PyPDF2
 import requests
 from docx import Document
 from gtts import gTTS
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 from openpyxl import load_workbook
 from pdf2docx import parse
 from pdf2image import convert_from_path

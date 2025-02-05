@@ -13,11 +13,11 @@ import numpy as np
 import soundfile as sf
 import speech_recognition as sr
 from colorama import Fore, Style, init
-from moviepy.editor import AudioFileClip, VideoFileClip
+from moviepy import AudioFileClip, VideoFileClip
 from pydub import AudioSegment, effects
 from scipy.signal import butter, lfilter
 
-from colors import (BLUE, CYAN, RESET)
+from colors import (CYAN, RESET)
 
 # Initialize colorama
 # Requires: ffmpeg-python

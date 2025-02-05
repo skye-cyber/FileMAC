@@ -94,7 +94,7 @@ class VideoRepair:
         l_frame = None
         r_frame = None
         current_batch_size = 0
-        frames_batch = []""""
+        frames_batch = []"""
 
         for _ in tqdm(range(self.frame_count), desc="Progress"):
             ret, frame = self.cap.read()

@@ -12,9 +12,9 @@ def sri():
             print("Requirement poppler-utils installing")
             subprocess.run(['sudo', 'apt', 'install', 'poppler-utils'])
 
-        result = subprocess.run(
+        '''result = subprocess.run(
                         ['dpkg', '-l', 'speedtest-cli'], stdout=subprocess.PIPE, text=True)
-        '''if result.returncode != 0:
+        if result.returncode != 0:
             print("Requirement speedtest-cli -> installing")
             subprocess.run(['sudo', 'apt', 'install', 'speedtest-cli'])'''
 
@@ -29,7 +29,7 @@ DESCRIPTION = 'Open source Python CLI toolkit for conversion, manipulation, Anal
 EXCLUDE_FROM_PACKAGES = ["build", "dist", "test", "src"]
 
 sri()
-dos
+dos_req()
 setup(
     name="filemac",
     author='wambua',
@@ -86,7 +86,7 @@ setup(
 
     include_package_data=True,
     zip_safe=False,
-    license="GPL v3",
+    license="GNU v3",
     keywords=["file-conversion", "file-analysis", "file-manipulation", "ocr", "image-conversion"],
 
     classifiers=[

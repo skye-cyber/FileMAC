@@ -4,7 +4,7 @@ import os
 
 import cv2
 from colorama import Fore, Style, init
-from moviepy.editor import AudioFileClip, VideoFileClip
+from moviepy import AudioFileClip, VideoFileClip
 
 # import numpy as np
 from tqdm import tqdm

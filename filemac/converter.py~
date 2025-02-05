@@ -19,7 +19,7 @@ import PyPDF2
 import requests
 from docx import Document
 from gtts import gTTS
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 from openpyxl import load_workbook
 from pdf2docx import parse
 from pdf2image import convert_from_path
@@ -186,7 +186,9 @@ class MakeConversion:
                 print(f"{GREEN}Conversion ✅{RESET}")
                 sys.exit(0)
             except ImportError:
-                logger.warning(f"{RED}docx2pdf Not found. {CYAN}Run pip install docx2pdf{RESET}")
+                logger.warning(
+                    f"{RED}docx2pdf Not found. {CYAN}Run pip install docx2pdf{RESET}"
+                )
             except Exception as e:
                 raise
                 logger.error(e)

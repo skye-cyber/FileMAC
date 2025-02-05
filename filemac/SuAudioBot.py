@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import argparse
 import logging
+
 # import mimetypes
 import os
 import sys
@@ -13,11 +14,11 @@ import numpy as np
 import soundfile as sf
 import speech_recognition as sr
 from colorama import Fore, Style, init
-from moviepy.editor import AudioFileClip, VideoFileClip
+from moviepy import AudioFileClip, VideoFileClip
 from pydub import AudioSegment, effects
 from scipy.signal import butter, lfilter
 
-from colors import (CYAN, RESET)
+from colors import CYAN, RESET
 
 # Initialize colorama
 # Requires: ffmpeg-python
@@ -33,7 +34,7 @@ class CustomFormatter(logging.Formatter):
         logging.INFO: Fore.GREEN,
         logging.WARNING: Fore.YELLOW,
         logging.ERROR: Fore.RED,
-        logging.CRITICAL: Fore.MAGENTA
+        logging.CRITICAL: Fore.MAGENTA,
     }
 
     def format(self, record):
@@ -64,14 +65,15 @@ def pitch_shift(audio_segment, n_steps):
 
     # Pitch shift (no need to pass sample_rate separately)
     shifted_samples = librosa.effects.pitch_shift(
-        samples, sr=audio_segment.frame_rate, n_steps=n_steps)
+        samples, sr=audio_segment.frame_rate, n_steps=n_steps
+    )
 
     # Convert the shifted samples back to int16
     shifted_audio = AudioSegment(
         shifted_samples.astype(np.int16).tobytes(),
         frame_rate=audio_segment.frame_rate,
         sample_width=audio_segment.sample_width,
-        channels=audio_segment.channels
+        channels=audio_segment.channels,
     )
 
     return shifted_audio
@@ -109,8 +111,9 @@ def hacker_voice(audio_segment):
         return None
 
     # Step 4: Apply low-pass filter (optional)
-    hacker_voice_effect = effects.low_pass_filter(
-        echo_effect, cutoff=2500) if echo_effect else None
+    hacker_voice_effect = (
+        effects.low_pass_filter(echo_effect, cutoff=2500) if echo_effect else None
+    )
     if hacker_voice_effect is None:
         logger.error("Low pass filter failed")
         return None
@@ -123,10 +126,10 @@ def apply_echo(samples, delay=0.2, decay=0.5, sample_rate=44100):
     delay_samples = int(sample_rate * delay)
     echo_signal = np.zeros(len(samples) + delay_samples)
 
-    echo_signal[:len(samples)] = samples
+    echo_signal[: len(samples)] = samples
     echo_signal[delay_samples:] += decay * samples  # Delayed echo signal
 
-    return echo_signal[:len(samples)]  # Truncate to original length
+    return echo_signal[: len(samples)]  # Truncate to original length
 
 
 def apply_reverb(samples, decay=0.7, delay=0.05, sample_rate=44100):
@@ -139,14 +142,15 @@ def apply_reverb(samples, decay=0.7, delay=0.05, sample_rate=44100):
 
         if samples.ndim == 2:  # Stereo
             for i in range(delay_samples, len(samples)):
-                reverb_samples[i, 0] = samples[i, 0] + \
-                    decay * samples[i - delay_samples, 0]
-                reverb_samples[i, 1] = samples[i, 1] + \
-                    decay * samples[i - delay_samples, 1]
+                reverb_samples[i, 0] = (
+                    samples[i, 0] + decay * samples[i - delay_samples, 0]
+                )
+                reverb_samples[i, 1] = (
+                    samples[i, 1] + decay * samples[i - delay_samples, 1]
+                )
         else:  # Mono
             for i in range(delay_samples, len(samples)):
-                reverb_samples[i] = samples[i] + \
-                    decay * samples[i - delay_samples]
+                reverb_samples[i] = samples[i] + decay * samples[i - delay_samples]
 
         return reverb_samples
     except Exception as e:
@@ -156,14 +160,13 @@ def apply_reverb(samples, decay=0.7, delay=0.05, sample_rate=44100):
 
 def apply_lowpass_filter(samples, cutoff=200, sample_rate=44100):
     """Apply a low-pass filter to remove frequencies higher than cutoff.
-for voice cutoff = 1000-2000 Hz
-    music cutoff = 5000-8000 Hz
-    hiss/noise removal cutoff = 200-500 Hz"""
-    logger.info(
-        "Apply a low-pass filter to remove frequencies higher than cutoff")
+    for voice cutoff = 1000-2000 Hz
+        music cutoff = 5000-8000 Hz
+        hiss/noise removal cutoff = 200-500 Hz"""
+    logger.info("Apply a low-pass filter to remove frequencies higher than cutoff")
     nyquist = 0.5 * sample_rate
     normal_cutoff = cutoff / nyquist
-    b, a = butter(6, normal_cutoff, btype='low', analog=False)
+    b, a = butter(6, normal_cutoff, btype="low", analog=False)
     filtered_samples = lfilter(b, a, samples)
 
     return filtered_samples
@@ -180,8 +183,8 @@ def apply_distortion(samples, gain=20, threshold=0.3):
 class Handle_np_segments:
     def __init__(self):
         """This class will convert:
-    1.Audiosegmnents to numpy array
-    2.Numpy array to audiosegment"""
+        1.Audiosegmnents to numpy array
+        2.Numpy array to audiosegment"""
         self = self
 
     def numpy_to_audiosegment(self, samples, sample_rate, sample_width, channels):
@@ -200,7 +203,7 @@ class Handle_np_segments:
             data=raw_data,
             sample_width=sample_width,
             frame_rate=sample_rate,
-            channels=channels
+            channels=channels,
         )
 
     def audiosegment_to_numpy(self, audio_segment):
@@ -218,7 +221,6 @@ class Handle_np_segments:
 
 
 def apply_voice_effect(audio_segment, effect, verbosity=False):
-
     handler = Handle_np_segments()
 
     # OK 1.2
@@ -238,7 +240,9 @@ def apply_voice_effect(audio_segment, effect, verbosity=False):
         return pitch_shift(effects.speedup(audio_segment, 1.01), n_steps=9)
 
     elif effect == "demonic":
-        return pitch_shift(effects.speedup(audio_segment, 1.01), n_steps=-10).overlay(AudioSegment.silent(duration=700) + audio_segment.fade_out(500))
+        return pitch_shift(effects.speedup(audio_segment, 1.01), n_steps=-10).overlay(
+            AudioSegment.silent(duration=700) + audio_segment.fade_out(500)
+        )
         # return seg.overlay(pitch_shift(effects.speedup(audio_segment, 1.01), n_steps=11).overlay(AudioSegment.silent(duration=250) + audio_segment.fade_out(2000)))
 
     # OK
@@ -250,15 +254,15 @@ def apply_voice_effect(audio_segment, effect, verbosity=False):
     elif effect == "reverb":
         # Convert to numpy array
 
-        samples, sample_rate = handler.audiosegment_to_numpy(
-            audio_segment)
+        samples, sample_rate = handler.audiosegment_to_numpy(audio_segment)
 
         # Apply the reverb effect
         samples = apply_reverb(samples)
 
         # Convert back to AudioSegment
         processed_audio = handler.numpy_to_audiosegment(
-            samples, sample_rate, audio_segment.sample_width, audio_segment.channels)
+            samples, sample_rate, audio_segment.sample_width, audio_segment.channels
+        )
 
         return processed_audio
         # Simple reverb effect
@@ -272,22 +276,22 @@ def apply_voice_effect(audio_segment, effect, verbosity=False):
     elif effect == "hacker":
         return hacker_voice(audio_segment)
 
-    elif effect == 'distortion':
+    elif effect == "distortion":
         # Convert to numpy array
-        samples, sample_rate = handler.audiosegment_to_numpy(
-            audio_segment)
+        samples, sample_rate = handler.audiosegment_to_numpy(audio_segment)
 
         # Apply the distortion effect
         samples = apply_distortion(samples)
 
         # Convert back to AudioSegment
         processed_audio = handler.numpy_to_audiosegment(
-            samples, sample_rate, audio_segment.sample_width, audio_segment.channels)
+            samples, sample_rate, audio_segment.sample_width, audio_segment.channels
+        )
 
         return processed_audio
 
     # OK
-    elif effect == 'lowpass':
+    elif effect == "lowpass":
         # processed_audio
         return effects.low_pass_filter(audio_segment, cutoff=2200)
 
@@ -302,7 +306,6 @@ def normalize_audio(audio_segment):
 
 
 def process_audio_file(input_file, effect, output_dir, verbosity, visualize=False):
-
     logger.info(f"Voice : \033[1;95m{effect}\033[0m")
 
     logger.info(f"Processing audio file: {input_file}")
@@ -315,7 +318,8 @@ def process_audio_file(input_file, effect, output_dir, verbosity, visualize=Fals
         modified_audio = apply_voice_effect(audio_segment, effect)
         modified_audio = normalize_audio(modified_audio)
         output_file = os.path.join(
-            output_dir, f"{effect}_{os.path.basename(input_file)}")
+            output_dir, f"{effect}_{os.path.basename(input_file)}"
+        )
         modified_audio.export(output_file, format="wav")
         logger.info(f"Modified audio saved as: {output_file}")
 
@@ -330,15 +334,14 @@ def process_audio_file(input_file, effect, output_dir, verbosity, visualize=Fals
 def get_bitrate(input_file, verbosity=False):
     """Fetch the original bitrate of the video file using ffmpeg."""
     if verbosity:
-        logger.info(
-            "Fetch the original bitrate of the video file using ffmpeg.")
+        logger.info("Fetch the original bitrate of the video file using ffmpeg.")
     try:
         probe = ffmpeg.probe(input_file)
         bitrate = None
         # Iterate over the streams and find the video stream
-        for stream in probe['streams']:
-            if stream['codec_type'] == 'video':
-                bitrate = stream.get('bit_rate', None)
+        for stream in probe["streams"]:
+            if stream["codec_type"] == "video":
+                bitrate = stream.get("bit_rate", None)
                 break
         return bitrate
     except ffmpeg.Error as e:
@@ -358,8 +361,7 @@ def process_video_file(input_file, effect, output_dir, verbosity, visualize=Fals
         # Get the original video bitrate
         original_bitrate = get_bitrate(input_file, verbosity)
         if verbosity and original_bitrate:
-            logger.info(
-                f"Original video bitrate: \033[33m{original_bitrate}\033[0m")
+            logger.info(f"Original video bitrate: \033[33m{original_bitrate}\033[0m")
 
         # Load the video
         video = VideoFileClip(input_file)
@@ -393,16 +395,22 @@ def process_video_file(input_file, effect, output_dir, verbosity, visualize=Fals
 
         # Define the output file path
         output_file = os.path.join(
-            output_dir, f"{effect}_{os.path.basename(input_file)}")
+            output_dir, f"{effect}_{os.path.basename(input_file)}"
+        )
 
         # Use the original bitrate or default to 5000k if unavailable
         if verbosity:
-            logger.info(f"Set:\n\tCodec = [\033[95mlibx264\033[0;32m]\n"
-                        f"\tCodec type = [\033[95maac\033[0;32m]\n"
-                        f"\tBitrate = [\033[95m{original_bitrate or '5000k'}\033[0m]")
+            logger.info(
+                f"Set:\n\tCodec = [\033[95mlibx264\033[0;32m]\n"
+                f"\tCodec type = [\033[95maac\033[0;32m]\n"
+                f"\tBitrate = [\033[95m{original_bitrate or '5000k'}\033[0m]"
+            )
 
         final_video.write_videofile(
-            output_file, codec="libx264", audio_codec="aac", bitrate=original_bitrate or "5000k"
+            output_file,
+            codec="libx264",
+            audio_codec="aac",
+            bitrate=original_bitrate or "5000k",
         )
 
         logger.info(f"Modified video saved as: {output_file}")
@@ -456,21 +464,56 @@ def transcribe_audio(input_file):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Apply voice effects to audio or video files.")
+        description="Apply voice effects to audio or video files."
+    )
     parser.add_argument(
-        "--input", "-i", help=f"{CYAN}The input audio, video file, or directory.{RESET}")
-    parser.add_argument('-e', "--effect", choices=["robotic", "deep", "high", "echo", "reverb", "whisper", "demonic", "chipmunk", "hacker", "lowpass", "distortion"],
-                        help=f"{CYAN}The voice effect to apply.{RESET}")
+        "--input", "-i", help=f"{CYAN}The input audio, video file, or directory.{RESET}"
+    )
     parser.add_argument(
-        "-o", "--output", help=f"{CYAN}Output directory for modified files.{RESET}",)
-    parser.add_argument("-v", "--verbose", action="store_true",
-                        help=f"{CYAN}Increase output verbosity.{RESET}")
-    parser.add_argument("-b", "--batch", action="store_true",
-                        help=f"{CYAN}Batch process all files in a directory.{RESET}")
-    parser.add_argument("--visualize", action="store_true",
-                        help=f"{CYAN}Visualize the audio waveform before and after modification.{RESET}")
-    parser.add_argument("--transcribe", action="store_true",
-                        help=f"{CYAN}Transcribe the audio content before applying the effect.{RESET}")
+        "-e",
+        "--effect",
+        choices=[
+            "robotic",
+            "deep",
+            "high",
+            "echo",
+            "reverb",
+            "whisper",
+            "demonic",
+            "chipmunk",
+            "hacker",
+            "lowpass",
+            "distortion",
+        ],
+        help=f"{CYAN}The voice effect to apply.{RESET}",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help=f"{CYAN}Output directory for modified files.{RESET}",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help=f"{CYAN}Increase output verbosity.{RESET}",
+    )
+    parser.add_argument(
+        "-b",
+        "--batch",
+        action="store_true",
+        help=f"{CYAN}Batch process all files in a directory.{RESET}",
+    )
+    parser.add_argument(
+        "--visualize",
+        action="store_true",
+        help=f"{CYAN}Visualize the audio waveform before and after modification.{RESET}",
+    )
+    parser.add_argument(
+        "--transcribe",
+        action="store_true",
+        help=f"{CYAN}Transcribe the audio content before applying the effect.{RESET}",
+    )
 
     args = parser.parse_args()
 
@@ -489,36 +532,50 @@ def main():
                     full_path = os.path.join(root, file)
                     file_type = mime.from_file(full_path)
                     print(
-                        f"{Fore.GREEN}- INFO -{Fore.RESET} \033[1;94mDetected file type: {file_type}\033[0m")
+                        f"{Fore.GREEN}- INFO -{Fore.RESET} \033[1;94mDetected file type: {file_type}\033[0m"
+                    )
                     if file_type.startswith("audio"):
                         if args.transcribe:
                             transcribe_audio(full_path)
-                        process_audio_file(full_path, args.effect,
-                                           output_dir, args.verbose, args.visualize)
+                        process_audio_file(
+                            full_path,
+                            args.effect,
+                            output_dir,
+                            args.verbose,
+                            args.visualize,
+                        )
                     elif file_type.startswith("video"):
-                        process_video_file(full_path, args.effect,
-                                           output_dir, args.verbose, args.visualize)
+                        process_video_file(
+                            full_path,
+                            args.effect,
+                            output_dir,
+                            args.verbose,
+                            args.visualize,
+                        )
                     else:
-                        logger.warning(
-                            f"Ignoring unsupported file type: {file}")
+                        logger.warning(f"Ignoring unsupported file type: {file}")
         except Exception as e:
             logger.info(e)
     else:
         try:
             file_type = mime.from_file(args.input)
             print(
-                f"{Fore.GREEN}- INFO -{Fore.RESET} \033[1;94mDetected file type: {file_type}\033[0m")
+                f"{Fore.GREEN}- INFO -{Fore.RESET} \033[1;94mDetected file type: {file_type}\033[0m"
+            )
             if file_type.startswith("audio"):
                 if args.transcribe:
                     transcribe_audio(args.input)
-                process_audio_file(args.input, args.effect,
-                                   output_dir, args.verbose, args.visualize)
+                process_audio_file(
+                    args.input, args.effect, output_dir, args.verbose, args.visualize
+                )
             elif file_type.startswith("video"):
-                process_video_file(args.input, args.effect,
-                                   output_dir, args.verbose, args.visualize)
+                process_video_file(
+                    args.input, args.effect, output_dir, args.verbose, args.visualize
+                )
             else:
                 logger.warning(
-                    f"Unsupported file type: {file_type}. Only audio and video files are supported.")
+                    f"Unsupported file type: {file_type}. Only audio and video files are supported."
+                )
         except Exception as e:
             logger.error(e)
 
