@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 """Extract pages specified by pange range from a pdf file and save them as a new file"""
+
 import PyPDF2
 
 from .colors import BLUE, BWHITE, DBLUE, DCYAN, DMAGENTA, DRED, RED, RESET
 
 
 class Extractor:
-
     """
     Args:
     Pdf -> pdf file to be operated on.
@@ -17,7 +17,12 @@ class Extractor:
     outf-> the output file contsining the extracted pages
     """
 
-    def __init__(self, pdf, Llimits: int, Ulimit: int = None,):
+    def __init__(
+        self,
+        pdf,
+        Llimits: int,
+        Ulimit: int = None,
+    ):
         limits = [Llimits, Ulimit]
         self.pdf = pdf
         self.start = limits[0] - 1
@@ -49,10 +54,9 @@ class Extractor:
                 pdf_writer.add_page(page)
 
             # Write the merged PDF to the output file
-            with open(self.outf, 'wb') as out_file:
+            with open(self.outf, "wb") as out_file:
                 pdf_writer.write(out_file)
-            print(
-                f"{DBLUE}[+]{RESET} {BWHITE}File {DMAGENTA}{self.outf}{RESET}")
+            print(f"{DBLUE}[+]{RESET} {BWHITE}File {DMAGENTA}{self.outf}{RESET}")
             return self.outf
         except KeyboardInterrupt:
             print("\n [!] Quit")
@@ -66,17 +70,20 @@ class Extractor:
 
 def _entry(kwargs):
     """
-        Args:
-        kwargs type: list - Contains Upper and lower limit (first and last page)
-        Returns:
-        None
+    Args:
+    kwargs type: list - Contains Upper and lower limit (first and last page)
+    Returns:
+    None
     """
     if len(kwargs) > 2:
         arg1, arg2, arg3 = kwargs
         init = Extractor(arg1, int(arg2), int(arg3))
         init.getPages()
     elif len(kwargs) == 2:
-        arg1, arg2, = kwargs
+        (
+            arg1,
+            arg2,
+        ) = kwargs
         init = Extractor(arg1, int(arg2))
         init.getPages()
     else:
@@ -84,5 +91,5 @@ def _entry(kwargs):
 
 
 if __name__ == "__main__":
-    pdf = '/home/skye/Documents/Reports/WAmbua_SC_Report.pdf'
+    pdf = "/home/skye/Documents/Reports/WAmbua_SC_Report.pdf"
     init = _entry([pdf, 5, 10])

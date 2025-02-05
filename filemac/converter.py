@@ -60,7 +60,7 @@ from .formats import (
     SUPPORTED_VIDEO_FORMATS,
     Video_codecs,
 )
-from .m4a_converter import _m4a_main_
+from .audiopy.m4a_converter import m4a
 
 # import pygame
 # from aspose.words import Document as aspose_document
@@ -986,7 +986,7 @@ class Scanner:
         mc = MakeConversion(file)
         img_objs = mc.doc2image()
         # print(img_objs)
-        from .OCRTextExtractor import ExtractText
+        from .OCR.Extractor import ExtractText
 
         text = ""
 
@@ -1030,7 +1030,7 @@ class Scanner:
             pdf_list = self.preprocess()
             pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
             from .longImg import LImage
-            from .OCRTextExtractor import ExtractText
+            from .OCR.Extractor import ExtractText
 
             for file in pdf_list:
                 LI = LImage(file)
@@ -1806,7 +1806,7 @@ class AudioConverter:
                     print(f"{DGREEN}Done{RESET}")
 
                 elif file[-3:].lower() == "m4a" or out_f.lower() == "m4a":
-                    _m4a_main_(file, out_f)
+                    m4a(file, out_f)
 
                 elif (
                     out_f.lower() in SUPPORTED_AUDIO_FORMATS

@@ -6,8 +6,8 @@ from .formats import SUPPORTED_AUDIO_FORMATS
 
 def convert_m4a_(obj_file, _out_f: str):
     try:
-        out_obj = obj_file.replace(obj_file.split('.')[-1], _out_f)
-        if obj_file[-3:].lower() == 'm4a':
+        out_obj = obj_file.replace(obj_file.split(".")[-1], _out_f)
+        if obj_file[-3:].lower() == "m4a":
             command = f'ffmpeg -i "{obj_file}" -c:a libmp3lame -b:a 320k "{out_obj}"'
         elif _out_f == "m4a":
             command = f'ffmpeg -i "{obj_file}" -c:a aac -b:a 128k "{out_obj}"'
@@ -17,7 +17,7 @@ def convert_m4a_(obj_file, _out_f: str):
         print(f"\033[91m{e}\033[0m")
 
 
-def _m4a_main_(obj, _out_f: str):
+def m4a(obj, _out_f: str):
     try:
         if os.path.isdir(obj):
             print("Detected directory input")
@@ -35,5 +35,4 @@ def _m4a_main_(obj, _out_f: str):
 
 
 if __name__ == "__main__":
-    _m4a_main_(
-        obj=input("\033[1;95mEnter directory/folder or file to operate on:\033[93m"))
+    m4a(obj=input("\033[1;95mEnter directory/folder or file to operate on:\033[93m"))

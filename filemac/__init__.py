@@ -37,3 +37,5 @@ Scan [doc, docx, pdf]
 Extract text from an image.
         example filemac --OCR image.png
 """
+
+from .main import main
