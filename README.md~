@@ -1,8 +1,8 @@
-# fconverter
+# filemac
 A python file `conversion`, `manipulation`, `Analysis` toolkit
 `This is a Linux command-line interface (CLI) utility that coverts documents from one format to another,
 analyzes files, manipulates files.
-Your can also convert text file to mp3 formart using google Text to speech library (gTTS).
+Your can also convert text file to mp3 format using google Text to speech library (gTTS).`
 ## Name variations
 ```shell
    filemac -h
@@ -32,7 +32,7 @@ FileMAC [options] stdin format
 Replace `[options]` with the appropriate command-line options based on the functionality you want to execute.
 
 ## Available Options
-````
+``*``
 - `1`:  --convert_doc         (doc* inter-conversion + tts)
 - `2`:  --convert_audio
 - `3`:  --convert_video
@@ -142,7 +142,19 @@ Contributions are welcome! If you encounter any issues or have suggestions for i
 
 ## License
 
-This project is an open source software. Under GPL-3.0 license
+This project is an open source software. Under GNU-3.0 license
+This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 Feel free to modify and customize this template according to your specific project requirements and add any additional sections or information that you think would be helpful for users.
