@@ -7,7 +7,7 @@ from pdf2image import convert_from_path
 from PIL import Image  # ImageSequence
 
 from ..utils.colors import DCYAN, DGREEN, DMAGENTA, DBLUE, DYELLOW, RED, RESET
-from .converter import MakeConversion
+from .audiopy.audio import MakeConversion
 
 
 class LImage:

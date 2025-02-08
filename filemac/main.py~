@@ -395,7 +395,7 @@ def main():
 
     if args.audio_effect:
         # Call audiobot subpackage to handle audio effects
-        Argsmain(args)
+        audiobot(args)
 
     # Call function to handle document conversion inputs before begining conversion
     if args.convert_doc and args.convert_doc[0] == "help":

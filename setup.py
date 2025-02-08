@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+
 from setuptools import find_namespace_packages, setup
 
 
@@ -13,12 +14,6 @@ def sri():
         if result.returncode != 0:
             print("Requirement poppler-utils installing")
             subprocess.run(["sudo", "apt", "install", "poppler-utils"])
-
-        """result = subprocess.run(
-                        ['dpkg', '-l', 'speedtest-cli'], stdout=subprocess.PIPE, text=True)
-        if result.returncode != 0:
-            print("Requirement speedtest-cli -> installing")
-            subprocess.run(['sudo', 'apt', 'install', 'speedtest-cli'])"""
 
 
 def dos_req():
@@ -42,6 +37,7 @@ setup(
     description=DESCRIPTION,
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
+    url="https://pypi.org/project/filemac/",
     entry_points={
         "console_scripts": [
             "filemac=filemac:main",
@@ -58,7 +54,6 @@ setup(
         "gTTS",
         "pypandoc",
         "pydub",
-        "requests",
         "Pillow",
         "pandas",
         "opencv-python",

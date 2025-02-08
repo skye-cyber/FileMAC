@@ -5,7 +5,7 @@ import sys
 
 from moviepy import VideoFileClip
 
-from ...utils.colors import DCYAN, DYELLOW, RED, RESET
+from ..utils.colors import DCYAN, DYELLOW, RED, RESET
 
 ###############################################################################
 logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")

@@ -1,0 +1,9 @@
+n1 = [1, 2, 3, 4, 5]
+n2 = [0, 9, 8, 7]
+n = 1
+if n in n1 and not n2:
+    print("True")
+if n in n1 and n not in n2:
+    print("True-")
+if n in n1 and n in n2:
+    print(n)

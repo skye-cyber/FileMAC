@@ -7,7 +7,8 @@ import logging.handlers
 import os
 import sys
 from typing import List, Union
-from audiobot.voicesChanger import Argsmain
+
+import audiobot.main as audiobot
 from imagepy.converter import ImageConverter
 
 from ..utils.colors import (
@@ -34,7 +35,7 @@ from . import warnings_handler
 from .audiopy.audio import AudioConverter
 from .audiopy.pyTTS import FileSynthesis
 from .audiopy.Extractor import ExtractAudio
-from .pydocs import DocConverter, Scanner
+from .p import DocConverter, Scanner
 from .imagepy.compress import Compress_Size
 from .OCR.Extractor import ExtractText
 from .pdf.Page_Extractor import _entry
@@ -67,6 +68,7 @@ class _DIR_CONVERSION_:
 
     def _unbundle_dir_(self):
         if self._format_ in SUPPORTED_AUDIO_FORMATS_DIRECT:
+
             return Batch_Audiofy(self._dir_, self.no_resume, self.threads)
         try:
             for root, dirs, files in os.walk(self._dir_):
@@ -111,12 +113,11 @@ class Batch_Audiofy:
         inst.audiofy(num_threads=self.threads)
 
 
-class Eval:
-    """
-    Class to handle document conversions based on their extensions and the target
-        output document format
-    """
+"""Class to handle document conversions based on their extensions and te targt
+output fdocument format"""
 
+
+class Eval:
     def __init__(self, file, outf):
         self.file = file
         self.outf = outf
@@ -387,7 +388,7 @@ def main():
         "-NS",
         "--no_strip",
         action="store_true",
-        help="Ensure that OCR result respects currect text formatting (spacing and tabulation)",
+        help="Allows OCR extration without re-formating maintaining currect text appearance (spacing and tabs)",
     )
 
     # Use parse_known_args to allow unknown arguments (for later tunneling)
@@ -395,7 +396,7 @@ def main():
 
     if args.audio_effect:
         # Call audiobot subpackage to handle audio effects
-        Argsmain(args)
+        audiobot(args)
 
     # Call function to handle document conversion inputs before begining conversion
     if args.convert_doc and args.convert_doc[0] == "help":

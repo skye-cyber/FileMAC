@@ -3,7 +3,7 @@ import sys
 
 import PyPDF2
 
-from ...utils.colors import BWHITE, CYAN, DBLUE, FCYAN, RED, RESET, YELLOW
+from ..utils.colors import BWHITE, CYAN, DBLUE, FCYAN, RED, RESET, YELLOW
 
 
 class pdfmaster:

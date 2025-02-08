@@ -1,4 +1,2 @@
-.aider/*
-.ropeproject/*
-*~
-__pycache__/*
+src/**
+.gitignore

@@ -3,7 +3,7 @@
 
 import PyPDF2
 
-from ...utils.colors import BLUE, BWHITE, DBLUE, DCYAN, DMAGENTA, DRED, RED, RESET
+from .colors import BLUE, BWHITE, DBLUE, DCYAN, DMAGENTA, DRED, RED, RESET
 
 
 class Extractor:

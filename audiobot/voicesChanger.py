@@ -4,7 +4,6 @@ import logging
 
 # import mimetypes
 import os
-import sys
 
 import ffmpeg
 import librosa
@@ -18,7 +17,7 @@ from moviepy import AudioFileClip, VideoFileClip
 from pydub import AudioSegment, effects
 from scipy.signal import butter, lfilter
 
-from colors import CYAN, RESET
+from ..utils.colors import CYAN, RESET
 
 # Initialize colorama
 # Requires: ffmpeg-python
@@ -181,10 +180,13 @@ def apply_distortion(samples, gain=20, threshold=0.3):
 
 
 class Handle_np_segments:
+    """
+    This class will convert:
+        1.Audiosegmnents to numpy array\n
+        2.Numpy array to audiosegment
+    """
+
     def __init__(self):
-        """This class will convert:
-        1.Audiosegmnents to numpy array
-        2.Numpy array to audiosegment"""
         self = self
 
     def numpy_to_audiosegment(self, samples, sample_rate, sample_width, channels):
@@ -344,9 +346,7 @@ def get_bitrate(input_file, verbosity=False):
                 bitrate = stream.get("bit_rate", None)
                 break
         return bitrate
-    except ffmpeg.Error as e:
-        logger.error(f"Error fetching bitrate for {input_file}: {e}")
-    except Exception as e:
+    except ffmpeg.Error or Exception as e:
         logger.error(f"Error fetching bitrate for {input_file}: {e}")
         return None
 
@@ -462,7 +462,10 @@ def transcribe_audio(input_file):
         return None
 
 
-def main():
+def Argsmain(args):
+    """
+    Recieve and precess agruments from audio/video audio effects
+    """
     parser = argparse.ArgumentParser(
         description="Apply voice effects to audio or video files."
     )
@@ -515,7 +518,7 @@ def main():
         help=f"{CYAN}Transcribe the audio content before applying the effect.{RESET}",
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     output_dir = os.getcwd() if not args.output else args.output
     if args.verbose:
@@ -581,4 +584,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    Argsmain()

@@ -7,7 +7,7 @@ import cv2
 import pytesseract
 from PIL import Image
 from rich.progress import Progress
-from ...utils.colors import BBWHITE, RED, RESET, CYAN
+from ...utils.colors import BBWHITE, FMAGENTA, RED, RESET, CYAN
 
 ###############################################################################
 logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")
