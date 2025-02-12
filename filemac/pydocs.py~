@@ -20,7 +20,7 @@ from rich.progress import Progress
 from tqdm import tqdm
 
 # from pathlib import Path
-from ..utils.colors import (
+from utils.colors import (
     BLUE,
     BWHITE,
     CYAN,
@@ -994,7 +994,7 @@ class Scanner:
 
         # Do clean up
         _cleaner_()
-        from ..utils. import clear_screen
+        from utils. import clear_screen
 
         clear_screen()
         print(f"{DGREEN}{IGREEN}Full Text{RESET}")

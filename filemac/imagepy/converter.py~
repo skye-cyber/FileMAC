@@ -6,8 +6,8 @@ import sys
 from tqdm import tqdm
 from PIL import Image
 import cv2
-from ..utils.formats import SUPPORTED_IMAGE_FORMATS
-from .colors import (
+from utils.formats import SUPPORTED_IMAGE_FORMATS
+from utils. import (
     BWHITE,
     DGREEN,
     DMAGENTA,

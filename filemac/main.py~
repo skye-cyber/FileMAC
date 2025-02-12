@@ -7,10 +7,10 @@ import logging.handlers
 import os
 import sys
 from typing import List, Union
-from audiobot.voicesChanger import Argsmain
-from imagepy.converter import ImageConverter
+from audiobot.voice_ffects import Argsmain
+from .imagepy.converter import ImageConverter
 
-from ..utils.colors import (
+from utils.colors import (
     BLUE,
     CYAN,
     DCYAN,
@@ -23,7 +23,7 @@ from ..utils.colors import (
     RED,
     RESET,
 )
-from ..utils.formats import (
+from utils.formats import (
     SUPPORTED_AUDIO_FORMATS_DIRECT,
     SUPPORTED_AUDIO_FORMATS_SHOW,
     SUPPORTED_DOC_FORMATS,
@@ -202,7 +202,7 @@ class Eval:
 def main():
     """Define main functions to create commandline arguments for different operations"""
     parser = argparse.ArgumentParser(
-        description="Multimedia Element Operations",
+        description="Filemac: A file management tool with audio effects. Supporting wide range of Multimedia Operations",
         epilog=f"{BLUE}When using {MAGENTA}-SALI{BLUE} long images have maximum height that can be processed{RESET}",
     )
 
@@ -371,6 +371,9 @@ def main():
         help=f"Change audio voice/apply effects/reduce noise{DYELLOW}-MA --help for options{RESET}",
     )
     parser.add_argument(
+        "--audio_help", action="store_true", help="Show help for audiobot"
+    )
+    parser.add_argument(
         "--no-resume",
         action="store_false",
         dest="no_resume",
@@ -391,11 +394,19 @@ def main():
     )
 
     # Use parse_known_args to allow unknown arguments (for later tunneling)
-    args = parser.parse_args()
+    args, remaining_args = parser.parse_known_args()
+
+    if not args and not remaining_args):
+        parser.print_help()
+
+    if args.audio_help:
+        # Call audiobot with help flag
+        Argsmain(["--help"])
+        return
 
     if args.audio_effect:
         # Call audiobot subpackage to handle audio effects
-        audiobot(args)
+        Argsmain(remaining_args)
 
     # Call function to handle document conversion inputs before begining conversion
     if args.convert_doc and args.convert_doc[0] == "help":
@@ -535,17 +546,6 @@ def main():
         init.controller()
     elif args.extract_pages:
         init = _entry(args.extract_pages)
-
-    elif args.manipulate_audio:
-        print("implementation underway")
-        exit(1)
-        command = []
-        subcommand = input(f":{DYELLOW}")
-        # command = [val for val in subcommand.split(' ')]
-        while ";" not in str(subcommand):
-            command.append(subcommand)
-            subcommand = input(f":{DYELLOW}")
-        print(tuple(command))
 
 
 if __name__ == "__main__":

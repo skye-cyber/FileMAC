@@ -10,8 +10,8 @@ from moviepy import VideoFileClip
 from pydub import AudioSegment
 from tqdm import tqdm
 
-from ..utils.colors import DBLUE, DGREEN, DMAGENTA, DYELLOW, RED, RESET
-from ..utils.formats import SUPPORTED_VIDEO_FORMATS, Video_codecs
+from utils.colors import DBLUE, DGREEN, DMAGENTA, DYELLOW, RED, RESET
+from utils.formats import SUPPORTED_VIDEO_FORMATS, Video_codecs
 
 
 class VideoConverter:
@@ -133,7 +133,7 @@ class VideoConverter:
                     "copy",
                     "-c:a",
                     "aac",
-                    output_file,
+                    output_file
                 ]
             )
 
@@ -153,10 +153,7 @@ class VideoConverter:
                     _, ext = os.path.splitext(file)
                     output_filename = _ + "." + out_f.lower()
                     # print(output_filename)
-                elif (
-                    out_f.upper() in SUPPORTED_VIDEO_FORMATS
-                    and out_f.upper() not Video_codecs.keys()
-                ):
+                elif out_f.upper() in SUPPORTED_VIDEO_FORMATS and out_f.upper() not in Video_codecs.keys():
                     print(
                         f"{RED}Unsupported output format --> Pending Implementation{RESET}"
                     )

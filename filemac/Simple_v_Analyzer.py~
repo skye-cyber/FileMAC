@@ -3,7 +3,7 @@
 import sys
 import cv2
 import numpy as np
-from .colors ..utils.colors import DYELLOW, RESET, DCYAN, DGREEN
+from utils.colors import DYELLOW, RESET, DCYAN, DGREEN
 import ffmpeg
 
 

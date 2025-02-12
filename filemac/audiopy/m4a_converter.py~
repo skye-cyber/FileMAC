@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from ..utils.formats import SUPPORTED_AUDIO_FORMATS
+from utils.formats import SUPPORTED_AUDIO_FORMATS
 
 
 def convert_m4a_(obj_file, _out_f: str):

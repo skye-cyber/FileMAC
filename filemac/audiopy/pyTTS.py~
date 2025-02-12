@@ -14,7 +14,7 @@ from gtts import gTTS
 from pydub import AudioSegment
 from rich.errors import MarkupError
 from ..pydocs import DocConverter
-from ..utils.colors import (
+from utils.colors import (
     BLUE,
     BWHITE,
     CYAN,

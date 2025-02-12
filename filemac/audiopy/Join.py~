@@ -5,7 +5,7 @@ import sys
 # import shutil
 from pydub import AudioSegment
 from rich.progress import Progress
-from ...utils.colors import (
+from utils.colors import (
     BLUE,
     DBLUE,
     DGREEN,
@@ -14,7 +14,7 @@ from ...utils.colors import (
     RESET,
     YELLOW,
 )
-from ..utils.formats import SUPPORTED_AUDIO_FORMATS_DIRECT
+from utils.formats import SUPPORTED_AUDIO_FORMATS_DIRECT
 
 
 class JoinAudios:

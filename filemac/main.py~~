@@ -11,7 +11,7 @@ from typing import List, Union
 import audiobot.main as audiobot
 from imagepy.converter import ImageConverter
 
-from ..utils.colors import (
+from utils.colors import (
     BLUE,
     CYAN,
     DCYAN,
@@ -24,7 +24,7 @@ from ..utils.colors import (
     RED,
     RESET,
 )
-from ..utils.formats import (
+from utils.formats import (
     SUPPORTED_AUDIO_FORMATS_DIRECT,
     SUPPORTED_AUDIO_FORMATS_SHOW,
     SUPPORTED_DOC_FORMATS,

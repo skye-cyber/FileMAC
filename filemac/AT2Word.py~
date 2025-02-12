@@ -2,7 +2,7 @@
 from docx import Document
 from docx.shared import Pt, RGBColor
 
-from ..utils.colors import BLUE, BWHITE, CYAN, DCYAN, RESET, YELLOW, MAGENTA
+from utils.colors import BLUE, BWHITE, CYAN, DCYAN, RESET, YELLOW, MAGENTA
 
 
 class AdvancedT2word:

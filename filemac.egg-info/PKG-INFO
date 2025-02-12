@@ -1,10 +1,11 @@
 Metadata-Version: 2.1
 Name: filemac
-Version: 1.1.2b0
+Version: 1.1.4
 Summary: Open source Python CLI toolkit for conversion, manipulation, Analysis of files (All major file operations)
+Home-page: https://pypi.org/project/filemac/
 Author: wambua
 Author-email: swskye17@gmail.com
-License: GPL v3
+License: GNU v3
 Keywords: file-conversion,file-analysis,file-manipulation,ocr,image-conversion
 Classifier: Environment :: Console
 Classifier: Natural Language :: English
@@ -28,7 +29,6 @@ Requires-Dist: python-pptx
 Requires-Dist: gTTS
 Requires-Dist: pypandoc
 Requires-Dist: pydub
-Requires-Dist: requests
 Requires-Dist: Pillow
 Requires-Dist: pandas
 Requires-Dist: opencv-python
@@ -53,11 +53,11 @@ Requires-Dist: SpeechRecognition
 Requires-Dist: colorama
 Requires-Dist: scipy
 
-# fconverter
+# filemac
 A python file `conversion`, `manipulation`, `Analysis` toolkit
 `This is a Linux command-line interface (CLI) utility that coverts documents from one format to another,
 analyzes files, manipulates files.
-Your can also convert text file to mp3 formart using google Text to speech library (gTTS).
+Your can also convert text file to mp3 format using google Text to speech library (gTTS).`
 ## Name variations
 ```shell
    filemac -h
@@ -196,8 +196,18 @@ The above command displays the surported input and output formats for document c
 Contributions are welcome! If you encounter any issues or have suggestions for improvements, please open an issue or submit a pull request.
 
 ## License
+This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-This project is an open source software. Under GPL-3.0 license
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 Feel free to modify and customize this template according to your specific project requirements and add any additional sections or information that you think would be helpful for users.

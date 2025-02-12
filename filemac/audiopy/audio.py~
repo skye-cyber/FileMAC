@@ -4,9 +4,9 @@ import sys
 import pydub
 from tqdm import tqdm
 
-from ...utils.colors import DGREEN, DMAGENTA, DYELLOW, RED, RESET
+from utils.colors import DGREEN, DMAGENTA, DYELLOW, RED, RESET
 from ..audiopy.m4a_converter import m4a
-from ..utils.formats import (SUPPORTED_AUDIO_FORMATS,
+from utils.formats import (SUPPORTED_AUDIO_FORMATS,
                              SUPPORTED_AUDIO_FORMATS_DIRECT)
 
 ###############################################################################
