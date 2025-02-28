@@ -1,4 +1,36 @@
+# Ignore the entire src directory (if not needed)
 src/**
-.gitignore
-__pycache__
+
+# Ignore this .gitignore file itself (not necessary, but can be included for clarity)
+#.gitignore
+
+# Ignore Python cache directories
+__pycache__/
+*.py[cod]
+
+# Ignore temporary files
 *~
+
+# Ignore build directories
+**/build/
+**/dist/
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.vscode/
+*.idea/
+
+# Ignore operating system files
+.DS_Store
+Thumbs.db
+
+# Ignore log files
+*.log
+
+# Ignore node_modules (if applicable)
+node_modules/
+
+# Ignore virtual environment directories (if applicable)
+env/
+venv/

@@ -15,7 +15,7 @@ Perform audio modifications such as adding voice effect to an audio or video fil
 </ul>
 """
 
-from .voicesChanger import Argsmain
+from .voice_ffects import Argsmain
 
 
 LOGO = """
