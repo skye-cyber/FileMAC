@@ -23,7 +23,7 @@ class ImageConverter:
         self.input_file = input_file
         self.out_format = out_format
 
-    def preprocess(self):
+    def preprocess(self) -> list:
         try:
             files_to_process = []
 
@@ -43,7 +43,7 @@ class ImageConverter:
             print("File not found❕")
             sys.exit(1)
 
-    def convert_image(self):
+    def convert_image(self) -> os.PathLike:
         try:
             input_list = self.preprocess()
             out_f = self.out_format.upper()
@@ -73,15 +73,8 @@ class ImageConverter:
                 print(f"\033[1;36mSaving image as {output_filename}{RESET}")
                 pil_img.save(output_filename, out_f)
                 print(f"{DGREEN}Done ✅{RESET}")
-                """Load the image back into OpenCV: """
-                # print(f"{DMAGENTA}Load and display image{RESET}")
-                # opencv_img = cv2.imread(output_filename)
-                """Display the images: """
-                # cv2.imshow('OpenCV Image', opencv_img)
-                # opencv_img.show()
-                """Wait for the user to press a key and close the windows: """
-                # cv2.waitKey(0)
-                # cv2.destroyAllWindows()
+
+            return output_filename
         except KeyboardInterrupt:
             print("\nQuit❕")
             sys.exit(1)

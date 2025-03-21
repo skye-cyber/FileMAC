@@ -24,6 +24,7 @@ filemac.egg-info/entry_points.txt
 filemac.egg-info/not-zip-safe
 filemac.egg-info/requires.txt
 filemac.egg-info/top_level.txt
+filemac/Imagepdfpy/image_to_pdf.py
 filemac/OCR/Extractor.py
 filemac/audiopy/Extractor.py
 filemac/audiopy/Join.py

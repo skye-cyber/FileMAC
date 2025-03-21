@@ -7,7 +7,7 @@ from pdf2image import convert_from_path
 from PIL import Image  # ImageSequence
 
 from utils.colors import DCYAN, DGREEN, DMAGENTA, DBLUE, DYELLOW, RED, RESET
-from .converter import MakeConversion
+from .pydocs import DocConverter
 
 
 class LImage:
@@ -21,7 +21,7 @@ class LImage:
             LI = LImage.pdf_2L_Img(doc)
             return LI
         if ext == "doc" or ext == "docx":
-            conv = MakeConversion(doc)
+            conv = DocConverter(doc)
 
             path = conv.word_to_pdf()
             LI = LImage.pdf_2L_Img(path)

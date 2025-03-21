@@ -13,6 +13,7 @@ from .imagepy.converter import ImageConverter
 from utils.colors import (
     BLUE,
     CYAN,
+    BWHITE,
     DCYAN,
     DYELLOW,
     FBLUE,
@@ -93,6 +94,24 @@ class _DIR_CONVERSION_:
             pass
 
 
+def _isolate_(_dir_, target):
+    try:
+        isolated_files = []
+        for root, dirs, files in os.walk(_dir_):
+            for file in files:
+                if file.lower().endswith(target):
+                    _path_ = os.path.join(root, file)
+                    isolated_files.append(_path_)
+        return isolated_files
+    except FileNotFoundError as e:
+        print(e)
+    except KeyboardInterrupt:
+        print("\nQuit!")
+        sys.exit(1)
+    except Exception as e:
+        print(e)
+
+
 class Batch_Audiofy:
     def __init__(
         self,
@@ -121,72 +140,87 @@ class Eval:
         self.file = file
         self.outf = outf
 
+    def spreedsheet(self, conv):
+        if self.outf.lower() == "csv":
+            conv.convert_xlsx_to_csv()
+        elif self.outf.lower() in ("txt", "text"):
+            conv.convert_xls_to_text()
+        elif self.outf.lower() in list(self.doc_ls):
+            conv.convert_xls_to_word()
+        elif self.outf.lower() == "db":
+            conv.convert_xlsx_to_database()
+        else:
+            print(f"{RED}Unsupported output format❌{RESET}")
+
+    def word(self, conv):
+        if self.outf.lower() in ("txt", "text"):
+            conv.word_to_txt()
+        elif self.outf.lower() == "pdf":
+            conv.word_to_pdf()
+        elif self.outf.lower() in ("pptx", "ppt"):
+            conv.word_to_pptx()
+        elif self.outf.lower() in ("audio", "ogg"):
+            conv = FileSynthesis(self.file)
+            conv.audiofy()
+        else:
+            print(f"{RED}Unsupported output format❌{RESET}")
+
+    def text(self, conv):
+        if self.outf.lower() == "pdf":
+            conv.txt_to_pdf()
+        elif self.outf.lower() in ("doc", "docx", "word"):
+            conv.text_to_word()
+        elif self.outf.lower() in ("audio", "ogg"):
+            conv = FileSynthesis(self.file)
+            conv.audiofy()
+        else:
+            print(f"{RED}Unsupported output format❌{RESET}")
+
+    def ppt(self, conv):
+        if self.outf.lower() in ("doc", "docx", "word"):
+            conv.ppt_to_word()
+        elif self.outf.lower() in ("text", "txt"):
+            word = conv.ppt_to_word()
+            conv = DocConverter(word)
+            conv.word_to_txt()
+        elif self.outf.lower() in ("pptx"):
+            conv.convert_ppt_to_pptx(self.file)
+        elif self.outf.lower() in ("audio", "ogg", "mp3", "wav"):
+            conv = FileSynthesis(self.file)
+            conv.audiofy()
+        else:
+            print(f"{RED}Unsupported output format❌{RESET}")
+
+    def pdf(self, conv):
+        if self.outf.lower() in ("doc", "docx", "word"):
+            conv.pdf_to_word()
+        elif self.outf.lower() in ("txt", "text"):
+            conv.pdf_to_txt()
+        elif self.outf.lower() in ("audio", "ogg", "mp3", "wav"):
+            conv = FileSynthesis(self.file)
+            conv.audiofy()
+        else:
+            print(f"{RED}Unsupported output format❌{RESET}")
+
     def document_eval(self):
-        ls = ["docx", "doc"]
+        self.doc_ls = ["docx", "doc"]
         sheetls = ["xlsx", "xls"]
         try:
             conv = DocConverter(self.file)
             if self.file.lower().endswith(tuple(sheetls)):
-                if self.outf.lower() == "csv":
-                    conv.convert_xlsx_to_csv()
-                elif self.outf.lower() in ("txt", "text"):
-                    conv.convert_xls_to_text()
-                elif self.outf.lower() in list(ls):
-                    conv.convert_xls_to_word()
-                elif self.outf.lower() == "db":
-                    conv.convert_xlsx_to_database()
-                else:
-                    print(f"{RED}Unsupported output format❌{RESET}")
+                self.spreedsheet(conv=conv)
 
-            elif self.file.lower().endswith(tuple(ls)):
-                if self.outf.lower() in ("txt", "text"):
-                    conv.word_to_txt()
-                elif self.outf.lower() == "pdf":
-                    conv.word_to_pdf()
-                elif self.outf.lower() in ("pptx", "ppt"):
-                    conv.word_to_pptx()
-                elif self.outf.lower() in ("audio", "ogg"):
-                    conv = FileSynthesis(self.file)
-                    conv.audiofy()
-                else:
-                    print(f"{RED}Unsupported output format❌{RESET}")
+            elif self.file.lower().endswith(tuple(self.doc_ls)):
+                self.word(conv=conv)
 
             elif self.file.endswith("txt"):
-                if self.outf.lower() == "pdf":
-                    conv.txt_to_pdf()
-                elif self.outf.lower() in ("doc", "docx", "word"):
-                    conv.text_to_word()
-                elif self.outf.lower() in ("audio", "ogg"):
-                    conv = FileSynthesis(self.file)
-                    conv.audiofy()
-                else:
-                    print(f"{RED}Unsupported output format❌{RESET}")
+                self.text(conv=conv)
 
             elif self.file.split(".")[-1].lower() in ("ppt", "pptx"):
-                if self.outf.lower() in ("doc", "docx", "word"):
-                    conv.ppt_to_word()
-                elif self.outf.lower() in ("text", "txt"):
-                    word = conv.ppt_to_word()
-                    conv = DocConverter(word)
-                    conv.word_to_txt()
-                elif self.outf.lower() in ("pptx"):
-                    conv.convert_ppt_to_pptx(self.file)
-                elif self.outf.lower() in ("audio", "ogg", "mp3", "wav"):
-                    conv = FileSynthesis(self.file)
-                    conv.audiofy()
-                else:
-                    print(f"{RED}Unsupported output format❌{RESET}")
+                self.ppt(conv)
 
             elif self.file.lower().endswith("pdf"):
-                if self.outf.lower() in ("doc", "docx", "word"):
-                    conv.pdf_to_word()
-                elif self.outf.lower() in ("txt", "text"):
-                    conv.pdf_to_txt()
-                elif self.outf.lower() in ("audio", "ogg", "mp3", "wav"):
-                    conv = FileSynthesis(self.file)
-                    conv.audiofy()
-                else:
-                    print(f"{RED}Unsupported output format❌{RESET}")
+                self.pdf(conv)
 
             elif self.file.lower().endswith("csv"):
                 if self.outf.lower() in ("xls", "xlsx", "excel"):
@@ -199,7 +233,7 @@ class Eval:
             logger.error(e)
 
 
-def main():
+def Cmd_arg_Handler():
     """Define main functions to create commandline arguments for different operations"""
     parser = argparse.ArgumentParser(
         description="Filemac: A file management tool with audio effects. Supporting wide range of Multimedia Operations",
@@ -393,160 +427,286 @@ def main():
         help="Ensure that OCR result respects currect text formatting (spacing and tabulation)",
     )
 
+    parser.add_argument(
+        "--image2pdf",
+        nargs="+",
+        help=f"Convert Images to pdf. {BWHITE}Accepts image list or dir/folder{RESET} e.g `{DYELLOW}filemac --image2pdf image1 image2{RESET}`",
+    )
+
     # Use parse_known_args to allow unknown arguments (for later tunneling)
     args, remaining_args = parser.parse_known_args()
+    mapper = argsOPMaper(parser, args, remaining_args)
+    mapper.run()
 
-    if not args and not remaining_args:
-        parser.print_help()
 
-    if args.audio_help:
-        # Call audiobot with help flag
-        Argsmain(["--help"])
-        return
+class argsOPMaper:
+    def __init__(self, parser, args, remaining_args):
+        self.parser = parser
+        self.args = args
+        self.remaining_args = remaining_args
+        self.SUPPORTED_IMAGE_FORMATS_SHOW = SUPPORTED_IMAGE_FORMATS_SHOW
+        self.SUPPORTED_DOC_FORMATS = SUPPORTED_DOC_FORMATS
+        self.SUPPORTED_AUDIO_FORMATS_SHOW = SUPPORTED_AUDIO_FORMATS_SHOW
+        self.SUPPORTED_AUDIO_FORMATS_DIRECT = SUPPORTED_AUDIO_FORMATS_DIRECT
+        self.RED = RED
+        self.CYAN = CYAN
+        self.RESET = RESET
+        self.Argsmain = Argsmain
+        self.VideoConverter = VideoConverter
+        self.AudioConverter = AudioConverter
+        self.ExtractAudio = ExtractAudio
+        self.Scanner = Scanner
+        self.DocConverter = DocConverter
+        self.Compress_Size = Compress_Size
+        self.ExtractText = ExtractText
+        self.SA = SA
+        self._entry = _entry
+        self.ImageConverter = ImageConverter
+        self.Batch_Audiofy = Batch_Audiofy
+        self._DIR_CONVERSION_ = _DIR_CONVERSION_
+        self.Eval = Eval
 
-    if args.audio_effect:
-        # Call audiobot subpackage to handle audio effects
-        Argsmain(remaining_args)
-
-    # Call function to handle document conversion inputs before begining conversion
-    if args.convert_doc and args.convert_doc[0] == "help":
-        print(SUPPORTED_DOC_FORMATS)
-        sys.exit(1)
-
-    if args.convert_doc and args.target_format is not None:
-        if args.use_extras:
-            DocConverter.word2pdf_extra(args.convert_doc)
-
-        if (
-            len(args.convert_doc) <= 1
-            and not os.path.isdir(args.convert_doc[0])
-            and isinstance(args.convert_doc, list)
-            and args.target_format in SUPPORTED_AUDIO_FORMATS_DIRECT
-        ):
-            Batch_Audiofy(args.convert_doc, args.no_resume, args.threads)
-
-        elif os.path.isdir(args.convert_doc[0]):
-            conv = _DIR_CONVERSION_(
-                args.convert_doc[0],
-                args.target_format,
-                args.no_resume,
-                args.threads,
-                args.isolate,
-            )
-            conv._unbundle_dir_()
-
-        elif os.path.isfile(args.convert_doc[0]):
-            ev = Eval(args.convert_doc[0], args.target_format)
-            ev.document_eval()
-
-    # Call function to handle video conversion inputs before begining conversion
-    elif args.convert_video and args.convert_video == "help":
-        print(SUPPORTED_VIDEO_FORMATS_SHOW)
-        sys.exit(1)
-    elif args.convert_video and args.target_format is not None:
-        ev = VideoConverter(args.convert_video, args.target_format)
-        ev.CONVERT_VIDEO()
-    # Call function to handle image conversion inputs before begining conversion
-
-    elif args.convert_image:
-        if args.convert_image == "help":
-            print(SUPPORTED_IMAGE_FORMATS_SHOW)
-            sys.exit(1)
-        if args.target_format is None:
-            print(f"{RED}Please provide output format specified by{
-                  CYAN} '-t'{RESET}")
-            sys.exit(1)
-        conv = ImageConverter(args.convert_image, args.target_format)
-        conv.convert_image()
-
-    # Handle image resizing
-    elif args.resize_image:
-        res = Compress_Size(args.resize_image)
-        res.resize_image(args.t_size)
-
-    # Handle documents to images conversion
-    elif args.convert_doc2image:
-        conv = DocConverter(args.convert_doc2image)
-        conv.doc2image(args.target_format)
-
-    # Call function to handle audio conversion inputs before begining conversion
-    if args.convert_audio == "help":
-        print(SUPPORTED_AUDIO_FORMATS_SHOW)
-        sys.exit(1)
-    elif args.convert_audio and args.target_format is not None:
-        ev = AudioConverter(args.convert_audio, args.target_format)
-        ev.pydub_conv()
-
-    # Call module to evaluate audio files before making audio extraction from input video files conversion
-    elif args.extract_audio:
-        vi = ExtractAudio(args.extract_audio)
-        vi.moviepyextract()
-
-    # Call module to scan the input and extract text
-    elif args.scan:
-        sc = Scanner(args.scan)
-        sc.scanPDF()
-
-    # Call module to scan the input FILE as image object and extract text
-    elif args.scanAsImg:
-        sc = Scanner(args.scanAsImg, args.no_strip)
-        sc.scanAsImgs()
-
-    # Call module to scan the input FILE as long image object and extract text
-    # effective for text intengration(combining)
-    elif args.scanAsLong_Image:
-        sc = Scanner(args.scanAsLong_Image, args.no_strip)
-        sc.scanAsLongImg()
-
-    # convert document to long image
-    elif args.doc_long_image:
-        from .longImg import LImage
-
-        conv = LImage(args.doc_long_image)
-        conv.preprocess()
-    # Call module to handle Candidate images for text extraction inputs before begining conversion
-    elif args.OCR:
-        conv = ExtractText(args.OCR, args.no_strip)
-        conv.OCR()
-
-    elif args.Analyze_video:
-        analyzer = SA(args.Analyze_video)
-        analyzer.SimpleAnalyzer()
-
-    # Call joinaudio script
-    elif args.AudioJoin:
-        from .audiopy.Join import JoinAudios
-
-        joiner = JoinAudios(args.AudioJoin)
-        joiner.worker()
-
-    # Call Advanced text to word converter
-    elif args.Atext2word:
-        from .AT2Word import AdvancedT2word
-
-        init = AdvancedT2word(args.Atext2word, None, args.font_size, args.font_name)
-        init.text_to_word()
-
-    # call for pdf join implementation
-    elif args.pdfjoin:
+    def pdfjoin(self):
         from .pdf.combine import pdfmaster
 
-        """if len(args.pdfjoin) > 2 and args.order in {'AAB', 'BBA', 'AA', 'BB'}:
-            init = pdfmaster(args.pdfjoin)
-            init.controller()"""
-
-        if args.pdfjoin[0].lower().strip() == "help":
+        if self.args.pdfjoin[0].lower().strip() == "help":
             from .pdf.combine import helpmaster
 
             opts, helper, example = helpmaster()
             print(f"{opts}\n {helper}\n {example}")
             sys.exit(0)
-
-        init = pdfmaster(args.pdfjoin, None, None, args.order)
+        init = pdfmaster(self.args.pdfjoin, None, None, self.args.order)
         init.controller()
-    elif args.extract_pages:
-        init = _entry(args.extract_pages)
+
+    def imageConv(self):
+        if self.args.convert_image == "help":
+            print(self.SUPPORTED_IMAGE_FORMATS_SHOW)
+            sys.exit(1)
+        if self.args.target_format is None:
+            print(
+                f"{self.RED}Please provide output format specified by{self.CYAN} '-t'{self.RESET}"
+            )
+            sys.exit(1)
+        conv = self.ImageConverter(self.args.convert_image, self.args.target_format)
+        conv.convert_image()
+
+    def docConv(self):
+        if self.args.use_extras:
+            self.DocConverter.word2pdf_extra(self.args.convert_doc)
+        if (
+            len(self.args.convert_doc) <= 1
+            and not os.path.isdir(self.args.convert_doc[0])
+            and isinstance(self.args.convert_doc, list)
+            and self.args.target_format in self.SUPPORTED_AUDIO_FORMATS_DIRECT
+        ):
+            self.Batch_Audiofy(
+                self.args.convert_doc, self.args.no_resume, self.args.threads
+            )
+        elif os.path.isdir(self.args.convert_doc[0]):
+            conv = self._DIR_CONVERSION_(
+                self.args.convert_doc[0],
+                self.args.target_format,
+                self.args.no_resume,
+                self.args.threads,
+                self.args.isolate,
+            )
+            conv._unbundle_dir_()
+        elif os.path.isfile(self.args.convert_doc[0]):
+            ev = self.Eval(self.args.convert_doc[0], self.args.target_format)
+            ev.document_eval()
+
+    def handle_help(self):
+        if not self.args and not self.remaining_args:
+            self.parser.print_help()
+            sys.exit(0)
+
+    def handle_audio_help(self):
+        if self.args.audio_help:
+            self.Argsmain(["--help"])
+
+    def handle_audio_effect(self):
+        self.Argsmain(self.remaining_args)
+
+    def handle_doc_conversion_help(self):
+        if self.args.convert_doc and self.args.convert_doc[0] == "help":
+            print(self.SUPPORTED_DOC_FORMATS)
+            sys.exit(1)
+
+    def handle_video_conversion_help(self):
+        if self.args.convert_video and self.args.convert_video == "help":
+            print(self.SUPPORTED_VIDEO_FORMATS_SHOW)
+            sys.exit(1)
+
+    def handle_video_conversion(self):
+        ev = self.VideoConverter(self.args.convert_video, self.args.target_format)
+        ev.CONVERT_VIDEO()
+
+    def handle_image_resize(self):
+        res = self.Compress_Size(self.args.resize_image)
+        res.resize_image(self.args.t_size)
+
+    def handle_doc_to_image_conversion(self):
+        conv = self.DocConverter(self.args.convert_doc2image)
+        conv.doc2image(self.args.target_format)
+
+    def handle_audio_conversion_help(self):
+        if self.args.convert_audio == "help":
+            print(self.SUPPORTED_AUDIO_FORMATS_SHOW)
+            sys.exit(1)
+
+    def handle_audio_conversion(self):
+        ev = self.AudioConverter(self.args.convert_audio, self.args.target_format)
+        ev.pydub_conv()
+
+    def handle_audio_extraction(self):
+        vi = self.ExtractAudio(self.args.extract_audio)
+        vi.moviepyextract()
+
+    def handle_scan_pdf(self):
+        sc = self.Scanner(self.args.scan)
+        sc.scanPDF()
+
+    def handle_scan_images(self):
+        sc = self.Scanner(self.args.scanAsImg, self.args.no_strip)
+        sc.scanAsImgs()
+
+    def handle_scan_long_image(self):
+        sc = self.Scanner(self.args.scanAsLong_Image, self.args.no_strip)
+        sc.scanAsLongImg()
+
+    def handle_doc_to_long_image(self):
+        from .longImg import LImage
+
+        conv = LImage(self.args.doc_long_image)
+        conv.preprocess()
+
+    def handle_ocr(self):
+        conv = self.ExtractText(self.args.OCR, self.args.no_strip)
+        conv.OCR()
+
+    def handle_video_analysis(self):
+        analyzer = self.SA(self.args.Analyze_video)
+        analyzer.SimpleAnalyzer()
+
+    def handle_audio_join(self):
+        from .audiopy.Join import JoinAudios
+
+        joiner = JoinAudios(self.args.AudioJoin)
+        joiner.worker()
+
+    def handle_advanced_text_to_word(self):
+        init = self.AdvancedT2word(
+            self.args.Atext2word, None, self.args.font_size, self.args.font_name
+        )
+        init.text_to_word()
+
+    def handle_extract_pages(self):
+        self._entry(self.args.extract_pages)
+
+    def image2pdf(self):
+        from .Imagepdfpy.image_to_pdf import ImageToPdfConverter
+
+        _input = self.args.image2pdf
+        if isinstance(_input, list):
+            if len(_input) > 1:
+                converter = ImageToPdfConverter(image_list=_input)
+            else:
+                converter = ImageToPdfConverter(input_dir=_input[0])
+        converter.run()
+
+    def run(self):
+        args = self.args
+        """Check for help argument by calling help method"""
+        self.handle_help()
+
+        """Check for audio help argument by calling help method"""
+        self.handle_audio_help()
+
+        """Check for doc conversion help argument by calling help method"""
+        self.handle_doc_conversion_help()
+
+        """Check for video conversion help argument by calling help method"""
+        self.handle_video_conversion_help()
+
+        """Check for audio conversion help argument by calling help method"""
+        self.handle_audio_conversion_help()
+
+        if args.audio_effect:
+            self.handle_audio_effect()
+            return
+
+        if args.convert_doc and args.target_format is not None:
+            self.docConv()
+            return
+
+        if args.convert_video and args.target_format is not None:
+            self.handle_video_conversion()
+            return
+
+        if args.convert_image:
+            self.imageConv()
+            return
+
+        if args.resize_image:
+            self.handle_image_resize()
+            return
+
+        if args.convert_doc2image:
+            self.handle_doc_to_image_conversion()
+            return
+
+        if args.convert_audio and args.target_format is not None:
+            self.handle_audio_conversion()
+            return
+
+        if args.extract_audio:
+            self.handle_audio_extraction()
+            return
+
+        if args.scan:
+            self.handle_scan_pdf()
+            return
+
+        if args.scanAsImg:
+            self.handle_scan_images()
+            return
+
+        if args.scanAsLong_Image:
+            self.handle_scan_long_image()
+            return
+
+        if args.doc_long_image:
+            self.handle_doc_to_long_image()
+            return
+
+        if args.OCR:
+            self.handle_ocr()
+            return
+
+        if args.Analyze_video:
+            self.handle_video_analysis()
+            return
+
+        if args.AudioJoin:
+            self.handle_audio_join()
+            return
+
+        if args.Atext2word:
+            self.handle_advanced_text_to_word()
+            return
+
+        if args.pdfjoin:
+            self.pdfjoin()
+            return
+
+        if args.extract_pages:
+            self.handle_extract_pages()
+            return
+
+        if args.image2pdf:
+            self.image2pdf()
+            return
 
 
 if __name__ == "__main__":
-    main()
+    Cmd_arg_Handler()

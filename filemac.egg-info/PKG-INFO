@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: filemac
 Version: 1.1.5
 Summary: Open source Python CLI toolkit for conversion, manipulation, Analysis of files (All major file operations)
@@ -52,6 +52,17 @@ Requires-Dist: soundfile
 Requires-Dist: SpeechRecognition
 Requires-Dist: colorama
 Requires-Dist: scipy
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
 
 # filemac
 A python file `conversion`, `manipulation`, `Analysis` toolkit
