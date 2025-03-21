@@ -152,7 +152,6 @@ class ImageToPdfConverter:
                 )
                 print(f"{GREEN}PDF created successfully from directory!{RESET}")
                 print(f"{BWHITE}Output:{RESET} {BLUE}{output_pdf_path}{RESET}")
-                return output_pdf_path
             else:
                 print(f"{RED}One or more images in the list do not exist.{RESET}")
         elif self.input_dir and self.output_pdf_path:
@@ -162,7 +161,6 @@ class ImageToPdfConverter:
                 )
                 print(f"{GREEN}PDF created successfully from directory!{RESET}")
                 print(f"{BWHITE}Output:{RESET} {BLUE}{output_pdf_path}{RESET}")
-                return output_pdf_path
             else:
                 print(f"Directory {YELLOW}{self.input_dir}{RESET} does not exist.")
         else:
@@ -170,6 +168,7 @@ class ImageToPdfConverter:
                 "Please provide either image_list and output_pdf_path or input_dir and output_pdf_path during object instantiation."
             )
             return
+        return output_pdf_path
 
 
 if __name__ == "__main__":

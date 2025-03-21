@@ -432,6 +432,11 @@ def Cmd_arg_Handler():
         nargs="+",
         help=f"Convert Images to pdf. {BWHITE}Accepts image list or dir/folder{RESET} e.g `{DYELLOW}filemac --image2pdf image1 image2{RESET}`",
     )
+    parser.add_argument(
+        "--image2word",
+        nargs="+",
+        help=f"Convert Images to word document. {BWHITE}Accepts image list or dir/folder{RESET} e.g `{DYELLOW}filemac --image2word image1 image2{RESET}`",
+    )
 
     # Use parse_known_args to allow unknown arguments (for later tunneling)
     args, remaining_args = parser.parse_known_args()
@@ -440,7 +445,7 @@ def Cmd_arg_Handler():
 
 
 class argsOPMaper:
-    def __init__(self, parser, args, remaining_args):
+    def __init__(self, parser, args, remaining_args) -> None:
         self.parser = parser
         self.args = args
         self.remaining_args = remaining_args
@@ -614,6 +619,48 @@ class argsOPMaper:
                 converter = ImageToPdfConverter(input_dir=_input[0])
         converter.run()
 
+    def image2word(self):
+        from .Image2docx.image_to_word import ImageToDocxConverter
+
+        _input = self.args.image2word
+        if isinstance(_input, list):
+            if len(_input) > 1:
+                converter = ImageToDocxConverter(image_list=_input)
+            else:
+                converter = ImageToDocxConverter(input_dir=_input[0])
+        converter.run()
+
+    def process_target(self):
+        if self.args.Analyze_video:
+            self.handle_video_analysis()
+            return
+
+        if self.args.AudioJoin:
+            self.handle_audio_join()
+            return
+
+        if self.args.Atext2word:
+            self.handle_advanced_text_to_word()
+            return
+
+        if self.args.pdfjoin:
+            self.pdfjoin()
+            return
+
+        if self.args.extract_pages:
+            self.handle_extract_pages()
+            return
+
+        if self.args.image2pdf:
+            self.image2pdf()
+            return
+        if self.args.OCR:
+            self.handle_ocr()
+            return
+        if self.args.image2word:
+            self.image2word()
+            return
+
     def run(self):
         args = self.args
         """Check for help argument by calling help method"""
@@ -679,32 +726,19 @@ class argsOPMaper:
             self.handle_doc_to_long_image()
             return
 
-        if args.OCR:
-            self.handle_ocr()
-            return
-
-        if args.Analyze_video:
-            self.handle_video_analysis()
-            return
-
-        if args.AudioJoin:
-            self.handle_audio_join()
-            return
-
-        if args.Atext2word:
-            self.handle_advanced_text_to_word()
-            return
-
-        if args.pdfjoin:
-            self.pdfjoin()
-            return
-
-        if args.extract_pages:
-            self.handle_extract_pages()
-            return
-
-        if args.image2pdf:
-            self.image2pdf()
+        if any(
+            (
+                args.OCR,
+                args.Analyze_video,
+                args.AudioJoin,
+                args.Atext2word,
+                args.pdfjoin,
+                args.extract_pages,
+                args.image2pdf,
+                args.image2word,
+            )
+        ):
+            self.process_target()
             return
 
 
