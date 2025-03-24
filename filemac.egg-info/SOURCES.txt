@@ -34,6 +34,7 @@ filemac/audiopy/m4a_converter.py
 filemac/audiopy/pyTTS.py
 filemac/imagepy/compress.py
 filemac/imagepy/converter.py
+filemac/imagepy/image_extractor.py
 filemac/pdf/Page_Extractor.py
 filemac/pdf/combine.py
 filemac/videopy/pyVideo.py

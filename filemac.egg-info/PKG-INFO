@@ -52,6 +52,7 @@ Requires-Dist: soundfile
 Requires-Dist: SpeechRecognition
 Requires-Dist: colorama
 Requires-Dist: scipy
+Requires-Dist: PyMuPDF
 Dynamic: author
 Dynamic: author-email
 Dynamic: classifier

@@ -77,6 +77,7 @@ setup(
         "SpeechRecognition",
         "colorama",
         "scipy",
+        "PyMuPDF",
     ],
     include_package_data=True,
     zip_safe=False,

@@ -15,6 +15,7 @@ from utils.colors import (
     CYAN,
     BWHITE,
     DCYAN,
+    YELLOW,
     DYELLOW,
     FBLUE,
     FCYAN,
@@ -244,31 +245,31 @@ def Cmd_arg_Handler():
         "--convert_doc",
         nargs="+",
         help=f"Converter document file(s) to different format ie pdf_to_docx.\
-       example: {DYELLOW}filemac --convert_doc example.docx -t pdf{RESET}",
+       example: {DYELLOW}filemac --convert_doc example.docx -tff pdf{RESET}",
     )
 
     parser.add_argument(
         "--convert_audio",
         help=f"Convert audio file(s) to and from different format ie mp3 to wav\
-        example: {DYELLOW}filemac --convert_audio example.mp3 -t wav{RESET}",
+        example: {DYELLOW}filemac --convert_audio example.mp3 -tff wav{RESET}",
     )
 
     parser.add_argument(
         "--convert_video",
         help=f"Convert video file(s) to and from different format ie mp4 to mkv.\
-        example: {DYELLOW}filemac --convert_video example.mp4 -t mkv{RESET}",
+        example: {DYELLOW}filemac --convert_video example.mp4 -tf mkv{RESET}",
     )
 
     parser.add_argument(
         "--convert_image",
         help=f"Convert image file(s) to and from different format ie png to jpg.\
-        example: {DYELLOW}filemac --convert_image example.jpg -t png{RESET}",
+        example: {DYELLOW}filemac --convert_image example.jpg -tf png{RESET}",
     )
 
     parser.add_argument(
         "--convert_doc2image",
         help=f"Convert documents to images ie png to jpg.\
-        example: {DYELLOW}filemac --convert_doc2image example.pdf -t png{RESET}",
+        example: {DYELLOW}filemac --convert_doc2image example.pdf -tf png{RESET}",
     )
 
     parser.add_argument(
@@ -282,7 +283,7 @@ def Cmd_arg_Handler():
         "-iso",
         "--isolate",
         help=f"Specify file types to isolate\
-                        for conversion, only works if directory is provided as input for the {FCYAN}convert_doc{RESET} argument example: {DYELLOW}filemac --convert_doc /home/user/Documents/ --isolate pdf -t txt{RESET}",
+                        for conversion, only works if directory is provided as input for the {FCYAN}convert_doc{RESET} argument example: {DYELLOW}filemac --convert_doc /home/user/Documents/ --isolate pdf -tf txt{RESET}",
     )
 
     parser.add_argument(
@@ -299,7 +300,7 @@ def Cmd_arg_Handler():
     parser.add_argument(
         "--resize_image",
         help=f"change size of an image compress/decompress \
-        example: {DYELLOW}filemac --resize_image example.png -t_size 2mb -t png {RESET}",
+        example: {DYELLOW}filemac --resize_image example.png -tf_size 2mb -tf png {RESET}",
     )
 
     parser.add_argument(
@@ -339,6 +340,7 @@ def Cmd_arg_Handler():
 
     parser.add_argument(
         "--OCR",
+        nargs="+",
         help=f"Extract text from an image.\
         example: {DYELLOW}filemac --OCR image.png{RESET}",
     )
@@ -346,7 +348,12 @@ def Cmd_arg_Handler():
     """Audio join  arguements"""
     # Accept 0 or more arguements
     parser.add_argument(
-        "--AudioJoin", "-AJ", nargs="*", help="Join Audio files into one master file"
+        "--AudioJoin",
+        "-AJ",
+        nargs="*",
+        help=f"{YELLOW}Join Audio files{RESET} into one master file.\
+            Provide a {BLUE}list{RESET} of audio file paths.  If no paths are provided, the program will still run.",
+        metavar="audio_file_path",
     )
 
     """'arguements for Advanced text to word conversion"""
@@ -362,23 +369,22 @@ def Cmd_arg_Handler():
         "--font_size",
         type=int,
         default=12,
-        help=f"Font size to be used default: \
-                            {CYAN}12{RESET}",
+        help=f"Font size to be used default: {CYAN}12{RESET}",
     )
     parser.add_argument(
         "--font_name",
         type=str,
         default="Times New Roman",
-        help=f"Font name default: \
-                            {CYAN}Times New Roman{RESET}",
+        help=f"Font name default: {CYAN}Times New Roman{RESET}",
     )
 
     """Alternative sequence args, critical redundancy measure"""
     parser.add_argument(
+        "-X",
         "--use_extras",
         action="store_true",
         help=f"Use alternative conversion method: Overides\
-                        default method i.e: {DYELLOW}filemac --convert_doc example.docx --use_extras -t pdf{RESET}",
+                        default method i.e: {DYELLOW}filemac --convert_doc example.docx --use_extras -tf pdf{RESET}",
     )
 
     """Pdf join arguements--> Accepts atleast 1 arguement"""
@@ -392,7 +398,7 @@ def Cmd_arg_Handler():
     )
     parser.add_argument(
         "--extract_pages",
-        "-XP",
+        "-p",
         nargs="+",
         help=f"Extract given pages from pdf: {
             DYELLOW}filemac --extract_pages file.pdf 6 10{RESET} for one page: {DYELLOW}filemac --extract_pages file.pdf 5{RESET}",
@@ -414,17 +420,18 @@ def Cmd_arg_Handler():
         help=f"Don't Resume previous File operation {DYELLOW}filemac --convert_doc simpledir --no-resume{RESET}",
     )
     parser.add_argument(
-        "--threads",
-        "-t",
+        "--t",
+        "-threads",
         type=int,
         default=3,
         help=f"Number of threads for text to speech  {DYELLOW}filemac --convert_doc simpledir --no-resume -t 2{RESET}",
     )
     parser.add_argument(
-        "-NS",
-        "--no_strip",
-        action="store_true",
-        help="Ensure that OCR result respects currect text formatting (spacing and tabulation)",
+        "-sep",
+        "--separator",
+        choices=["\\n", "\\t", " ", "", "newline", "space", "none", "tab"],
+        default="\n",
+        help="Separator to be used  in OCR eg.('\\n', ' ',  '')",
     )
 
     parser.add_argument(
@@ -489,7 +496,7 @@ class argsOPMaper:
             sys.exit(1)
         if self.args.target_format is None:
             print(
-                f"{self.RED}Please provide output format specified by{self.CYAN} '-t'{self.RESET}"
+                f"{self.RED}Please provide output format specified by{self.CYAN} '-tf'{self.RESET}"
             )
             sys.exit(1)
         conv = self.ImageConverter(self.args.convert_image, self.args.target_format)
@@ -576,7 +583,7 @@ class argsOPMaper:
         sc.scanAsImgs()
 
     def handle_scan_long_image(self):
-        sc = self.Scanner(self.args.scanAsLong_Image, self.args.no_strip)
+        sc = self.Scanner(self.args.scanAsLong_Image, self.args.separator)
         sc.scanAsLongImg()
 
     def handle_doc_to_long_image(self):
@@ -586,8 +593,8 @@ class argsOPMaper:
         conv.preprocess()
 
     def handle_ocr(self):
-        conv = self.ExtractText(self.args.OCR, self.args.no_strip)
-        conv.OCR()
+        ocr = self.ExtractText(self.args.OCR, self.args.separator)
+        ocr.run()
 
     def handle_video_analysis(self):
         analyzer = self.SA(self.args.Analyze_video)
@@ -613,7 +620,7 @@ class argsOPMaper:
 
         _input = self.args.image2pdf
         if isinstance(_input, list):
-            if len(_input) > 1:
+            if len(_input) > 1 or os.path.isfile(os.path.abspath(_input[0])):
                 converter = ImageToPdfConverter(image_list=_input)
             else:
                 converter = ImageToPdfConverter(input_dir=_input[0])

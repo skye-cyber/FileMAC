@@ -1,123 +1,248 @@
 import logging
-import logging.handlers
 import os
 import sys
+from typing import Union, List, Optional
 
 import cv2
 import pytesseract
 from PIL import Image
 from rich.progress import Progress
-from utils.colors import BBWHITE, RED, RESET, CYAN
+from utils.colors import YELLOW, RESET
 
-###############################################################################
+# Define constants for better readability and maintainability
+SUPPORTED_IMAGE_FORMATS = {"png", "jpg", "jpeg"}
+DEFAULT_CONFIG = "-l eng --oem 3 --psm 6"
+DEFAULT_SEPARATOR = "\n"
+
+# Configure logging at the module level
 logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")
 logger = logging.getLogger(__name__)
 
 
 class ExtractText:
-    ###############################################################################
     """
-    Do OCR text extraction from a given image file and display the extracted
-    text to the screen finally save it to a text file assuming the name of the input
-    file
-    Args:
-    input_obj -> file ie image conatinig the text
-    code -> bool, keep text formarting
-    Returns:
-    text -> Extracted text
+    Extracts text from images using OCR, with options for file/directory input,
+    output file naming, and text separation.
     """
 
-    ###############################################################################
+    def __init__(
+        self,
+        input_obj: Optional[Union[list[str], str, os.PathLike]],
+        sep: str = DEFAULT_SEPARATOR,
+    ):
+        """
+        Initializes the ExtractText object.
 
-    def __init__(self, input_obj, no_strip: bool = False):
+        Args:
+            input_obj: Path to the image file or directory containing images.
+            sep: Separator to use when joining extracted text.  Defaults to newline.
+        """
+        if not isinstance(input_obj, (str, list, os.PathLike)):
+            raise TypeError(
+                f"input_obj must be a string or os.PathLike, not {type(input_obj)}"
+            )
         self.input_obj = input_obj
-        self.no_strip = no_strip
+        self.sep = sep
+        self.sep = (
+            "\n"
+            if self.sep == "newline"
+            else (
+                "\t"
+                if self.sep == "tab"
+                else (
+                    " "
+                    if self.sep == "space"
+                    else ("" if self.sep == "none" else self.sep)
+                )
+            )
+        )
 
-    def preprocess(self):
         """
-        Check input object (i.e a file or a directory)
-        -> if file append  the file to a set otherwise append directory full path to the set and return the set. The returned set will be
-        evaluated in the next step as required on the basis of requested operation.
-        For every requested operation, the output file if any is automatically generated and saved in respect to the input file filename and directory respectively.
-        Exit if the folder is empty
+            separator_map = {
+            "newline": "\n",
+            "tab": "\t",
+            "space": " ",
+            "none": "",
+            }
+
+            self.sep = separator_map.get(self.sep, self.sep)
         """
+
+    def get_dir_files(self, path):
+        """
+        Get file path list given dir/folder
+
+        -------
+        Args:
+            path: path to the directory/folder
+        Returns:
+        -------
+            list
+        """
+        files = [
+            os.path.join(path, f)
+            for f in os.listdir(path)
+            if os.path.isfile(os.path.join(path, f)) and self._is_supported_image(f)
+        ]
+        if not files:  # Check for empty directory *after* filtering
+            raise FileNotFoundError(f"No supported image files found in: {obj}")
+        return files
+
+    def _get_image_files(self) -> List[str]:
+        """
+        Identifies image files to process, handling both single files and directories.
+
+        Returns:
+            A list of paths to image files.  Raises FileNotFoundError if no
+            valid image files are found.
+        """
+        if isinstance(self.input_obj, (str, os.PathLike)):
+            if os.path.isfile(self.input_obj):
+                return [self.input_obj]
+            else:
+                return self.get_dir_files(self.input_obj)
 
         files_to_process = []
+        for obj in self.input_obj:
+            if os.path.isfile(obj):
+                if self._is_supported_image(obj):
+                    files_to_process.append(obj)
+                else:
+                    logger.warning(f"Skipping unsupported file: {obj}")
 
-        if os.path.isfile(self.input_obj):
-            files_to_process.append(self.input_obj)
-        elif os.path.isdir(self.input_obj):
-            if os.listdir(self.input_obj) is None:
-                print(f"{RED}Cannot work with empty folder{RESET}")
-                sys.exit(1)
-            for file in os.listdir(self.input_obj):
-                file_path = os.path.join(self.input_obj, file)
-                if os.path.isfile(file_path) and file_path.split(".")[-1].lower() in {
-                    "png",
-                    "jpg",
-                    "jpeg",
-                }:
-                    files_to_process.append(file_path)
-
+            elif os.path.isdir(obj):
+                files = self.get_dir_files(obj)
+                if not files:  # Check for empty directory *after* filtering
+                    raise FileNotFoundError(f"No supported image files found in: {obj}")
+                files_to_process.extend(files)
+            else:
+                raise FileNotFoundError(
+                    f"Input is not a valid file or directory: {obj}"
+                )
         return files_to_process
 
-    def OCR(self):
-        image_list = self.preprocess()
+    def _is_supported_image(self, filename: str) -> bool:
+        """Checks if a file has a supported image extension."""
+        return filename.lower().endswith(tuple(SUPPORTED_IMAGE_FORMATS))
 
-        def ocr_text_extraction(image_path):
-            """Load image using OpenCV"""
+    def _process_image(self, image_path: str, output_file: str) -> str:
+        """
+        Extracts text from a single image and saves it to a file.
+
+        Args:
+            image_path: Path to the image file.
+            output_file: Path to the output text file.
+
+        Returns:
+            The extracted text.  Returns an empty string on error.
+        """
+        try:
+            # Load image using OpenCV
             img = cv2.imread(image_path)
+            if img is None:
+                raise ValueError(f"Could not read image: {image_path}")
 
-            try:
-                """Preprocess image for better OCR results"""
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                thresh = cv2.threshold(
-                    gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
-                )[1]
-                img_pil = Image.fromarray(thresh)
+            # Preprocess image for better OCR results
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            img_pil = Image.fromarray(thresh)
 
-                """Perform OCR using pytesseract"""
-                config = "-l eng --oem 3 --psm 6"
-                text = pytesseract.image_to_string((img_pil), config=config)
+            # Perform OCR using pytesseract
+            self.sep = (
+                self.sep.replace("\r\n", "\n")
+                .replace("\\n", "\n")
+                .replace("\r", "\n")
+                .replace("\r\t", "\t")
+                .replace("\\t", "\t")
+            )
 
-                text = (
-                    " ".join(text) if self.no_strip else " ".join(text.split()).strip()
-                )
+            text = pytesseract.image_to_string(img_pil, config=DEFAULT_CONFIG)
+            text = self.sep.join(text.splitlines())  # handle empty lines
+            logger.info("")
+            logger.info(f"Extracted text from {image_path}")
+            print(f"{YELLOW}{text}{RESET}")
 
-                logger.info(f"{CYAN}Found:\n{RESET, text}")
-                current_path = os.getcwd()
-                file_path = os.path.join(current_path, OCR_file)
+            # Save text to file
+            with open(output_file, "w", encoding="utf-8") as file:  # Specify encoding
+                file.write(text)
+            return text
 
-                with open(file_path, "w") as file:
-                    file.write(text)
+        except FileNotFoundError as e:
+            logger.error(f"File not found: {e}")
+        except IOError as e:
+            logger.error(f"IOError: {e}")
+        except pytesseract.TesseractError as e:
+            logger.error(f"Tesseract error: {e}")
+        except cv2.error as e:
+            logger.error(f"OpenCV error processing {image_path}: {e}")
+        except Exception as e:
+            logger.error(
+                f"An unexpected error occurred while processing {image_path}: {e}"
+            )
 
-                if len(image_list) >= 2:
-                    input(f"{BBWHITE}Press Enter to continue{RESET}")
-                return text
-            except KeyboardInterrupt:
-                print("\nExiting")
-                sys.exit(0)
-            except FileNotFoundError as e:
-                logger.error(f"Error: {str(e)}")
-            except IOError as e:
-                logger.error(
-                    f"Could not write to output file '{OCR_file}'. \
-Reason: {str(e)}{RESET}"
-                )
-            except Exception as e:
-                logger.error(f"{type(e).__name__}: {str(e)}")
-                logger.error(f"{RED}{e}{RESET}")
+        return ""  # Return empty string on error
 
-        if len(image_list) >= 1:
-            with Progress() as progress:
-                task = progress.add_task("[magenta] Extracting")
-                for image_path in image_list:
-                    OCR_file = image_path[:-4] + ".txt"
-                    progress.update(task, advance=1)
-                    return ocr_text_extraction(image_path)
-                    # _file_list_.append(OCR_file)
-        else:
-            for image_path in image_list:
-                OCR_file = image_path[:-4] + ".txt"
-                task.update(task, advance=1)
-                return ocr_text_extraction(image_path)
+    def run(
+        self, output_file: Optional[Union[list[str], str, os.PathLike]] = None
+    ) -> Optional[List[str]]:
+        """
+        Runs the OCR extraction process on the input file(s) or directory.
+
+        Args:
+            output_file: Optional path to a single output file. If provided, all
+                extracted text will be written to this file.  If None, output
+                files will be generated based on input image names.
+
+        Returns:
+            A list of extracted texts, or None if no images were processed.
+            If output_file is provided, returns a list with a single string.
+        """
+        image_list = self._get_image_files()  # rename to avoid shadowing
+        num_images = len(image_list)
+        extracted_texts = []
+
+        if num_images == 0:
+            logger.warning("No images found to process.")
+            return None
+
+        try:
+            if output_file:
+                # Process all images and concatenate text into one output file
+                all_text = ""
+                with Progress() as progress:
+                    task = progress.add_task(
+                        "[yellow]Extracting text...", total=num_images
+                    )
+                    for image_path in image_list:
+                        all_text += (
+                            self._process_image(
+                                image_path, os.path.splitext(output_file)[0] + ".txt"
+                            )
+                            + self.sep
+                        )
+                        progress.update(task, advance=1)
+                with open(output_file, "w", encoding="utf-8") as f:
+                    f.write(all_text)
+                return [all_text]  # Return a list containing the combined text
+
+            else:
+                # Process each image individually, creating separate output files
+                with Progress() as progress:
+                    task = progress.add_task(
+                        "[yellow]Extracting text...", total=num_images
+                    )
+                    for image_path in image_list:
+                        _output_file = (
+                            os.path.splitext(os.path.basename(image_path))[0] + ".txt"
+                        )
+                        text = self._process_image(image_path, _output_file)
+                        extracted_texts.append(text)
+                        progress.update(task, advance=1)
+                return extracted_texts
+
+        except KeyboardInterrupt:
+            print("\n[red]Operation interrupted by user.[/]")
+            sys.exit(0)
+        except Exception as e:
+            logger.error(f"An unexpected error occurred: {e}")
+            return None  # Ensure None is returned on error

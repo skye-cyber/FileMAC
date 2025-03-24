@@ -1,4 +1,5 @@
 Pillow
+PyMuPDF
 PyPDF2
 SpeechRecognition
 argparse

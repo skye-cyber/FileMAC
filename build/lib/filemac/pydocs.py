@@ -41,12 +41,7 @@ from utils.colors import (
     YELLOW,
 )
 
-# import pygame
-# from aspose.words import Document as aspose_document
-# from aspose.slides import Presentation as aspose_presentation
-# from show_progress import progress_show
-# from PIL import ImageDraw, ImageFont
-###############################################################################
+DEFAULT_SEPARATOR = "\n"
 
 _ext_word = ["doc", "docx"]
 _ext_ppt_ = ["ppt", "pptx"]
@@ -912,9 +907,9 @@ class Scanner:
     Returns:
         None"""
 
-    def __init__(self, input_file, no_strip: bool = False):
+    def __init__(self, input_file, sep: str = DEFAULT_SEPARATOR):
         self.input_file = input_file
-        self.no_strip = no_strip
+        self.sep = sep
 
     def preprocess(self):
         files_to_process = []
@@ -972,7 +967,7 @@ class Scanner:
         with Progress() as progress:
             task = progress.add_task("[magenta]Extracting text", totsl=len(img_objs))
             for i in img_objs:
-                extract = ExtractText(i, self.no_strip)
+                extract = ExtractText(i, self.sep)
                 _text = extract.OCR()
 
                 if _text is not None:
@@ -1016,7 +1011,7 @@ class Scanner:
                 fl = LI.preprocess()
 
                 # fpath = file.split('.')[0] + '.png'
-                tx = ExtractText(fl, self.no_strip)
+                tx = ExtractText(fl, self.sep)
                 text = tx.OCR()
                 if text is not None:
                     # print(text)
