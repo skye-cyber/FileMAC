@@ -85,7 +85,7 @@ class ExtractText:
             if os.path.isfile(os.path.join(path, f)) and self._is_supported_image(f)
         ]
         if not files:  # Check for empty directory *after* filtering
-            raise FileNotFoundError(f"No supported image files found in: {obj}")
+            raise FileNotFoundError(f"No supported image files found in: {path}")
         return files
 
     def _get_image_files(self) -> List[str]:
