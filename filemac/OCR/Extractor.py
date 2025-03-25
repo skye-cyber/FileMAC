@@ -8,6 +8,8 @@ import pytesseract
 from PIL import Image
 from rich.progress import Progress
 from utils.colors import YELLOW, RESET
+from utils.dirbuster import Unbundle
+from utils.namerule import modify_filename_if_exists
 
 # Define constants for better readability and maintainability
 SUPPORTED_IMAGE_FORMATS = {"png", "jpg", "jpeg"}
@@ -67,63 +69,6 @@ class ExtractText:
 
             self.sep = separator_map.get(self.sep, self.sep)
         """
-
-    def get_dir_files(self, path):
-        """
-        Get file path list given dir/folder
-
-        -------
-        Args:
-            path: path to the directory/folder
-        Returns:
-        -------
-            list
-        """
-        files = [
-            os.path.join(path, f)
-            for f in os.listdir(path)
-            if os.path.isfile(os.path.join(path, f)) and self._is_supported_image(f)
-        ]
-        if not files:  # Check for empty directory *after* filtering
-            raise FileNotFoundError(f"No supported image files found in: {path}")
-        return files
-
-    def _get_image_files(self) -> List[str]:
-        """
-        Identifies image files to process, handling both single files and directories.
-
-        Returns:
-            A list of paths to image files.  Raises FileNotFoundError if no
-            valid image files are found.
-        """
-        if isinstance(self.input_obj, (str, os.PathLike)):
-            if os.path.isfile(self.input_obj):
-                return [self.input_obj]
-            else:
-                return self.get_dir_files(self.input_obj)
-
-        files_to_process = []
-        for obj in self.input_obj:
-            if os.path.isfile(obj):
-                if self._is_supported_image(obj):
-                    files_to_process.append(obj)
-                else:
-                    logger.warning(f"Skipping unsupported file: {obj}")
-
-            elif os.path.isdir(obj):
-                files = self.get_dir_files(obj)
-                if not files:  # Check for empty directory *after* filtering
-                    raise FileNotFoundError(f"No supported image files found in: {obj}")
-                files_to_process.extend(files)
-            else:
-                raise FileNotFoundError(
-                    f"Input is not a valid file or directory: {obj}"
-                )
-        return files_to_process
-
-    def _is_supported_image(self, filename: str) -> bool:
-        """Checks if a file has a supported image extension."""
-        return filename.lower().endswith(tuple(SUPPORTED_IMAGE_FORMATS))
 
     def _process_image(self, image_path: str, output_file: str) -> str:
         """
@@ -197,7 +142,8 @@ class ExtractText:
             A list of extracted texts, or None if no images were processed.
             If output_file is provided, returns a list with a single string.
         """
-        image_list = self._get_image_files()  # rename to avoid shadowing
+
+        image_list = Unbundle(self.input_obj).run()
         num_images = len(image_list)
         extracted_texts = []
 
@@ -235,6 +181,7 @@ class ExtractText:
                         _output_file = (
                             os.path.splitext(os.path.basename(image_path))[0] + ".txt"
                         )
+                        _output_file = modify_filename_if_exists(_output_file)
                         text = self._process_image(image_path, _output_file)
                         extracted_texts.append(text)
                         progress.update(task, advance=1)

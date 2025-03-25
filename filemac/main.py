@@ -444,6 +444,11 @@ def Cmd_arg_Handler():
         nargs="+",
         help=f"Convert Images to word document. {BWHITE}Accepts image list or dir/folder{RESET} e.g `{DYELLOW}filemac --image2word image1 image2{RESET}`",
     )
+    parser.add_argument(
+        "--image2gray",
+        nargs="+",
+        help=f"Convert Images to grayscale. {BWHITE}Accepts image list or dir/folder{RESET} e.g `{DYELLOW}filemac --image2gray image1 image2{RESET}`",
+    )
 
     # Use parse_known_args to allow unknown arguments (for later tunneling)
     args, remaining_args = parser.parse_known_args()
@@ -637,6 +642,15 @@ class argsOPMaper:
                 converter = ImageToDocxConverter(input_dir=_input[0])
         converter.run()
 
+    def image2grayscale(self):
+        from .imagepy.grayscale import Grayscale
+
+        _input = self.args.image2gray
+
+        if isinstance(_input, list):
+            converter = Grayscale(_input) if len(_input) > 1 else Grayscale(_input[0])
+            converter.run()
+
     def process_target(self):
         if self.args.Analyze_video:
             self.handle_video_analysis()
@@ -666,6 +680,9 @@ class argsOPMaper:
             return
         if self.args.image2word:
             self.image2word()
+            return
+        if self.args.image2gray:
+            self.image2grayscale()
             return
 
     def run(self):
@@ -743,6 +760,7 @@ class argsOPMaper:
                 args.extract_pages,
                 args.image2pdf,
                 args.image2word,
+                args.image2gray,
             )
         ):
             self.process_target()
