@@ -7,13 +7,14 @@ import logging.handlers
 import os
 import sys
 from typing import List, Union
-from audiobot.voice_ffects import Argsmain
+from audiobot.cli import Argsmain
 from .imagepy.converter import ImageConverter
 
 from utils.colors import (
     BLUE,
     CYAN,
     BWHITE,
+    DGREEN,
     DCYAN,
     YELLOW,
     DYELLOW,
@@ -30,7 +31,6 @@ from utils.formats import (
     SUPPORTED_AUDIO_FORMATS_SHOW,
     SUPPORTED_DOC_FORMATS,
     SUPPORTED_IMAGE_FORMATS_SHOW,
-    SUPPORTED_VIDEO_FORMATS_SHOW,
 )
 from . import warnings_handler
 from .audiopy.audio import AudioConverter
@@ -450,6 +450,12 @@ def Cmd_arg_Handler():
         help=f"Convert Images to grayscale. {BWHITE}Accepts image list or dir/folder{RESET} e.g `{DYELLOW}filemac --image2gray image1 image2{RESET}`",
     )
 
+    parser.add_argument(
+        "-V",
+        "--version",
+        action="store_true",
+        help="Show software version and exit.",
+    )
     # Use parse_known_args to allow unknown arguments (for later tunneling)
     args, remaining_args = parser.parse_known_args()
     mapper = argsOPMaper(parser, args, remaining_args)
@@ -651,6 +657,13 @@ class argsOPMaper:
             converter = Grayscale(_input) if len(_input) > 1 else Grayscale(_input[0])
             converter.run()
 
+    def display_version(self):
+        if self.args.version:
+            version = "1.1.7"
+
+            return print(f"{BLUE}filemac: V-{DGREEN}{version}{RESET}")
+        return
+
     def process_target(self):
         if self.args.Analyze_video:
             self.handle_video_analysis()
@@ -701,6 +714,9 @@ class argsOPMaper:
 
         """Check for audio conversion help argument by calling help method"""
         self.handle_audio_conversion_help()
+
+        """Call version printer"""
+        self.display_version()
 
         if args.audio_effect:
             self.handle_audio_effect()
