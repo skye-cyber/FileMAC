@@ -1,11 +1,13 @@
 import numpy as np
-from .logger_init import set_logger
+from .logging_config import setup_colored_logger
 import librosa
 from pydub import AudioSegment, effects
-from scipy.signal import butter, lfilter
+from scipy.signal import butter, lfilter, sosfilt
+from .config import Config
+from utils.colors import BLUE, CYAN, RESET
 
-
-logger = set_logger()
+Clogger = setup_colored_logger()
+config = Config()
 
 
 class Modulator:
@@ -42,31 +44,31 @@ class Modulator:
         """Applies a deep, robotic voice effect used for anonymity."""
 
         # Step 1: Pitch shift down (lower the pitch)
-        logger.info("Applying deep pitch shift for hacker voice")
+        Clogger.info("Applying deep pitch shift for hacker voice")
         deep_voice = self.pitch_shift(audio_segment, n_steps=-10)
 
         # Step 2: Speed up for robotic effect
-        logger.info("Speeding up for robotic effect")
+        Clogger.info("Speeding up for robotic effect")
         robotic_voice = effects.speedup(deep_voice, playback_speed=1.1)
         if robotic_voice is None:
-            logger.error("Speedup failed")
+            Clogger.error("Speedup failed")
             return None
 
         # Step 3: Apply reverb (check for validity)
-        logger.info("Adding subtle echo for distortion")
+        Clogger.info("Adding subtle echo for distortion")
         if isinstance(robotic_voice, AudioSegment):
             # Shorter delay for subtle echo
             delay = AudioSegment.silent(duration=500)
 
-            logger.info("Overlaying echo effect")
+            Clogger.info("Overlaying echo effect")
 
             try:
                 echo_effect = robotic_voice.overlay(delay + robotic_voice - 5000)
             except Exception as e:
-                logger.error(f"Error during overlay: {e}")
+                Clogger.error(f"Error during overlay: {e}")
                 return None
         else:
-            logger.error("Robotic voice generation failed")
+            Clogger.error("Robotic voice generation failed")
             return None
 
         # Step 4: Apply low-pass filter (optional)
@@ -74,7 +76,7 @@ class Modulator:
             effects.low_pass_filter(echo_effect, cutoff=2500) if echo_effect else None
         )
         if hacker_voice_effect is None:
-            logger.error("Low pass filter failed")
+            Clogger.error("Low pass filter failed")
             return None
 
         return hacker_voice_effect
@@ -111,7 +113,7 @@ class Modulator:
 
             return reverb_samples
         except Exception as e:
-            logger.error(e)
+            Clogger.error(e)
             # raise
 
     def lowpass_filter(self, samples, cutoff=200, sample_rate=44100):
@@ -133,7 +135,7 @@ class Modulator:
         Returns:
             numpy.ndarray: The filtered audio samples as a NumPy array.
         """
-        logger.info("Apply a low-pass filter to remove frequencies higher than cutoff")
+        Clogger.info("Apply a low-pass filter to remove frequencies higher than cutoff")
         nyquist = 0.5 * sample_rate
         normal_cutoff = cutoff / nyquist
         b, a = butter(6, normal_cutoff, btype="low", analog=False)
@@ -143,7 +145,7 @@ class Modulator:
 
     def distort(self, samples, gain=20, threshold=0.3):
         """Apply distortion by clipping the waveform."""
-        logger.info("Apply distortion by clipping the waveform.")
+        Clogger.info("Apply distortion by clipping the waveform.")
         samples = samples * gain
         samples = np.clip(samples, -threshold, threshold)  # Clip at threshold
         return samples
@@ -156,3 +158,112 @@ class Modulator:
 
     def normalize(self, audio_segment):
         return effects.normalize(audio_segment)
+
+
+class Denoiser:
+    def __init__(self, sample_rate=44100):
+        self.sample_rate = sample_rate
+        # Dictionaries to cache filter coefficients by cutoff value
+        self._sos_low = {}
+        self._sos_high = {}
+        self._cutoff = config.options.get("cutoff")
+        Clogger.debug(f"{BLUE}cutoff: {CYAN}{self._cutoff}{RESET}")
+
+    def lowpass_filter(
+        self, samples: np.ndarray, cutoff: int = 2200, order: int = 6
+    ) -> np.ndarray:
+        """
+        Apply a 6th-order low-pass Butterworth filter to remove frequencies above the cutoff.
+
+        Args:
+            samples (np.ndarray): The input audio samples.
+            cutoff (int, optional): Cutoff frequency in Hz. Defaults to 2200.
+            order (int, optional): Order of the filter. Defaults to 6.
+
+        Returns:
+            np.ndarray: The low-pass filtered audio samples.
+        """
+        cutoff = self._cutoff if self._cutoff else cutoff
+
+        if not isinstance(samples, np.ndarray):
+            raise ValueError("Input samples must be a NumPy array")
+
+        nyquist = 0.5 * self.sample_rate
+        if cutoff >= nyquist:
+            Clogger.warn(f"Cutoff frequency must be less than Nyquist ({nyquist} Hz)")
+            cutoff = nyquist - (nyquist * 0.1)
+
+        # Cache coefficients to avoid recomputation for the same cutoff value.
+        if cutoff not in self._sos_low:
+            self._sos_low[cutoff] = butter(
+                order, cutoff / nyquist, btype="low", analog=False, output="sos"
+            )
+
+        return sosfilt(self._sos_low[cutoff], samples)
+
+    def highpass_filter(
+        self, samples: np.ndarray, cutoff: int = 200, order: int = 30
+    ) -> np.ndarray:
+        """
+        Apply a 6th-order high-pass Butterworth filter to remove frequencies below the cutoff.
+
+        Args:
+            samples (np.ndarray): The input audio samples.
+            cutoff (int, optional): Cutoff frequency in Hz. Defaults to 200.
+            order (int, optional): Order of the filter. Defaults to 6.
+
+        Returns:
+            np.ndarray: The high-pass filtered audio samples.
+        """
+
+        cutoff = self._cutoff if self._cutoff else cutoff
+
+        if not isinstance(samples, np.ndarray):
+            raise ValueError("Input samples must be a NumPy array")
+
+        nyquist = 0.5 * self.sample_rate
+        if cutoff <= 0:
+            raise ValueError("Cutoff frequency must be positive")
+
+        if cutoff not in self._sos_high:
+            self._sos_high[cutoff] = butter(
+                order, cutoff / nyquist, btype="high", analog=False, output="sos"
+            )
+
+        return sosfilt(self._sos_high[cutoff], samples)
+
+    def denoise(
+        self,
+        samples: np.ndarray,
+        lowpass_cutoff: int = 2200,
+        highpass_cutoff: int = 200,
+        order: int = 6,
+    ) -> np.ndarray:
+        """
+        Denoise the audio by sequentially applying a low-pass filter and a high-pass filter.
+        This combination effectively acts as a band-pass filter,
+        removing both high-frequency noise (hiss) and low-frequency rumble.
+
+        Args:
+            samples (np.ndarray): The input audio samples.
+            lowpass_cutoff (int, optional): Cutoff frequency for low-pass filtering. Defaults to 2200 Hz.
+            highpass_cutoff (int, optional): Cutoff frequency for high-pass filtering. Defaults to 200 Hz.
+            order (int, optional): Order of the filters. Defaults to 6.
+
+        Returns:
+            np.ndarray: The denoised audio samples.
+        """
+        noise = config.options.get("noise") if config.options.get("noise") else "low"
+
+        Clogger.info(f"{BLUE}Noise: {CYAN}{config.options.get("noise")}{RESET}")
+        if noise == "low":
+            # Remove high-frequency noise
+            return self.lowpass_filter(samples, cutoff=lowpass_cutoff, order=order)
+        if noise == "high":
+            # Remove low-frequency noise
+            return self.highpass_filter(samples, cutoff=highpass_cutoff, order=order)
+        if noise == "both":
+            # Remove high-frequency noise
+            filtered = self.lowpass_filter(samples, cutoff=lowpass_cutoff, order=order)
+            # Remove low-frequency noise
+            return self.highpass_filter(filtered, cutoff=highpass_cutoff, order=order)

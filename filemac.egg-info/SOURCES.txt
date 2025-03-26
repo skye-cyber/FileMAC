@@ -5,8 +5,9 @@ audiobot/__init__.py
 audiobot/_utils.py
 audiobot/cli.py
 audiobot/codec.py
+audiobot/config.py
 audiobot/effects.py
-audiobot/logger_init.py
+audiobot/logging_config.py
 audiobot/modulator.py
 audiobot/processor.py
 filemac/AT2Word.py

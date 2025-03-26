@@ -6,11 +6,12 @@ import os
 
 import magic
 from ._utils import transcribe_audio
-from utils.colors import CYAN, RESET, GREEN, DBLUE
-from .logger_init import set_logger
+from utils.colors import CYAN, RESET, GREEN, DBLUE, YELLOW, BLUE
 from .processor import VideoProcessor, AudioProcessor
+from .logging_config import setup_colored_logger
+from .config import Config
 
-logger = set_logger()
+Clogger = setup_colored_logger()
 
 
 class Processor:
@@ -38,9 +39,7 @@ class Processor:
     def mono_processor(self):
         try:
             file_type = self.mime.from_file(self.args.file)
-            print(
-                f"{GREEN}- INFO -{RESET} {DBLUE}Detected file type: {file_type}{RESET}"
-            )
+            Clogger.info(f"{DBLUE}Detected file type: {file_type}{RESET}")
             if file_type.startswith("audio"):
                 if self.args.transcribe:
                     transcribe_audio(self.args.file)
@@ -60,11 +59,11 @@ class Processor:
                     self.args.visualize,
                 )
             else:
-                logger.warning(
+                Clogger.warning(
                     f"Unsupported file type: {file_type}. Only audio and video files are supported."
                 )
         except Exception as e:
-            logger.error(e)
+            Clogger.error(e)
 
     def batch_processor(self):
         try:
@@ -72,9 +71,7 @@ class Processor:
                 for file in files:
                     full_path = os.path.join(root, file)
                     file_type = self.mime.from_file(full_path)
-                    print(
-                        f"{GREEN}- INFO -{RESET} {DBLUE}Detected file type: {file_type}{RESET}"
-                    )
+                    Clogger.info(f"{DBLUE}Detected file type: {file_type}{RESET}")
                     if file_type.startswith("audio"):
                         if self.args.transcribe:
                             transcribe_audio(full_path)
@@ -94,9 +91,9 @@ class Processor:
                             self.args.visualize,
                         )
                     else:
-                        logger.warning(f"Ignoring unsupported file type: {file}")
+                        Clogger.warning(f"Ignoring unsupported file type: {file}")
         except Exception as e:
-            logger.info(e)
+            Clogger.info(e)
 
 
 def Argsmain(argsv=None):
@@ -111,7 +108,7 @@ def Argsmain(argsv=None):
             [--audio_effect]",
     )
     parser.add_argument(
-        "--file", "-f", help=f"{CYAN}The input audio, video file, or directory.{RESET}"
+        "file", help=f"{CYAN}The input audio, video file, or directory.{RESET}"
     )
     parser.add_argument(
         "-e",
@@ -128,8 +125,22 @@ def Argsmain(argsv=None):
             "hacker",
             "lowpass",
             "distortion",
+            "denoise",
         ],
         help=f"{CYAN}The voice effect to apply.{RESET}",
+    )
+    parser.add_argument(
+        "--cutoff",
+        type=int,
+        help=f"Cutoff frequency for denoise operation, defualt={YELLOW}200{RESET}",
+    )
+    parser.add_argument(
+        "-N",
+        "--noise",
+        choices=["low", "high", "both"],
+        type=str,
+        default="low",
+        help=f"Specifies the type of noise to remove choices:[{BLUE}low, high, both{RESET}] defualt={YELLOW}low{RESET}",
     )
     parser.add_argument(
         "-o",
@@ -161,7 +172,10 @@ def Argsmain(argsv=None):
     parser.add_argument("--audio_effect", action="store_true", help=argparse.SUPPRESS)
 
     args = parser.parse_args(argsv) if argsv else parser.parse_args()
-
+    if args.cutoff:
+        config = Config()
+        config.options["cutoff"] = args.cutoff
+        config.options["noise"] = args.noise
     # Call argument processor
     Processor(args, parser).process()
 
