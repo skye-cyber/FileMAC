@@ -4,7 +4,10 @@ import librosa
 from pydub import AudioSegment, effects
 from scipy.signal import butter, lfilter, sosfilt
 from .config import Config
-from utils.colors import BLUE, CYAN, RESET
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 Clogger = setup_colored_logger()
 config = Config()
@@ -167,7 +170,7 @@ class Denoiser:
         self._sos_low = {}
         self._sos_high = {}
         self._cutoff = config.options.get("cutoff")
-        Clogger.debug(f"{BLUE}cutoff: {CYAN}{self._cutoff}{RESET}")
+        Clogger.debug(f"{fcl.BLUE_FG}cutoff: {fcl.CYAN_FG}{self._cutoff}{RESET}")
 
     def lowpass_filter(
         self, samples: np.ndarray, cutoff: int = 2200, order: int = 6
@@ -255,7 +258,9 @@ class Denoiser:
         """
         noise = config.options.get("noise") if config.options.get("noise") else "low"
 
-        Clogger.info(f"{BLUE}Noise: {CYAN}{config.options.get("noise")}{RESET}")
+        Clogger.info(
+            f"{fcl.BLUE_FG}Noise: {fcl.CYAN_FG}{config.options.get("noise")}{RESET}"
+        )
         if noise == "low":
             # Remove high-frequency noise
             return self.lowpass_filter(samples, cutoff=lowpass_cutoff, order=order)

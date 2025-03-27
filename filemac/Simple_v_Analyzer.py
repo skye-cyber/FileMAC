@@ -3,8 +3,11 @@
 import sys
 import cv2
 import numpy as np
-from utils.colors import DYELLOW, RESET, DCYAN, DGREEN
+from utils.colors import foreground
 import ffmpeg
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class SA:
@@ -55,7 +58,7 @@ class SA:
         try:
             # Read the video file
             cap = cv2.VideoCapture(self.video)
-            print(f"{DYELLOW}Initializing..{RESET}")
+            print(f"{fcl.BYELLOW_FG}Initializing..{RESET}")
             # Initialize variables
             # Frame rate (fps)
             bitrate, aspect_ratio, codec_name, channels, encoder = self.get_info(
@@ -65,7 +68,7 @@ class SA:
             total_area = 0
             duration = 0
 
-            print(f"{DCYAN}Working on it{RESET}")
+            print(f"{fcl.DCYAN_FG}Working on it{RESET}")
             while True:
                 ret, frame = cap.read()
 
@@ -91,15 +94,17 @@ class SA:
             cv2.destroyAllWindows()
 
             # Print results
-            # print(f"Size {DGREEN}{size}{RESET}Kb")
-            print(f"Channels: {DGREEN}{channels}{RESET}")
-            print(f"Encoder {DGREEN}{encoder}{RESET}")
-            print(f"Bitrate {DGREEN}{bitrate}{RESET}")
-            print(f"Aspect ratio{DGREEN}{aspect_ratio}{RESET}")
-            print(f"Codec name {DGREEN}{codec_name}{RESET}")
-            print(f"Total Frames: {DGREEN}{frame_count}{RESET}")
-            print(f"Average Frame Area: {DGREEN}{total_area / frame_count}{RESET}")
-            print(f"Duration: {DGREEN}{duration:.2f}{RESET} seconds")
+            # print(f"Size {fcl.BGREEN_FG}{size}{RESET}Kb")
+            print(f"Channels: {fcl.BGREEN_FG}{channels}{RESET}")
+            print(f"Encoder {fcl.BGREEN_FG}{encoder}{RESET}")
+            print(f"Bitrate {fcl.BGREEN_FG}{bitrate}{RESET}")
+            print(f"Aspect ratio{fcl.BGREEN_FG}{aspect_ratio}{RESET}")
+            print(f"Codec name {fcl.BGREEN_FG}{codec_name}{RESET}")
+            print(f"Total Frames: {fcl.BGREEN_FG}{frame_count}{RESET}")
+            print(
+                f"Average Frame Area: {fcl.BGREEN_FG}{total_area / frame_count}{RESET}"
+            )
+            print(f"Duration: {fcl.BGREEN_FG}{duration:.2f}{RESET} seconds")
             return frame_count, total_area, duration
         except KeyboardInterrupt:
             print("\nExiting")

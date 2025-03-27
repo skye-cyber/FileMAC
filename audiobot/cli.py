@@ -6,10 +6,13 @@ import os
 
 import magic
 from ._utils import transcribe_audio
-from utils.colors import CYAN, RESET, GREEN, DBLUE, YELLOW, BLUE
+from utils.colors import foreground
 from .processor import VideoProcessor, AudioProcessor
 from .logging_config import setup_colored_logger
 from .config import Config
+
+fcl = foreground()
+RESET = fcl.RESET
 
 Clogger = setup_colored_logger()
 
@@ -39,7 +42,7 @@ class Processor:
     def mono_processor(self):
         try:
             file_type = self.mime.from_file(self.args.file)
-            Clogger.info(f"{DBLUE}Detected file type: {file_type}{RESET}")
+            Clogger.info(f"{fcl.BLUE_FG_FG}Detected file type: {file_type}{RESET}")
             if file_type.startswith("audio"):
                 if self.args.transcribe:
                     transcribe_audio(self.args.file)
@@ -71,7 +74,9 @@ class Processor:
                 for file in files:
                     full_path = os.path.join(root, file)
                     file_type = self.mime.from_file(full_path)
-                    Clogger.info(f"{DBLUE}Detected file type: {file_type}{RESET}")
+                    Clogger.info(
+                        f"{fcl.Bfcl.BLUE_FG_FG}Detected file type: {file_type}{RESET}"
+                    )
                     if file_type.startswith("audio"):
                         if self.args.transcribe:
                             transcribe_audio(full_path)
@@ -108,7 +113,8 @@ def Argsmain(argsv=None):
             [--audio_effect]",
     )
     parser.add_argument(
-        "file", help=f"{CYAN}The input audio, video file, or directory.{RESET}"
+        "file",
+        help=f"{fcl.fcl.CYAN_FG_FG}The input audio, video file, or directory.{RESET}",
     )
     parser.add_argument(
         "-e",
@@ -127,12 +133,12 @@ def Argsmain(argsv=None):
             "distortion",
             "denoise",
         ],
-        help=f"{CYAN}The voice effect to apply.{RESET}",
+        help=f"{fcl.CYAN_FG}The voice effect to apply.{RESET}",
     )
     parser.add_argument(
         "--cutoff",
         type=int,
-        help=f"Cutoff frequency for denoise operation, defualt={YELLOW}200{RESET}",
+        help=f"Cutoff frequency for denoise operation, defualt={fcl.YELLOW_FG}200{RESET}",
     )
     parser.add_argument(
         "-N",
@@ -140,34 +146,34 @@ def Argsmain(argsv=None):
         choices=["low", "high", "both"],
         type=str,
         default="low",
-        help=f"Specifies the type of noise to remove choices:[{BLUE}low, high, both{RESET}] defualt={YELLOW}low{RESET}",
+        help=f"Specifies the type of noise to remove choices:[{fcl.BLUE_FG}low, high, both{RESET}] defualt={fcl.YELLOW_FG}low{RESET}",
     )
     parser.add_argument(
         "-o",
         "--output",
-        help=f"{CYAN}Output directory for modified files.{RESET}",
+        help=f"{fcl.CYAN_FG}Output directory for modified files.{RESET}",
     )
     parser.add_argument(
         "-v",
         "--verbose",
         action="store_true",
-        help=f"{CYAN}Increase output verbosity.{RESET}",
+        help=f"{fcl.CYAN_FG}Increase output verbosity.{RESET}",
     )
     parser.add_argument(
         "-b",
         "--batch",
         action="store_true",
-        help=f"{CYAN}Batch process all files in a directory.{RESET}",
+        help=f"{fcl.CYAN_FG}Batch process all files in a directory.{RESET}",
     )
     parser.add_argument(
         "--visualize",
         action="store_true",
-        help=f"{CYAN}Visualize the audio waveform before and after modification.{RESET}",
+        help=f"{fcl.CYAN_FG}Visualize the audio waveform before and after modification.{RESET}",
     )
     parser.add_argument(
         "--transcribe",
         action="store_true",
-        help=f"{CYAN}Transcribe the audio content before applying the effect.{RESET}",
+        help=f"{fcl.CYAN_FG}Transcribe the audio content before applying the effect.{RESET}",
     )
     parser.add_argument("--audio_effect", action="store_true", help=argparse.SUPPRESS)
 

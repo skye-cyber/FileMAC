@@ -3,7 +3,10 @@ from PIL import Image
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from pathlib import Path
-from utils.colors import GREEN, YELLOW, RESET, BLUE, RED, BWHITE
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class ImageToPdfConverter:
@@ -150,19 +153,27 @@ class ImageToPdfConverter:
                 output_pdf_path = self.create_pdf_from_images(
                     self.image_list, self.output_pdf_path
                 )
-                print(f"{GREEN}PDF created successfully from directory!{RESET}")
-                print(f"{BWHITE}Output:{RESET} {BLUE}{output_pdf_path}{RESET}")
+                print(f"{fcl.GREEN_FG}PDF created successfully from directory!{RESET}")
+                print(
+                    f"{fcl.GREEN_FG}Output:{RESET} {fcl.BLUE_FG}{output_pdf_path}{RESET}"
+                )
             else:
-                print(f"{RED}One or more images in the list do not exist.{RESET}")
+                print(
+                    f"{fcl.RED_FG}One or more images in the list do not exist.{RESET}"
+                )
         elif self.input_dir and self.output_pdf_path:
             if os.path.exists(self.input_dir):
                 output_pdf_path = self.convert_images_in_directory(
                     self.input_dir, self.output_pdf_path
                 )
-                print(f"{GREEN}PDF created successfully from directory!{RESET}")
-                print(f"{BWHITE}Output:{RESET} {BLUE}{output_pdf_path}{RESET}")
+                print(f"{fcl.GREEN_FG}PDF created successfully from directory!{RESET}")
+                print(
+                    f"{fcl.BWHITE_FG}Output:{RESET} {fcl.BLUE_FG}{output_pdf_path}{RESET}"
+                )
             else:
-                print(f"Directory {YELLOW}{self.input_dir}{RESET} does not exist.")
+                print(
+                    f"Directory {fcl.YELLOW_FG}{self.input_dir}{RESET} does not exist."
+                )
         else:
             print(
                 "Please provide either image_list and output_pdf_path or input_dir and output_pdf_path during object instantiation."

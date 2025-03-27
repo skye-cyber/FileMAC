@@ -1,18 +1,21 @@
 import logging
-from utils.colors import DBLUE, GREEN, YELLOW, RED, MAGENTA, RESET, WHITE
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class CustomFormatter(logging.Formatter):
     COLORS = {
-        logging.DEBUG: DBLUE,
-        logging.INFO: GREEN,
-        logging.WARNING: YELLOW,
-        logging.ERROR: RED,
-        logging.CRITICAL: MAGENTA,
+        logging.DEBUG: fcl.BBLUE_FG,
+        logging.INFO: fcl.GREEN_FG,
+        logging.WARNING: fcl.YELLOW_FG,
+        logging.ERROR: fcl.RED_FG,
+        logging.CRITICAL: fcl.MAGENTA_FG,
     }
 
     def format(self, record):
-        log_color = self.COLORS.get(record.levelno, WHITE)
+        log_color = self.COLORS.get(record.levelno, fcl.WHITE_FG)
         log_message = super().format(record)
         return f"{log_color}{log_message}{RESET}"
 

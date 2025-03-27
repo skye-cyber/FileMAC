@@ -3,7 +3,11 @@
 
 import PyPDF2
 
-from utils.colors import BLUE, BWHITE, DBLUE, DCYAN, DMAGENTA, DRED, RED, RESET
+from utils.colors import foreground, background
+
+fcl = foreground()
+bcl = background()
+RESET = fcl.RESET
 
 
 class Extractor:
@@ -47,22 +51,26 @@ class Extractor:
                 self.stop = len(reader.pages)
 
             pdf_writer = PyPDF2.PdfWriter()
-            print(f"{DBLUE}[🤖]{BLUE} Extracting:{RESET}")
+            print(f"{fcl.BBLUE_FG}[🤖]{fcl.BBLUE_FG} Extracting:{RESET}")
             for page_num in range(self.start, self.stop):
-                print(f"{DBLUE}[📄]{RESET}{DCYAN}Page {page_num + 1}{RESET}")
+                print(
+                    f"{fcl.BBLUE_FG}[📄]{RESET}{fcl.DCYAN_FG}Page {page_num + 1}{RESET}"
+                )
                 page = reader.pages[page_num]
                 pdf_writer.add_page(page)
 
             # Write the merged PDF to the output file
             with open(self.outf, "wb") as out_file:
                 pdf_writer.write(out_file)
-            print(f"{DBLUE}[+]{RESET} {BWHITE}File {DMAGENTA}{self.outf}{RESET}")
+            print(
+                f"{fcl.BBLUE_FG}[+]{RESET} {fcl.BWHITE_FG}File {fcl.BMAGENTA_FG}{self.outf}{RESET}"
+            )
             return self.outf
         except KeyboardInterrupt:
             print("\n [!] Quit")
             exit(2)
         except FileNotFoundError as e:
-            print(f"{DRED}[-] {RED}{e}{RESET}")
+            print(f"[{bcl.BRED_FG}-{RESET}] {fcl.RED_FG}{e}{RESET}")
         except Exception as e:
             print(e)
             # raise

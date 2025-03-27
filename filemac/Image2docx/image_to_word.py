@@ -6,7 +6,10 @@ from docx import Document
 from docx.shared import Inches, Mm
 from pathlib import Path
 from utils.formats import SUPPORTED_IMAGE_FORMATS
-from utils.colors import GREEN, YELLOW, RESET, BLUE, RED, MAGENTA, CYAN
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class ImageToDocxConverter:
@@ -83,11 +86,11 @@ class ImageToDocxConverter:
                     valid_images.append(image_path)
                 else:
                     print(
-                        f"{MAGENTA}Skipping unsupported image format: {CYAN}{image_path}{RESET}"
+                        f"{fcl.MAGENTA_FG}Skipping unsupported image format: {fcl.CYAN_FG}{image_path}{RESET}"
                     )
             except Exception as e:
                 print(
-                    f"{RED}Error processing image {YELLOW}{image_path} - {RED} {e}{RESET}"
+                    f"{fcl.RED_FG}Error processing image {fcl.YELLOW_FG}{image_path} - {fcl.RED_FG} {e}{RESET}"
                 )
         return valid_images
 
@@ -119,7 +122,7 @@ class ImageToDocxConverter:
                     self.document.add_page_break()
             except Exception as e:
                 print(
-                    f"{RED}Error processing image {YELLOW}{image_path}:{RED} {e}{RESET}"
+                    f"{fcl.RED_FG}Error processing image {fcl.YELLOW_FG}{image_path}:{fcl.RED_FG} {e}{RESET}"
                 )
 
         docx_file_path = (
@@ -176,7 +179,9 @@ class ImageToDocxConverter:
                 )
 
         if docx_file_path:
-            print(f"{GREEN}Successfully created DOCX: {BLUE}{docx_file_path}{RESET}")
+            print(
+                f"{fcl.GREEN_RG}Successfully created DOCX: {fcl.BLUE_FG}{docx_file_path}{RESET}"
+            )
 
         return docx_file_path
 

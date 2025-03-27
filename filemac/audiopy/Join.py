@@ -5,16 +5,11 @@ import sys
 # import shutil
 from pydub import AudioSegment
 from rich.progress import Progress
-from utils.colors import (
-    BLUE,
-    DBLUE,
-    DGREEN,
-    DYELLOW,
-    RED,
-    RESET,
-    YELLOW,
-)
+from utils.colors import foreground
 from utils.formats import SUPPORTED_AUDIO_FORMATS_DIRECT
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class JoinAudios:
@@ -31,7 +26,7 @@ class JoinAudios:
         elif os.path.isdir(self.obj):
             self.obj = self.obj
             self.isdir = True
-            print(f"Join {DBLUE}{len(os.listdir(self.obj))}{RESET} files")
+            print(f"Join {fcl.BBLUE_FG}{len(os.listdir(self.obj))}{RESET} files")
 
             for file in list(os.listdir(self.obj)):
                 path = os.path.join(self.obj, file)
@@ -65,13 +60,13 @@ class JoinAudios:
                 print(os.path.splitext(self.files[0]))
             else:
                 masterfile = self.masterfile
-            print(f"{YELLOW}Master file = {BLUE}{masterfile}{RESET}")
+            print(f"{fcl.YELLOW_FG}Master file = {fcl.BLUE_FG}{masterfile}{RESET}")
 
             self.ext = os.path.splitext(masterfile)[-1]
             _format = self.ext if self.ext in SUPPORTED_AUDIO_FORMATS_DIRECT else "ogg"
-            print(f"{DYELLOW}Format = {DBLUE}{_format}{RESET}")
+            print(f"{fcl.BYELLOW_FG}Format = {fcl.BBLUE_FG}{_format}{RESET}")
 
-            print(f"{DBLUE}Create a master file{RESET}")
+            print(f"{fcl.BBLUE_FG}Create a master file{RESET}")
             # Create a list to store files
             ogg_files = []
 
@@ -112,10 +107,10 @@ class JoinAudios:
 
             # Export the combined ogg to new mp3 file or ogg file
             combined_ogg.export(masterfile, format=_format)
-            print(f"{DGREEN}Master file:Ok🤏")
+            print(f"{fcl.BGREEN_FG}Master file:Ok🤏")
             """
             if self.isdir:
-                query = input(f"{DBLUE}Remove the directory ?(y/n)").lower() in ('y', 'yes')
+                query = input(f"{BBLUE}Remove the directory ?(y/n)").lower() in ('y', 'yes')
                 if query:
                     shutil.rmtree(self.obj)
             """
@@ -124,7 +119,7 @@ class JoinAudios:
             sys.exit(1)
         except Exception as e:
             raise
-            print(f"{RED}{e}{RESET}")
+            print(f"{fcl.RED_FG}{e}{RESET}")
 
 
 if __name__ == "__main__":

@@ -7,15 +7,10 @@ from tqdm import tqdm
 from PIL import Image
 import cv2
 from utils.formats import SUPPORTED_IMAGE_FORMATS
-from utils.colors import (
-    BWHITE,
-    DGREEN,
-    DMAGENTA,
-    DYELLOW,
-    ICYAN,
-    RED,
-    RESET,
-)
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class ImageConverter:
@@ -64,15 +59,15 @@ class ImageConverter:
                     print("Unsupported output format")
                     sys.exit(1)
                 """Load the image using OpenCV: """
-                print(f"{DYELLOW}Reading input image..{RESET}")
+                print(f"{fcl.BYELLOW_FG}Reading input image..{RESET}")
                 img = cv2.imread(file)
                 """Convert the OpenCV image to a PIL image: """
-                print(f"{DMAGENTA}Converting to PIL image{RESET}")
+                print(f"{fcl.BMAGENTA_FG}Converting to PIL image{RESET}")
                 pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
                 """Save the PIL image to a different format: """
                 print(f"\033[1;36mSaving image as {output_filename}{RESET}")
                 pil_img.save(output_filename, out_f)
-                print(f"{DGREEN}Done ✅{RESET}")
+                print(f"{fcl.BGREEN_FG}Done ✅{RESET}")
 
             return output_filename
         except KeyboardInterrupt:
@@ -82,7 +77,7 @@ class ImageConverter:
             print("Assertion failed.")
         except KeyError:
             print(
-                f"{RED}ERROR:\tPending Implementation for{ICYAN} {out_f} {BWHITE}format{RESET}"
+                f"{fcl.RED_FG}ERROR:\tPending Implementation for{fcl.ICYAN_FG} {out_f} {fcl.BWHITE_FG}format{RESET}"
             )
         except Exception as e:
-            print(f"{RED}{e}{RESET}")
+            print(f"{fcl.RED_FG}{e}{RESET}")

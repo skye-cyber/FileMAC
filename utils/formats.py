@@ -1,9 +1,9 @@
 # multimedia_cli/formats.py
 from utils.colors import (
     CYAN,
-    DBLUE,
-    DMAGENTA,
-    DYELLOW,
+    BBLUE,
+    BMAGENTA,
+    BYELLOW,
     FCYAN,
     FYELLOW,
     IMAGENTA,
@@ -12,17 +12,17 @@ from utils.colors import (
 
 SUPPORTED_DOC_FORMATS = f"""
 |---------------------------------------------------------------------------
-|{DBLUE}Input format{RESET}                    |{DBLUE}Output format{RESET}                             |
+|{BBLUE}Input format{RESET}                    |{BBLUE}Output format{RESET}                             |
 |________________________________|__________________________________________|
-|   xlsx    {DYELLOW}-------------------->{RESET}|csv txt doc/docx db(sql)                  |
+|   xlsx    {BYELLOW}-------------------->{RESET}|csv txt doc/docx db(sql)                  |
 |                                |                                          |
-|   doc/docx{DYELLOW}-------------------->{RESET}|txt pdf ppt/pptx audio(ogg)               |
+|   doc/docx{BYELLOW}-------------------->{RESET}|txt pdf ppt/pptx audio(ogg)               |
 |                                |                                          |
-|   txt     {DYELLOW}-------------------->{RESET}|pdf docx/doc audio(ogg)                   |
+|   txt     {BYELLOW}-------------------->{RESET}|pdf docx/doc audio(ogg)                   |
 |                                |                                          |
-|   pdf     {DYELLOW}-------------------->{RESET}|doc/docx txt audio(ogg)                   |
+|   pdf     {BYELLOW}-------------------->{RESET}|doc/docx txt audio(ogg)                   |
 |                                |                                          |
-|   pptx/ppt{DYELLOW}-------------------->{RESET}|doc/docx                                  |
+|   pptx/ppt{BYELLOW}-------------------->{RESET}|doc/docx                                  |
 |                                                                           |
 |___________________________________________________________________________|
 """
@@ -57,20 +57,20 @@ SUPPORTED_AUDIO_FORMATS_DIRECT = [
 ]  # Video
 SUPPORTED_AUDIO_FORMATS_SHOW = f"""
 |==============================|
-|  {DBLUE}Supported I/O formats {RESET}      |
+|  {BBLUE}Supported I/O formats {RESET}      |
 |==============================|
-|          {CYAN} wav {DYELLOW}               |
-|          {CYAN} mp3 {DYELLOW}               |
-|          {CYAN} ogg {DYELLOW}               |
-|          {CYAN} flv {DYELLOW}               |
-|          {CYAN} ogv {DYELLOW}               |
-|          {CYAN} mov {DYELLOW}               |
-|          {CYAN} webm {DYELLOW}              |
-|          {CYAN} aac {DYELLOW}-------------->|{IMAGENTA}Pending Implementation{RESET}{DYELLOW}
-|          {CYAN} bpf {DYELLOW}-------------->|{IMAGENTA}Pending Implementation{RESET}{DYELLOW}
-|          {CYAN} m4a {DYELLOW}               |
-|          {CYAN} raw {DYELLOW}               |
-|          {CYAN} aiff {DYELLOW}              |
+|          {CYAN} wav {BYELLOW}               |
+|          {CYAN} mp3 {BYELLOW}               |
+|          {CYAN} ogg {BYELLOW}               |
+|          {CYAN} flv {BYELLOW}               |
+|          {CYAN} ogv {BYELLOW}               |
+|          {CYAN} mov {BYELLOW}               |
+|          {CYAN} webm {BYELLOW}              |
+|          {CYAN} aac {BYELLOW}-------------->|{IMAGENTA}Pending Implementation{RESET}{BYELLOW}
+|          {CYAN} bpf {BYELLOW}-------------->|{IMAGENTA}Pending Implementation{RESET}{BYELLOW}
+|          {CYAN} m4a {BYELLOW}               |
+|          {CYAN} raw {BYELLOW}               |
+|          {CYAN} aiff {BYELLOW}              |
 --------------------------------
 
 """
@@ -99,17 +99,17 @@ Video_codecs = {
 }
 SUPPORTED_VIDEO_FORMATS_SHOW = f"""
 ,_______________________________________,
-|x| {DBLUE}Supported I/O formats{RESET}             |x|
-|x|-----------------------------------{DYELLOW}|x|
-|x|               {DMAGENTA} MP4 {DYELLOW}               |x|
-|x|               {DMAGENTA} AVI {DYELLOW}               |x|
-|x|               {DMAGENTA} OGV {DYELLOW}-------------->|x|{IMAGENTA}Pending Implementation{RESET}{DYELLOW}
-|x|               {DMAGENTA} WEBM{DYELLOW}               |x|
-|x|               {DMAGENTA} MOV {DYELLOW}               |x|
-|x|               {DMAGENTA} MKV {DYELLOW}               |x|
-|x|               {DMAGENTA} FLV {DYELLOW}               |x|
-|x|               {DMAGENTA} WMV {DYELLOW}-------------->|x|{IMAGENTA}Pending Implementation{RESET}{DYELLOW}
-|,|___________________________________|,|{DYELLOW}
+|x| {BBLUE}Supported I/O formats{RESET}             |x|
+|x|-----------------------------------{BYELLOW}|x|
+|x|               {BMAGENTA} MP4 {BYELLOW}               |x|
+|x|               {BMAGENTA} AVI {BYELLOW}               |x|
+|x|               {BMAGENTA} OGV {BYELLOW}-------------->|x|{IMAGENTA}Pending Implementation{RESET}{BYELLOW}
+|x|               {BMAGENTA} WEBM{BYELLOW}               |x|
+|x|               {BMAGENTA} MOV {BYELLOW}               |x|
+|x|               {BMAGENTA} MKV {BYELLOW}               |x|
+|x|               {BMAGENTA} FLV {BYELLOW}               |x|
+|x|               {BMAGENTA} WMV {BYELLOW}-------------->|x|{IMAGENTA}Pending Implementation{RESET}{BYELLOW}
+|,|___________________________________|,|{BYELLOW}
 """
 
 SUPPORTED_IMAGE_FORMATS = {
@@ -137,24 +137,24 @@ SUPPORTED_IMAGE_FORMATS = {
 
 SUPPORTED_IMAGE_FORMATS_SHOW = f"""
 __________________________________________
-|x|{DBLUE}Supported I/O formats{RESET}                |x|
-|x|_____________________________________{DYELLOW}|x|
-|x|               {DMAGENTA} JPEG {DYELLOW}                |x|
-|x|               {DMAGENTA} PNG  {DYELLOW}                 |x|
-|x|               {DMAGENTA} GIF  {DYELLOW}                 |x|
-|x|               {DMAGENTA} BMP  {DYELLOW}                 |x|
-|x|               {DMAGENTA} DIB  {DYELLOW}                 |x|
-|x|               {DMAGENTA} TIFF {DYELLOW}                 |x|
-|x|               {DMAGENTA} PIC  {DYELLOW}                 |x|
-|x|               {DMAGENTA} EXR  {FYELLOW}---------------->|x|{FCYAN} Pending Implementation{RESET}{DYELLOW}
-|x|               {DMAGENTA} PDF  {DYELLOW}                 |x|
-|x|               {DMAGENTA} WebP {DYELLOW}                 |x|
-|x|               {DMAGENTA} ICNS {DYELLOW}                 |x|
-|x|               {DMAGENTA} PSD  {FYELLOW}---------------->|x|{FCYAN} Pending Implementation{RESET}{DYELLOW}
-|x|               {DMAGENTA} SVG  {FYELLOW}---------------->|x|{FCYAN} Pending Implementation{RESET}{DYELLOW}
-|x|               {DMAGENTA} EPS  {DYELLOW}                 |x|
-|x|               {DMAGENTA} Postscript {FYELLOW}---------->|x|{FCYAN} Pending Implementation{RESET}{DYELLOW}
-|x|               {DMAGENTA} PICT {FYELLOW}---------------->|x|{FCYAN} Pending Implementation{RESET}{DYELLOW}
+|x|{BBLUE}Supported I/O formats{RESET}                |x|
+|x|_____________________________________{BYELLOW}|x|
+|x|               {BMAGENTA} JPEG {BYELLOW}                |x|
+|x|               {BMAGENTA} PNG  {BYELLOW}                 |x|
+|x|               {BMAGENTA} GIF  {BYELLOW}                 |x|
+|x|               {BMAGENTA} BMP  {BYELLOW}                 |x|
+|x|               {BMAGENTA} DIB  {BYELLOW}                 |x|
+|x|               {BMAGENTA} TIFF {BYELLOW}                 |x|
+|x|               {BMAGENTA} PIC  {BYELLOW}                 |x|
+|x|               {BMAGENTA} EXR  {FYELLOW}---------------->|x|{FCYAN} Pending Implementation{RESET}{BYELLOW}
+|x|               {BMAGENTA} PDF  {BYELLOW}                 |x|
+|x|               {BMAGENTA} WebP {BYELLOW}                 |x|
+|x|               {BMAGENTA} ICNS {BYELLOW}                 |x|
+|x|               {BMAGENTA} PSD  {FYELLOW}---------------->|x|{FCYAN} Pending Implementation{RESET}{BYELLOW}
+|x|               {BMAGENTA} SVG  {FYELLOW}---------------->|x|{FCYAN} Pending Implementation{RESET}{BYELLOW}
+|x|               {BMAGENTA} EPS  {BYELLOW}                 |x|
+|x|               {BMAGENTA} Postscript {FYELLOW}---------->|x|{FCYAN} Pending Implementation{RESET}{BYELLOW}
+|x|               {BMAGENTA} PICT {FYELLOW}---------------->|x|{FCYAN} Pending Implementation{RESET}{BYELLOW}
 |_|_____________________________________|x|
 """
 

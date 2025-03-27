@@ -10,22 +10,7 @@ from typing import List, Union
 from audiobot.cli import Argsmain
 from .imagepy.converter import ImageConverter
 
-from utils.colors import (
-    BLUE,
-    CYAN,
-    BWHITE,
-    DGREEN,
-    DCYAN,
-    YELLOW,
-    DYELLOW,
-    FBLUE,
-    FCYAN,
-    FMAGENTA,
-    FYELLOW,
-    MAGENTA,
-    RED,
-    RESET,
-)
+from utils.colors import foreground
 from utils.formats import (
     SUPPORTED_AUDIO_FORMATS_DIRECT,
     SUPPORTED_AUDIO_FORMATS_SHOW,
@@ -42,6 +27,10 @@ from .OCR.Extractor import ExtractText
 from .pdf.Page_Extractor import _entry
 from .Simple_v_Analyzer import SA
 from .videopy.pyVideo import VideoConverter
+
+fcl = foreground()
+RESET = fcl.RESET
+
 
 warnings_handler
 logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")
@@ -65,7 +54,9 @@ class _DIR_CONVERSION_:
             else [_isolate_]
         )
         if self._isolate_:
-            print(f"INFO\t {FMAGENTA}Isolate {DCYAN}{self._isolate_}{RESET}")
+            print(
+                f"INFO\t {fcl.FMAGENTA_FG}Isolate {fcl.DCYAN_FG}{self._isolate_}{RESET}"
+            )
 
     def _unbundle_dir_(self):
         if self._format_ in SUPPORTED_AUDIO_FORMATS_DIRECT:
@@ -78,8 +69,8 @@ class _DIR_CONVERSION_:
                     _path_ = os.path.join(root, file)
 
                     if _ext_ in self._ls_ and os.path.exists(_path_):
-                        print(f"INFO\t {FYELLOW}Parse {
-                            FBLUE}{_path_}{RESET}")
+                        print(f"INFO\t {fcl.FYELLOW_FG}Parse {
+                            fcl.Ffcl.BLUE_FG_FG}{_path_}{RESET}")
                         init = Eval(_path_, self._format_)
                         init.document_eval()
 
@@ -151,7 +142,7 @@ class Eval:
         elif self.outf.lower() == "db":
             conv.convert_xlsx_to_database()
         else:
-            print(f"{RED}Unsupported output format❌{RESET}")
+            print(f"{fcl.RED_FG}Unsupported output format❌{RESET}")
 
     def word(self, conv):
         if self.outf.lower() in ("txt", "text"):
@@ -164,7 +155,7 @@ class Eval:
             conv = FileSynthesis(self.file)
             conv.audiofy()
         else:
-            print(f"{RED}Unsupported output format❌{RESET}")
+            print(f"{fcl.RED_FG}Unsupported output format❌{RESET}")
 
     def text(self, conv):
         if self.outf.lower() == "pdf":
@@ -175,7 +166,7 @@ class Eval:
             conv = FileSynthesis(self.file)
             conv.audiofy()
         else:
-            print(f"{RED}Unsupported output format❌{RESET}")
+            print(f"{fcl.RED_FG}Unsupported output format❌{RESET}")
 
     def ppt(self, conv):
         if self.outf.lower() in ("doc", "docx", "word"):
@@ -190,7 +181,7 @@ class Eval:
             conv = FileSynthesis(self.file)
             conv.audiofy()
         else:
-            print(f"{RED}Unsupported output format❌{RESET}")
+            print(f"{fcl.RED_FG}Unsupported output format❌{RESET}")
 
     def pdf(self, conv):
         if self.outf.lower() in ("doc", "docx", "word"):
@@ -201,7 +192,7 @@ class Eval:
             conv = FileSynthesis(self.file)
             conv.audiofy()
         else:
-            print(f"{RED}Unsupported output format❌{RESET}")
+            print(f"{fcl.RED_FG}Unsupported output format❌{RESET}")
 
     def document_eval(self):
         self.doc_ls = ["docx", "doc"]
@@ -228,7 +219,7 @@ class Eval:
                     conv.convert_csv_to_xlsx()
 
             else:
-                print(f"{DYELLOW}Unsupported Conversion type❌{RESET}")
+                print(f"{fcl.fcl.BYELLOW_FG_FG}Unsupported Conversion type❌{RESET}")
                 pass
         except Exception as e:
             logger.error(e)
@@ -238,59 +229,59 @@ def Cmd_arg_Handler():
     """Define main functions to create commandline arguments for different operations"""
     parser = argparse.ArgumentParser(
         description="Filemac: A file management tool with audio effects. Supporting wide range of Multimedia Operations",
-        epilog=f"{BLUE}When using {MAGENTA}-SALI{BLUE} long images have maximum height that can be processed{RESET}",
+        epilog=f"{fcl.BLUE_FG}When using {fcl.MAGENTA_FG}-SALI{fcl.BLUE_FG} long images have maximum height that can be processed{RESET}",
     )
 
     parser.add_argument(
         "--convert_doc",
         nargs="+",
         help=f"Converter document file(s) to different format ie pdf_to_docx.\
-       example: {DYELLOW}filemac --convert_doc example.docx -tff pdf{RESET}",
+       example: {fcl.BYELLOW_FG}filemac --convert_doc example.docx -tff pdf{RESET}",
     )
 
     parser.add_argument(
         "--convert_audio",
         help=f"Convert audio file(s) to and from different format ie mp3 to wav\
-        example: {DYELLOW}filemac --convert_audio example.mp3 -tff wav{RESET}",
+        example: {fcl.BYELLOW_FG}filemac --convert_audio example.mp3 -tff wav{RESET}",
     )
 
     parser.add_argument(
         "--convert_video",
         help=f"Convert video file(s) to and from different format ie mp4 to mkv.\
-        example: {DYELLOW}filemac --convert_video example.mp4 -tf mkv{RESET}",
+        example: {fcl.BYELLOW_FG}filemac --convert_video example.mp4 -tf mkv{RESET}",
     )
 
     parser.add_argument(
         "--convert_image",
         help=f"Convert image file(s) to and from different format ie png to jpg.\
-        example: {DYELLOW}filemac --convert_image example.jpg -tf png{RESET}",
+        example: {fcl.BYELLOW_FG}filemac --convert_image example.jpg -tf png{RESET}",
     )
 
     parser.add_argument(
         "--convert_doc2image",
         help=f"Convert documents to images ie png to jpg.\
-        example: {DYELLOW}filemac --convert_doc2image example.pdf -tf png{RESET}",
+        example: {fcl.BYELLOW_FG}filemac --convert_doc2image example.pdf -tf png{RESET}",
     )
 
     parser.add_argument(
         "-xA",
         "--extract_audio",
         help=f"Extract audio from a video.\
-                        example: {DYELLOW}filemac -xA example.mp4 {RESET}",
+                        example: {fcl.BYELLOW_FG}filemac -xA example.mp4 {RESET}",
     )
 
     parser.add_argument(
         "-iso",
         "--isolate",
         help=f"Specify file types to isolate\
-                        for conversion, only works if directory is provided as input for the {FCYAN}convert_doc{RESET} argument example: {DYELLOW}filemac --convert_doc /home/user/Documents/ --isolate pdf -tf txt{RESET}",
+                        for conversion, only works if directory is provided as input for the {fcl.FCYAN_FG}convert_doc{RESET} argument example: {fcl.BYELLOW_FG}filemac --convert_doc /home/user/Documents/ --isolate pdf -tf txt{RESET}",
     )
 
     parser.add_argument(
         "-Av",
         "--Analyze_video",
         help=f"Analyze a given video.\
-        example: {DYELLOW}filemac --analyze_video example.mp4 {RESET}",
+        example: {fcl.BYELLOW_FG}filemac --analyze_video example.mp4 {RESET}",
     )
 
     parser.add_argument(
@@ -300,7 +291,7 @@ def Cmd_arg_Handler():
     parser.add_argument(
         "--resize_image",
         help=f"change size of an image compress/decompress \
-        example: {DYELLOW}filemac --resize_image example.png -tf_size 2mb -tf png {RESET}",
+        example: {fcl.BYELLOW_FG}filemac --resize_image example.png -tf_size 2mb -tf png {RESET}",
     )
 
     parser.add_argument(
@@ -313,36 +304,36 @@ def Cmd_arg_Handler():
         "-S",
         "--scan",
         help=f"Scan pdf file and extract text\
-                        example: {DYELLOW}filemac --scan example.pdf {RESET}",
+                        example: {fcl.BYELLOW_FG}filemac --scan example.pdf {RESET}",
     )
 
     parser.add_argument(
         "-doc2L",
         "--doc_long_image",
         help=f"Convert pdf file to long image\
-                        example: {DYELLOW}filemac --doc_long_image example.pdf {RESET}",
+                        example: {fcl.BYELLOW_FG}filemac --doc_long_image example.pdf {RESET}",
     )
 
     parser.add_argument(
         "-SA",
         "--scanAsImg",
         help=f"Convert pdf to image then extract text\
-                        example: {DYELLOW}filemac --scanAsImg example.pdf {RESET}",
+                        example: {fcl.BYELLOW_FG}filemac --scanAsImg example.pdf {RESET}",
     )
 
     parser.add_argument(
         "-SALI",
         "--scanAsLong_Image",
-        help=f"Scan {CYAN}[doc, docx, pdf]\
+        help=f"Scan {fcl.CYAN_FG}[doc, docx, pdf]\
         {RESET} file and extract text by first converting them to long image,-> very effective\
-                    example: {DYELLOW}filemac --scanAsImg example.pdf {RESET}",
+                    example: {fcl.BYELLOW_FG}filemac --scanAsImg example.pdf {RESET}",
     )
 
     parser.add_argument(
         "--OCR",
         nargs="+",
         help=f"Extract text from an image.\
-        example: {DYELLOW}filemac --OCR image.png{RESET}",
+        example: {fcl.BYELLOW_FG}filemac --OCR image.png{RESET}",
     )
 
     """Audio join  arguements"""
@@ -351,8 +342,8 @@ def Cmd_arg_Handler():
         "--AudioJoin",
         "-AJ",
         nargs="*",
-        help=f"{YELLOW}Join Audio files{RESET} into one master file.\
-            Provide a {BLUE}list{RESET} of audio file paths.  If no paths are provided, the program will still run.",
+        help=f"{fcl.YELLOW_FG}Join Audio files{RESET} into one master file.\
+            Provide a {fcl.BLUE_FG}list{RESET} of audio file paths.  If no paths are provided, the program will still run.",
         metavar="audio_file_path",
     )
 
@@ -361,7 +352,7 @@ def Cmd_arg_Handler():
         "-AT2W",
         "--Atext2word",
         help=f"Advanced Text to word conversion i.e:{
-            DYELLOW}filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}",
+            fcl.BYELLOW_FG}filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}",
     )
 
     # Add arguments that must accompany the "obj" command
@@ -369,13 +360,13 @@ def Cmd_arg_Handler():
         "--font_size",
         type=int,
         default=12,
-        help=f"Font size to be used default: {CYAN}12{RESET}",
+        help=f"Font size to be used default: {fcl.CYAN_FG}12{RESET}",
     )
     parser.add_argument(
         "--font_name",
         type=str,
         default="Times New Roman",
-        help=f"Font name default: {CYAN}Times New Roman{RESET}",
+        help=f"Font name default: {fcl.FCYAN_FG}Times New Roman{RESET}",
     )
 
     """Alternative sequence args, critical redundancy measure"""
@@ -384,7 +375,7 @@ def Cmd_arg_Handler():
         "--use_extras",
         action="store_true",
         help=f"Use alternative conversion method: Overides\
-                        default method i.e: {DYELLOW}filemac --convert_doc example.docx --use_extras -tf pdf{RESET}",
+                        default method i.e: {fcl.BYELLOW_FG}filemac --convert_doc example.docx --use_extras -tf pdf{RESET}",
     )
 
     """Pdf join arguements--> Accepts atleast 1 arguement"""
@@ -393,7 +384,7 @@ def Cmd_arg_Handler():
         "--order",
         type=str,
         default="AAB",
-        help=f"Order of pages when joining the pdf use: {DYELLOW}filemac\
+        help=f"Order of pages when joining the pdf use: {fcl.BYELLOW_FG}filemac\
                         -pj help for more details{RESET}",
     )
     parser.add_argument(
@@ -401,14 +392,14 @@ def Cmd_arg_Handler():
         "-p",
         nargs="+",
         help=f"Extract given pages from pdf: {
-            DYELLOW}filemac --extract_pages file.pdf 6 10{RESET} for one page: {DYELLOW}filemac --extract_pages file.pdf 5{RESET}",
+            fcl.BYELLOW_FG}filemac --extract_pages file.pdf 6 10{RESET} for one page: {fcl.BYELLOW_FG}filemac --extract_pages file.pdf 5{RESET}",
     )
 
     parser.add_argument(
         "--audio_effect",
         "-af",
         action="store_true",
-        help=f"Change audio voice/apply effects/reduce noise{DYELLOW}-MA --help for options{RESET}",
+        help=f"Change audio voice/apply effects/reduce noise{fcl.BYELLOW_FG}-MA --help for options{RESET}",
     )
     parser.add_argument(
         "--audio_help", action="store_true", help="Show help for audiobot"
@@ -417,14 +408,14 @@ def Cmd_arg_Handler():
         "--no-resume",
         action="store_false",
         dest="no_resume",
-        help=f"Don't Resume previous File operation {DYELLOW}filemac --convert_doc simpledir --no-resume{RESET}",
+        help=f"Don't Resume previous File operation {fcl.BYELLOW_FG}filemac --convert_doc simpledir --no-resume{RESET}",
     )
     parser.add_argument(
         "--t",
         "-threads",
         type=int,
         default=3,
-        help=f"Number of threads for text to speech  {DYELLOW}filemac --convert_doc simpledir --no-resume -t 2{RESET}",
+        help=f"Number of threads for text to speech  {fcl.BYELLOW_FG}filemac --convert_doc simpledir --no-resume -t 2{RESET}",
     )
     parser.add_argument(
         "-sep",
@@ -437,17 +428,17 @@ def Cmd_arg_Handler():
     parser.add_argument(
         "--image2pdf",
         nargs="+",
-        help=f"Convert Images to pdf. {BWHITE}Accepts image list or dir/folder{RESET} e.g `{DYELLOW}filemac --image2pdf image1 image2{RESET}`",
+        help=f"Convert Images to pdf. {fcl.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fcl.BYELLOW_FG}filemac --image2pdf image1 image2{RESET}`",
     )
     parser.add_argument(
         "--image2word",
         nargs="+",
-        help=f"Convert Images to word document. {BWHITE}Accepts image list or dir/folder{RESET} e.g `{DYELLOW}filemac --image2word image1 image2{RESET}`",
+        help=f"Convert Images to word document. {fcl.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fcl.BYELLOW_FG}filemac --image2word image1 image2{RESET}`",
     )
     parser.add_argument(
         "--image2gray",
         nargs="+",
-        help=f"Convert Images to grayscale. {BWHITE}Accepts image list or dir/folder{RESET} e.g `{DYELLOW}filemac --image2gray image1 image2{RESET}`",
+        help=f"Convert Images to grayscale. {fcl.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fcl.BYELLOW_FG}filemac --image2gray image1 image2{RESET}`",
     )
 
     parser.add_argument(
@@ -471,9 +462,6 @@ class argsOPMaper:
         self.SUPPORTED_DOC_FORMATS = SUPPORTED_DOC_FORMATS
         self.SUPPORTED_AUDIO_FORMATS_SHOW = SUPPORTED_AUDIO_FORMATS_SHOW
         self.SUPPORTED_AUDIO_FORMATS_DIRECT = SUPPORTED_AUDIO_FORMATS_DIRECT
-        self.RED = RED
-        self.CYAN = CYAN
-        self.RESET = RESET
         self.Argsmain = Argsmain
         self.VideoConverter = VideoConverter
         self.AudioConverter = AudioConverter
@@ -507,7 +495,7 @@ class argsOPMaper:
             sys.exit(1)
         if self.args.target_format is None:
             print(
-                f"{self.RED}Please provide output format specified by{self.CYAN} '-tf'{self.RESET}"
+                f"{fcl.RED_FG}Please provide output format specified by{fcl.CYAN_FG} '-tf'{RESET}"
             )
             sys.exit(1)
         conv = self.ImageConverter(self.args.convert_image, self.args.target_format)
@@ -661,7 +649,7 @@ class argsOPMaper:
         if self.args.version:
             version = "1.1.7"
 
-            return print(f"{BLUE}filemac: V-{DGREEN}{version}{RESET}")
+            return print(f"{fcl.BLUE_FG}filemac: V-{fcl.BGREEN_FG}{version}{RESET}")
         return
 
     def process_target(self):

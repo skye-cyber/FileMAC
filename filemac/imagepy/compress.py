@@ -3,7 +3,10 @@ import os
 import sys
 import logging
 import logging.handlers
-from utils.colors import DYELLOW, RESET, YELLOW, DGREEN, DMAGENTA, BLUE, RED
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")
 logger = logging.getLogger(__name__)
@@ -24,7 +27,7 @@ class Compress_Size:
             original_image = Image.open(input_image_path)
             original_size = original_image.size
             size = os.path.getsize(input_image_path)
-            print(f"Original image size {YELLOW}{size/1000_000:.2f}MiB{RESET}")
+            print(f"Original image size {fcl.YELLOW_FG}{size/1000_000:.2f}MiB{RESET}")
 
             # Calculate the aspect ratio of the original image
             aspect_ratio = original_size[0] / original_size[1]
@@ -36,20 +39,20 @@ class Compress_Size:
             elif target_size[-2:].lower() == "kb":
                 target_size_bytes = tz * 1024
             else:
-                logger.warning(f"Invalid units. Please use either {DMAGENTA}'MB'{RESET}\
-        or {DMAGENTA}'KB'{RESET}")
+                logger.warning(f"Invalid units. Please use either {fcl.BMAGENTA_FG}'MB'{RESET}\
+        or {fcl.BMAGENTA_FG}'KB'{RESET}")
 
             # Calculate the new dimensions based on the target size
             new_width, new_height = Compress_Size.calculate_new_dimensions(
                 original_size, aspect_ratio, target_size_bytes
             )
-            print(f"{BLUE}Processing ..{RESET}")
+            print(f"{fcl.BLUE_FG}Processing ..{RESET}")
             resized_image = original_image.resize((new_width, new_height))
             resized_image.save(output_image_path, optimize=True, format="png")
             t_size = os.path.getsize(output_image_path) / 1000_000
-            print(f"{DGREEN}Ok{RESET}")
+            print(f"{fcl.BGREEN_FG}Ok{RESET}")
             print(
-                f"Image resized to {DYELLOW}{t_size:.2f}{RESET} and saved to {DYELLOW}{output_image_path}"
+                f"Image resized to {fcl.BYELLOW_FG}{t_size:.2f}{RESET} and saved to {fcl.BYELLOW_FG}{output_image_path}"
             )
         except KeyboardInterrupt:
             print("\nQuit⏹️")
@@ -57,7 +60,7 @@ class Compress_Size:
         except KeyError:
             print("KeyError")
         except Exception as e:
-            print(f"{RED}{e}{RESET}")
+            print(f"{fcl.RED_FG}{e}{RESET}")
 
     def calculate_new_dimensions(original_size, aspect_ratio, target_size_bytes):
         try:
@@ -77,7 +80,7 @@ class Compress_Size:
         except KeyError:
             print("KeyError")
         except Exception as e:
-            print(f"{RED}{e}{RESET}")
+            print(f"{fcl.RED_FG}{e}{RESET}")
 
 
 if __name__ == "__main__":

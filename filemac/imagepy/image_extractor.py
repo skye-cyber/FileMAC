@@ -1,10 +1,9 @@
-import os
 import sys
 import fitz  # PyMuPDF for PDF
 from docx import Document
 from PIL import Image
 from io import BytesIO
-from typing import List, Optional
+from typing import List
 from pathlib import Path
 
 

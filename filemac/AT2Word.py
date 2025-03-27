@@ -3,7 +3,10 @@
 from docx import Document
 from docx.shared import Pt, RGBColor
 
-from utils.colors import BLUE, BWHITE, CYAN, DCYAN, RESET, YELLOW, MAGENTA
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class AdvancedT2word:
@@ -44,8 +47,8 @@ class AdvancedT2word:
         Set body font to fstyle and font size to fsize.
         """
 
-        print(f"{BWHITE}Set Font: {CYAN}{self.fsize}{RESET}")
-        print(f"{BWHITE}Set Style: {CYAN}{self.fstyle}{RESET}")
+        print(f"{fcl.BWHITE_FG}Set Font: {fcl.CYAN_FG}{self.fsize}{RESET}")
+        print(f"{fcl.BWHITE_FG}Set Style: {fcl.CYAN_FG}{self.fstyle}{RESET}")
         # Create a new Document
         doc = Document()
 
@@ -72,7 +75,7 @@ class AdvancedT2word:
 
         for i, line in enumerate(lines):
             print(
-                f"{BWHITE}Line: {DCYAN}{i}{YELLOW} of {BLUE}{len(lines)}{RESET}",
+                f"{fcl.BWHITE_FG}Line: {fcl.DCYAN_FG}{i}{fcl.YELLOW_FG} of {fcl.BLUE_FG}{len(lines)}{RESET}",
                 end="\r",
             )
             # Determine heading level or body text
@@ -98,7 +101,7 @@ class AdvancedT2word:
         print("\n")
         doc.save(self.out_obj)
         print(
-            f"{BWHITE}Text file converted to Word document: {MAGENTA}{self.out_obj}{RESET}"
+            f"{fcl.BWHITE_FG}Text file converted to Word document: {fcl.MAGENTA_FG}{self.out_obj}{RESET}"
         )
 
 

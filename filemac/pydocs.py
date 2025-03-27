@@ -20,26 +20,11 @@ from rich.progress import Progress
 from tqdm import tqdm
 
 # from pathlib import Path
-from utils.colors import (
-    BLUE,
-    BWHITE,
-    CYAN,
-    DBLUE,
-    DCYAN,
-    DGREEN,
-    DMAGENTA,
-    DRED,
-    DYELLOW,
-    FCYAN,
-    FMAGENTA,
-    GREEN,
-    ICYAN,
-    IGREEN,
-    MAGENTA,
-    RED,
-    RESET,
-    YELLOW,
-)
+from utils.colors import foreground, background
+
+fcl = foreground()
+bcl = background()
+RESET = fcl.RESET
 
 DEFAULT_SEPARATOR = "\n"
 
@@ -105,15 +90,17 @@ class DocConverter:
             try:
                 if os.name == "posix":  # Check if running on Linux
                     print(
-                        f"{BLUE}Converting: {RESET}{word_file} {BLUE}to {RESET}{pdf_file}"
+                        f"{fcl.BLUE_FG}Converting: {RESET}{word_file} {fcl.BLUE_FG}to {RESET}{pdf_file}"
                     )
                     # Use subprocess to run the dpkg and grep commands
                     result = subprocess.run(
                         ["dpkg", "-l", "libreoffice"], stdout=subprocess.PIPE, text=True
                     )
                     if result.returncode != 0:
-                        logger.exception(f"{RED}Libreoffice not found !{RESET}")
-                        print(f"{CYAN}Initiating critical redundacy measure !{RESET}")
+                        logger.exception(f"{fcl.RED_FG}Libreoffice not found !{RESET}")
+                        print(
+                            f"{fcl.CYAN_FG}Initiating critical redundacy measure !{RESET}"
+                        )
                         self.word2pdf_extra(word_file)
                     subprocess.run(
                         [
@@ -127,7 +114,7 @@ class DocConverter:
                     )
 
                     print(
-                        f"{DMAGENTA} Successfully converted {word_file} to {pdf_file}{RESET}"
+                        f"{fcl.BMAGENTA_FG} Successfully converted {word_file} to {pdf_file}{RESET}"
                     )
                     return pdf_file
 
@@ -144,7 +131,7 @@ class DocConverter:
         for file in obj:
             file = os.path.abspath(file)
             if file.split(".")[-1] not in ("doc", "docx"):
-                logger.error(f"{RED}File is not a word file{RESET}")
+                logger.error(f"{fcl.RED_FG}File is not a word file{RESET}")
                 sys.exit(1)
             pdf_file = os.path.splitext(file)[0] + ".pdf" if outf is None else outf
             try:
@@ -152,16 +139,16 @@ class DocConverter:
                     print(f"The file {obj} does not exist or is not a valid file.")
                     sys.exit("Exit!")
                 logger.info(
-                    f"{BLUE}Converting: {RESET}{file} {BLUE}to {RESET}{pdf_file}"
+                    f"{fcl.BLUE_FG}Converting: {RESET}{file} {fcl.BLUE_FG}to {RESET}{pdf_file}"
                 )
                 from docx2pdf import convert
 
                 convert(file, pdf_file)
-                print(f"{GREEN}Conversion ✅{RESET}")
+                print(f"{fcl.GREEN_FG}Conversion ✅{RESET}")
                 sys.exit(0)
             except ImportError:
                 logger.warning(
-                    f"{RED}docx2pdf Not found. {CYAN}Run pip install docx2pdf{RESET}"
+                    f"{fcl.RED_FG}docx2pdf Not found. {fcl.CYAN_FG_FG}Run pip install docx2pdf{RESET}"
                 )
             except Exception as e:
                 raise
@@ -179,16 +166,18 @@ class DocConverter:
             )
 
             try:
-                print(f"{DYELLOW}Parse the pdf document..{RESET}")
+                print(f"{fcl.BYELLOW_FG}Parse the pdf document..{RESET}")
                 parse(pdf_file, word_file, start=0, end=None)
 
-                logger.info(f"{MAGENTA}New file is {CYAN}{word_file}{RESET}")
-                logger.info(f"{DGREEN}Success👨‍💻✅{RESET}")
+                logger.info(
+                    f"{fcl.MAGENTA_FG}New file is {fcl.fcl.CYAN_FG_FG}{word_file}{RESET}"
+                )
+                logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
             except KeyboardInterrupt:
                 print("\nQuit❕")
                 sys.exit(1)
             except Exception as e:
-                logger.info(f"{DRED}All conversion attempts have failed: \
+                logger.info(f"{bcl.RED_BG}All conversion attempts have failed: \
 {e}{RESET}")
 
     def txt_to_pdf(self):
@@ -209,25 +198,25 @@ class DocConverter:
                 text_contents = file.readlines()
 
             # Initialize the PDF document
-            logger.info(f"{DYELLOW}Initialize the PDF document{RESET}")
+            logger.info(f"{fcl.BYELLOW_FG}Initialize the PDF document{RESET}")
             doc = SimpleDocTemplate(_pdf_, pagesize=letter)
 
             # Create a story to hold the elements of the PDF
             logger.info(
-                f"{DYELLOW}Create a story to hold the elements of the PDF{RESET}"
+                f"{fcl.BYELLOW_FG}Create a story to hold the elements of the PDF{RESET}"
             )
             story = []
 
             # Iterate through each line in the input .txt file and add it to the PDF
             logger.info(
-                f"{DYELLOW}Iterate through each line in the input .txt file and add it to the PDF{RESET}"
+                f"{fcl.BYELLOW_FG}Iterate through each line in the input .txt file and add it to the PDF{RESET}"
             )
             _line_count_ = 0
             try:
                 for line in text_contents:
                     _line_count_ += 1
                     logger.info(
-                        f"Lines {DBLUE}{_line_count_}{RESET}/{len(text_contents)}"
+                        f"Lines {fcl.BBLUE_FG}{_line_count_}{RESET}/{len(text_contents)}"
                     )
                     story.append(Paragraph(line.strip(), style="normalText"))
 
@@ -238,10 +227,12 @@ class DocConverter:
                 logger.error(e)
                 pass
             # Build and write the PDF document
-            logger.info(f"{DYELLOW}Build and write the PDF document{RESET}")
+            logger.info(f"{fcl.BYELLOW_FG}Build and write the PDF document{RESET}")
             doc.build(story)
-            logger.info(f"{MAGENTA}New file is {CYAN}{_pdf_}{RESET}")
-            print(f"\n{DGREEN}Success👨‍💻✅{RESET}")
+            logger.info(
+                f"{fcl.MAGENTA_FG}New file is {fcl.fcl.CYAN_FG_FG}{_pdf_}{RESET}"
+            )
+            print(f"\n{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
 
     def word_to_pptx(self):
         ###############################################################################
@@ -272,22 +263,25 @@ class DocConverter:
 
             try:
                 # Load the Word document
-                print(f"{DYELLOW}Load the Word document..{RESET}")
+                print(f"{fcl.BYELLOW_FG}Load the Word document..{RESET}")
                 doc = Document(word_file)
 
                 # Create a new PowerPoint presentation
-                print(f"{DYELLOW}Create a new PowerPoint presentation..{RESET}")
+                print(f"{fcl.BYELLOW_FG}Create a new PowerPoint presentation..{RESET}")
                 prs = Presentation()
 
                 # Iterate through each paragraph in the Word document
                 print(
-                    f"{DGREEN}Populating pptx slides with {DYELLOW}{len(doc.paragraphs)}{DGREEN} entries..{RESET}"
+                    f"{fcl.BGREEN_FG}Populating pptx slides with {fcl.BYELLOW_FG}{len(doc.paragraphs)}{fcl.BGREEN_FG} entries..{RESET}"
                 )
                 count = 0
                 for paragraph in doc.paragraphs:
                     count += 1
                     perc = (count / len(doc.paragraphs)) * 100
-                    print(f"{DMAGENTA}Progress:: {DCYAN}{perc:.2f}%{RESET}", end="\r")
+                    print(
+                        f"{fcl.BMAGENTA_FG}Progress:: {fcl.BCYAN_FG}{perc:.2f}%{RESET}",
+                        end="\r",
+                    )
                     # Create a new slide in the PowerPoint presentation
                     slide = prs.slides.add_slide(prs.slide_layouts[1])
 
@@ -296,8 +290,10 @@ class DocConverter:
 
                 # Save the PowerPoint presentation
                 prs.save(pptx_file)
-                logger.info(f"{MAGENTA}New file is {CYAN}{pptx_file}{RESET}")
-                print(f"\n{DGREEN}Success👨‍💻✅{RESET}")
+                logger.info(
+                    f"{fcl.MAGENTA_FG}New file is {fcl.fcl.CYAN_FG_FG}{pptx_file}{RESET}"
+                )
+                print(f"\n{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
             except KeyboardInterrupt:
                 print("\nQuit❕⌨️")
                 sys.exit(1)
@@ -322,7 +318,7 @@ class DocConverter:
             )
 
             try:
-                logger.info(f"{BLUE}Create Doument Tablet{RESET}")
+                logger.info(f"{fcl.BLUE_FG}Create Doument Tablet{RESET}")
                 doc = Document(file_path)
 
                 with open(txt_file, "w", encoding="utf-8") as f:
@@ -331,16 +327,21 @@ class DocConverter:
                         f.write(paragraph.text + "\n")
                         Par += 1
 
-                        print(f"Par:{BLUE}{Par}/{len(doc.paragraphs)}{RESET}", end="\r")
-                    logger.info(f"{MAGENTA}Conversion of file to txt success{RESET}")
+                        print(
+                            f"Par:{fcl.BLUE_FG}{Par}/{len(doc.paragraphs)}{RESET}",
+                            end="\r",
+                        )
+                    logger.info(
+                        f"{fcl.MAGENTA_FG}Conversion of file to txt success{RESET}"
+                    )
 
-                logger.info(f"File: {GREEN}{txt_file}{RESET}")
+                logger.info(f"File: {fcl.GREEN_FG}{txt_file}{RESET}")
                 return txt_file
             except KeyboardInterrupt:
                 print("\nQuit❕⌨️")
                 sys.exit()
             except Exception as e:
-                logger.error(f"{RED}{e}{RESET}")
+                logger.error(f"{fcl.RED_FG}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
                     log_file.write(f"Couldn't convert {file_path} to {txt_file}:\
 REASON->{e}")
@@ -355,25 +356,27 @@ REASON->{e}")
         for file_path in pdf_list:
             txt_file = file_path[:-3] + "txt"
             try:
-                print(f"{DYELLOW}Open and read the pdf document..{RESET}")
+                print(f"{fcl.BYELLOW_FG}Open and read the pdf document..{RESET}")
                 with open(file_path, "rb") as file:
                     pdf_reader = PyPDF2.PdfReader(file)
                     text = ""
                     _pg_ = 0
-                    print(f"{YELLOW}Convert pages..{RESET}")
+                    print(f"{fcl.YELLOW_FG}Convert pages..{RESET}")
                     for page_num in range(len(pdf_reader.pages)):
                         _pg_ += 1
                         logger.info(
-                            f"Page {DBLUE}{_pg_}{RESET}/{len(pdf_reader.pages)}"
+                            f"Page {fcl.BBLUE_FG}{_pg_}{RESET}/{len(pdf_reader.pages)}"
                         )
                         page = pdf_reader.pages[page_num]
                         text += page.extract_text()
                 with open(txt_file, "w", encoding="utf-8") as f:
                     f.write(text)
-                logger.info(f"{MAGENTA}New file is {CYAN}{txt_file}{RESET}")
-                logger.info(f"{DGREEN}Success👨‍💻✅{RESET}")
+                logger.info(
+                    f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{txt_file}{RESET}"
+                )
+                logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
             except Exception as e:
-                logger.error(f"{RED}{e}{RESET}")
+                logger.error(f"{fcl.RED_FG}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
                     log_file.write(f"Error converting {file_path} to {txt_file}: {e}\n")
 
@@ -400,7 +403,7 @@ REASON->{e}")
 
                 presentation = Presentation(file_path)
 
-                logger.info(f"Slide count ={DMAGENTA} {
+                logger.info(f"Slide count ={fcl.BMAGENTA_FG} {
                             len(presentation.slides)}{RESET}")
 
                 _slide_count_ = 0
@@ -437,10 +440,12 @@ REASON->{e}")
                         print(text_buffer)
                         return text_buffer
 
-                logger.info(f"{MAGENTA}New file is {CYAN}{txt_file}{RESET}")
-                logger.info(f"{DGREEN}Success👨‍💻✅{RESET}")
+                logger.info(
+                    f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{txt_file}{RESET}"
+                )
+                logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
         except Exception as e:
-            logger.error(f"\n❌Oops! {RED}{e}{RESET}")
+            logger.error(f"\n❌Oops! {bcl.RED_BG}{e}{RESET}")
 
     @staticmethod
     def convert_ppt_to_pptx(obj: os.PathLike):
@@ -465,12 +470,12 @@ REASON->{e}")
                     powerpoint.Quit()
                     return pptx_file
             else:
-                print(f"{RED}Unable to identify the system{RESET}")
+                print(f"{fcl.RED_FG}Unable to identify the system{RESET}")
         except KeyboardInterrupt:
             print("\nQuit!")
             sys.exit(1)
         except Exception as e:
-            logger.error(f"{RED}{e}{RESET}")
+            logger.error(f"{fcl.RED_FG}{e}{RESET}")
 
     def ppt_to_word(self):
         from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
@@ -495,7 +500,7 @@ REASON->{e}")
                 else None
             )
             try:
-                logger.info(f"{DYELLOW}Create Doument Tablet{RESET}")
+                logger.info(f"{fcl.BYELLOW_FG}Create Doument Tablet{RESET}")
                 file_path = os.path.abspath(file_path)
                 if ext == "ppt":
                     file_path = self.convert_ppt_to_pptx(
@@ -504,7 +509,7 @@ REASON->{e}")
                 presentation = Presentation(file_path)
                 document = Document()
                 logger.info(
-                    f"Slide count ={DMAGENTA} {len(presentation.slides)}{RESET}"
+                    f"Slide count ={fcl.BMAGENTA_FG} {len(presentation.slides)}{RESET}"
                 )
                 _slide_count_ = 0
                 with Progress() as progress:
@@ -579,13 +584,15 @@ REASON->{e}")
 
                         progress.update(task, advance=1)
                 document.save(word_file)
-                logger.info(f"{MAGENTA}New file is {CYAN}{word_file}{RESET}")
-                logger.info(f"{DGREEN}Success👨‍💻✅{RESET}")
+                logger.info(
+                    f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{word_file}{RESET}"
+                )
+                logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
                 return word_file
             except Exception as e:
-                logger.error(f"\n❌Oops! {RED}{e}{RESET}")
+                logger.error(f"\n❌Oops! {bcl.RED_BG}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
-                    log_file.write(f"\n❌Oops! {RED}{e}{RESET}")
+                    log_file.write(f"\n❌Oops! {e}")
 
     def text_to_word(self):
         ###############################################################################
@@ -603,7 +610,7 @@ REASON->{e}")
 
             try:
                 # Read the text file
-                logger.info(f"{DCYAN}Open and read the text file{RESET}")
+                logger.info(f"{fcl.BCYAN_FG}Open and read the text file{RESET}")
                 with open(file_path, "r", encoding="utf-8", errors="ignore") as file:
                     text_content = file.read()
 
@@ -613,21 +620,25 @@ REASON->{e}")
                 )
 
                 # Create a new Word document
-                logger.info(f"{DYELLOW}Create Doument Tablet{RESET}")
+                logger.info(f"{fcl.BYELLOW_FG}Create Doument Tablet{RESET}")
                 doc = Document()
                 # Add the filtered text content to the document
                 doc.add_paragraph(filtered_content)
 
                 # Save the document as a Word file
                 doc.save(word_file)
-                logger.info(f"{MAGENTA}New file is {DCYAN}{word_file}{RESET}")
-                logger.info(f"{DGREEN}Success👨‍💻✅{RESET}")
+                logger.info(
+                    f"{fcl.MAGENTA_FG}New file is {fcl.BCYAN_FG}{word_file}{RESET}"
+                )
+                logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
             except FileExistsError as e:
                 logger.error(f"{str(e)}📁")
             except Exception as e:
-                logger.error(f"\n❌Oops something went awry {RED}{e}{RESET}")
+                logger.error(f"\n❌Oops something went awry {fcl.RED_FG}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
-                    log_file.write(f"\n❌Oops something went astray{RED}{e}{RESET}")
+                    log_file.write(
+                        f"\n❌Oops something went astray{fcl.RED_FG}{e}{RESET}"
+                    )
 
     def convert_xls_to_word(self):
         ###############################################################################
@@ -642,7 +653,7 @@ REASON->{e}")
             item for item in xls_list if item.split(".")[-1].lower() in ("xls", "xlsx")
         ]
 
-        print(f"{DGREEN}Initializing conversion sequence{RESET}")
+        print(f"{fcl.BGREEN_FG}Initializing conversion sequence{RESET}")
 
         for xls_file in xls_list:
             ext = os.path.splitext(xls_file)[-1][1:]
@@ -661,7 +672,7 @@ REASON->{e}")
 
                 """Iterate over the rows of the dataframe and add them to the
                 Word document"""
-                logger.info(f"{ICYAN}Converting {xls_file}..{RESET}")
+                logger.info(f"{fcl.ICYAN_FG}Converting {xls_file}..{RESET}")
                 # time.sleep(2)
                 total_rows = df.shape[0]
                 for _, row in df.iterrows():
@@ -670,20 +681,20 @@ REASON->{e}")
                     for value in row:
                         doc.add_paragraph(str(value))
                     print(
-                        f"Row {DYELLOW}{current_row}/{total_rows} \
-{DBLUE}{percentage:.1f}%{RESET}",
+                        f"Row {fcl.BYELLOW_FG}{current_row}/{total_rows} \
+{fcl.BBLUE_FG}{percentage:.1f}%{RESET}",
                         end="\r",
                     )
                     # print(f"\033[1;36m{row}{RESET}")
 
                 # Save the Word document
                 doc.save(word_file)
-                print(f"{DGREEN}Conversion successful!{RESET}", end="\n")
+                print(f"{fcl.BGREEN_FG}Conversion successful!{RESET}", end="\n")
             except KeyboardInterrupt:
                 print("\nQuit⌨️")
                 sys.exit(1)
             except Exception as e:
-                print(f"{RED}Oops Conversion failed:❕{RESET}", str(e))
+                print(f"{bcl.RED_BG}Oops Conversion failed:❕{RESET}", str(e))
 
     def convert_xls_to_text(self):
         ###############################################################################
@@ -699,7 +710,7 @@ REASON->{e}")
             for item in xls_list
             if any(item.lower().endswith(ext) for ext in _ext_xls)
         ]
-        print(f"{DGREEN}Initializing conversion sequence{RESET}")
+        print(f"{fcl.BGREEN_FG}Initializing conversion sequence{RESET}")
         for xls_file in tqdm(xls_list):
             ext = os.path.splitext(xls_file)[-1][1:]
             txt_file = (
@@ -719,8 +730,8 @@ REASON->{e}")
                 lines = len(text.splitlines())
 
                 print(
-                    f"Preparing to write: {DYELLOW}{chars} \033[1;30m \
-characters{DYELLOW} {words}\033[1;30m words {DYELLOW}{lines}\033[1;30m \
+                    f"Preparing to write: {fcl.BYELLOW_FG}{chars} \033[1;30m \
+characters{fcl.BYELLOW_FG} {words}\033[1;30m words {fcl.BYELLOW_FG}{lines}\033[1;30m \
 lines {RESET}",
                     end="\n",
                 )
@@ -728,7 +739,7 @@ lines {RESET}",
                 with open(txt_file, "w") as file:
                     file.write(text)
 
-                print(f"{DGREEN}Conversion successful!{RESET}", end="\n")
+                print(f"{fcl.BGREEN_FG}Conversion successful!{RESET}", end="\n")
             except KeyboardInterrupt:
                 print("\nQuit❕")
                 sys.exit(1)
@@ -755,16 +766,16 @@ lines {RESET}",
             )
             try:
                 """Load the Excel file"""
-                print(f"{DGREEN}Initializing conversion sequence{RESET}")
+                print(f"{fcl.BGREEN_FG}Initializing conversion sequence{RESET}")
                 df = pd.read_excel(xls_file)
                 logger.info(f"Converting {xls_file}..")
                 total_rows = df.shape[0]
-                print(f"Writing {DYELLOW}{total_rows} rows {RESET}", end="\n")
+                print(f"Writing {fcl.BYELLOW_FG}{total_rows} rows {RESET}", end="\n")
                 for i in range(101):
                     print(f"Progress: {i}%", end="\r")
                 """Save the DataFrame to CSV"""
                 df.to_csv(csv_file, index=False)
-                print(f"{DMAGENTA} Conversion successful{RESET}")
+                print(f"{fcl.BMAGENTA_FG} Conversion successful{RESET}")
 
             except KeyboardInterrupt:
                 print("\nQuit❕")
@@ -829,7 +840,9 @@ lines {RESET}",
                 else None
             )
             try:
-                db_file = input(f"{DBLUE}Please enter desired sql filename: {RESET}")
+                db_file = input(
+                    f"{fcl.BBLUE_FG}Please enter desired sql filename: {RESET}"
+                )
                 table_name = input("Please enter desired table name: ")
                 # res = ["db_file", "table_name"]
                 if any(db_file) == "":
@@ -843,11 +856,11 @@ lines {RESET}",
                 # Read the Excel file into a pandas DataFrame
                 print(f"Reading {xlsx_file}...")
                 df = pd.read_excel(xlsx_file)
-                print(f"{DGREEN}Initializing conversion sequence{RESET}")
-                print(f"{DGREEN} Connected to sqlite3 database::{RESET}")
+                print(f"{fcl.BGREEN_FG}Initializing conversion sequence{RESET}")
+                print(f"{fcl.BGREEN_FG} Connected to sqlite3 database::{RESET}")
                 # Create a connection to the SQLite database
                 conn = sqlite3.connect(db_file)
-                print(f"{DYELLOW} Creating database table::{RESET}")
+                print(f"{fcl.BYELLOW_FG} Creating database table::{RESET}")
                 # Insert the DataFrame into a new table in the database
                 df.to_sql(table_name, column, conn, if_exists="replace", index=False)
                 print(
@@ -876,24 +889,24 @@ lines {RESET}",
         for file in file_list:
             if file.lower().endswith("pdf"):
                 # Convert the PDF to a list of PIL image objects
-                print(f"{DBLUE}Generate image objects ..{RESET}")
+                print(f"{fcl.BLUE_FG}Generate image objects ..{RESET}")
                 images = convert_from_path(file)
 
                 # Save each image to a file
                 fname = file[:-4]
-                print(f"{YELLOW}Target images{BLUE} {len(images)}{RESET}")
+                print(f"{fcl.YELLOW_FG}Target images{fcl.BLUE_FG} {len(images)}{RESET}")
 
                 with Progress() as progress:
                     task = progress.add_task(
                         "[magenta]Generating images ", total=len(images)
                     )
                     for i, image in enumerate(images):
-                        # print(f"{DBLUE}{i}{RESET}", end="\r")
+                        # print(f"{Bfcl.BLUE_FG}{i}{RESET}", end="\r")
                         yd = f"{fname}_{i+1}.{outf}"
                         image.save(yd)
                         imgs.append(yd)
                         progress.update(task, advance=1)
-                # print(f"\n{GREEN}Ok{RESET}")
+                # print(f"\n{fcl.GREEN_FG}Ok{RESET}")
 
         return imgs
 
@@ -933,7 +946,7 @@ class Scanner:
 
         for pdf in pdf_list:
             out_f = pdf[:-3] + "txt"
-            print(f"{YELLOW}Read pdf ..{RESET}")
+            print(f"{fcl.YELLOW_FG}Read pdf ..{RESET}")
 
             with open(pdf, "rb") as f:
                 reader = PyPDF2.PdfReader(f)
@@ -943,17 +956,17 @@ class Scanner:
                 for page_num in range(len(reader.pages)):
                     pg += 1
 
-                    print(f"{DYELLOW}Progress:{RESET}", end="")
-                    print(f"{CYAN}{pg}/{len(reader.pages)}{RESET}", end="\r")
+                    print(f"{fcl.BYELLOW_FG}Progress:{RESET}", end="")
+                    print(f"{fcl.CYAN_FG}{pg}/{len(reader.pages)}{RESET}", end="\r")
                     page = reader.pages[page_num]
                     text += page.extract_text()
 
             print(f"\n{text}")
-            print(f"\n{YELLOW}Write text to {GREEN}{out_f}{RESET}")
+            print(f"\n{fcl.YELLOW_FG}Write text to {fcl.GREEN_FG}{out_f}{RESET}")
             with open(out_f, "w") as f:
                 f.write(text)
 
-            print(f"\n{DGREEN}Ok{RESET}")
+            print(f"\n{fcl.BGREEN_FG}Ok{RESET}")
 
     def scanAsImgs(self):
         file = self.input_file
@@ -977,14 +990,14 @@ class Scanner:
                 progress.update(task, advance=1)
 
         def _cleaner_():
-            print(f"{FMAGENTA}Clean")
+            print(f"{fcl.FMAGENTA_FG}Clean")
             for obj in img_objs:
                 if os.path.exists(obj):
                     print(obj, end="\r")
                     os.remove(obj)
                 txt_file = f"{obj[:-4]}.txt"
                 if os.path.exists(txt_file):
-                    print(f"{FCYAN}{txt_file}{RESET}", end="\r")
+                    print(f"{bcl.CYAN_BG}{txt_file}{RESET}", end="\r")
                     os.remove(txt_file)
 
         # Do clean up
@@ -992,10 +1005,12 @@ class Scanner:
         from utils.overwrite import clear_screen
 
         clear_screen()
-        print(f"{DGREEN}{IGREEN}Full Text{RESET}")
+        print(f"{bcl.GREEN_BG}Full Text{RESET}")
         print(text)
-        print(f"{BWHITE}Text File ={IGREEN}{self.input_file[:-4]}_filemac.txt{RESET}")
-        print(f"{GREEN}Ok✅{RESET}")
+        print(
+            f"{fcl.BWHITE_FG}Text File ={fcl.IGREEN_FG}{self.input_file[:-4]}_filemac.txt{RESET}"
+        )
+        print(f"{fcl.GREEN_FG}Ok✅{RESET}")
         return text
 
     def scanAsLongImg(self) -> bool:
@@ -1015,7 +1030,7 @@ class Scanner:
                 text = tx.OCR()
                 if text is not None:
                     # print(text)
-                    print(f"{GREEN}Ok{RESET}")
+                    print(f"{fcl.GREEN_FG}Ok{RESET}")
             return True
         except Exception as e:
             print(e)

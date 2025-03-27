@@ -5,9 +5,12 @@ import logging
 from typing import Optional, Union
 from utils.dirbuster import Unbundle
 from utils.decorators import Decorators
-from utils.colors import CYAN, BLUE, GREEN, YELLOW, RESET, RED, BWHITE
+from utils.colors import foreground
 from utils.formats import SUPPORTED_IMAGE_FORMATS
 from utils.namerule import modify_filename_if_exists
+
+fcl = foreground()
+RESET = fcl.RESET
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")
 logger = logging.getLogger(__name__)
@@ -49,7 +52,7 @@ class Grayscale:
         Returns:
             The computed output file path.
         """
-        logger.info(f"{BWHITE}Obtaining output file name{RESET}")
+        logger.info(f"{fcl.BWHITE_FG}Obtaining output file name{RESET}")
         if self.output_file and self.output_file.endswith(
             tuple(SUPPORTED_IMAGE_FORMATS.values())
         ):
@@ -74,7 +77,9 @@ class Grayscale:
         def process_image(self, image_path):
             """Processes a single image, converting it to grayscale and saving."""
             try:
-                logger.info(f"{YELLOW}Processing {CYAN}{image_path}{RESET}")
+                logger.info(
+                    f"{fcl.YELLOW_FG}Processing {fcl.CYAN_FG}{image_path}{RESET}"
+                )
                 img = cv2.imread(image_path)
                 if img is None:
                     raise FileNotFoundError(f"Could not read image: {image_path}")
@@ -84,10 +89,10 @@ class Grayscale:
                 )
                 self.save_pil_image(thresh, image_path)
             except FileNotFoundError as e:
-                logger.error(f"{RED}{e}{RESET}")
+                logger.error(f"{fcl.RED_FG}{e}{RESET}")
             except Exception as e:
                 raise
-                logger.error(f"An unexpected error occurred: {RED}{e}{RESET}")
+                logger.error(f"An unexpected error occurred: {fcl.RED_FG}{e}{RESET}")
 
         process_image(self)
 
@@ -104,7 +109,7 @@ class Grayscale:
             filename = self.get_output_file(image_path)
             filename = modify_filename_if_exists(filename)
             img_pil.save(filename)
-            logger.info(f"{GREEN}Image saved as {BLUE}{filename}{RESET}")
+            logger.info(f"{fcl.GREEN_FG}Image saved as {fcl.BLUE_FG}{filename}{RESET}")
         except Exception as e:
             raise
-            logger.error(f"Unable to save the image: {RED}{e}{RESET}")
+            logger.error(f"Unable to save the image: {fcl.RED_FG}{e}{RESET}")

@@ -3,7 +3,10 @@ import sys
 
 import PyPDF2
 
-from utils.colors import BWHITE, CYAN, DBLUE, FCYAN, RED, RESET, YELLOW
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class pdfmaster:
@@ -46,7 +49,7 @@ class pdfmaster:
                 for reader in pdf_readers:
                     if page_num < len(reader.pages):
                         print(
-                            f"{CYAN}Page {DBLUE}{page_num + 1}/{len(reader.pages)}{RESET}",
+                            f"{fcl.CYAN_FG}Page {fcl.BBLUE_FG}{page_num + 1}/{len(reader.pages)}{RESET}",
                             end="\r",
                         )
                         # Order pages in terms of page1-pd1, page2-pd2
@@ -56,13 +59,13 @@ class pdfmaster:
             with open(self.outf, "wb") as self.outf:
                 pdf_writer.write(self.outf)
             print(
-                f"\n{FCYAN}PDFs combined with specified page order into{RESET}{DBLUE} {self.outf.name}{RESET}"
+                f"\n{fcl.FCYAN_FG}PDFs combined with specified page order into{RESET}{fcl.BBLUE_FG} {self.outf.name}{RESET}"
             )
         except KeyboardInterrupt:
             print("\nQuit!")
             sys.exit(1)
         except Exception as e:
-            print(f"{RED}{e}{RESET}")
+            print(f"{fcl.RED_FG}{e}{RESET}")
 
     def combine_pdfs_AAB_order(self):
         try:
@@ -71,14 +74,14 @@ class pdfmaster:
             reader2 = PyPDF2.PdfReader(self.obj2)
             # pdf_readers = [PyPDF2.PdfReader(pdf) for pdf in pdf_files]
 
-            print(f"{CYAN}File A{RESET}")
+            print(f"{fcl.CYAN_FG}File A{RESET}")
             for p1_num in range(len(reader1.pages)):
                 print(f"Page {p1_num + 1}/{len(reader1.pages)}", end="\r")
                 p1 = reader1.pages[p1_num]
                 # Order pages in terms of page1-pd1, page2-pd2
                 pdf_writer.add_page(p1)
 
-            print(f"\n{CYAN}File B{RESET}")
+            print(f"\n{fcl.CYAN_FG}File B{RESET}")
             for p2_num in range(len(reader2.pages)):
                 print(f"Page {p2_num + 1}/{len(reader2.pages)}", end="\r")
                 p2 = reader2.pages[p2_num]
@@ -87,13 +90,13 @@ class pdfmaster:
             with open(self.outf, "wb") as self.outf:
                 pdf_writer.write(self.outf)
             print(
-                f"\n{FCYAN}PDFs combined with specified page order into{RESET}{DBLUE} {self.outf.name}{RESET}"
+                f"\n{fcl.FCYAN_FG}PDFs combined with specified page order into{RESET}{fcl.BBLUE_FG} {self.outf.name}{RESET}"
             )
         except KeyboardInterrupt:
             print("\nQuit!")
             sys.exit(1)
         except Exception as e:
-            print(f"{RED}{e}{RESET}")
+            print(f"{fcl.RED_FG}{e}{RESET}")
 
     def merge_All_AAB(self):
         try:
@@ -107,7 +110,7 @@ class pdfmaster:
             for reader in pdf_readers:
                 for page_num in range(len(reader.pages)):
                     print(
-                        f"{BWHITE}Page {CYAN}{page_num + 1}/{len(reader.pages)}{RESET}",
+                        f"{fcl.BWHITE_FG}Page {fcl.CYAN_FG}{page_num + 1}/{len(reader.pages)}{RESET}",
                         end="\r",
                     )
                     page = reader.pages[page_num]
@@ -117,32 +120,32 @@ class pdfmaster:
             with open(self.outf, "wb") as out_file:
                 pdf_writer.write(out_file)
             print(
-                f"\n{FCYAN}PDFs combined with specified page order into{RESET}{DBLUE} {self.outf}{RESET}"
+                f"\n{fcl.FCYAN_FG}PDFs combined with specified page order into{RESET}{fcl.BBLUE_FG} {self.outf}{RESET}"
             )
         except KeyboardInterrupt:
             print("\nQuit!")
             sys.exit(1)
         except Exception as e:
-            print(f"{RED}{e}{RESET}")
+            print(f"{fcl.RED_FG}{e}{RESET}")
 
 
 def helpmaster():
     options = f"""
         _________________________
-        {BWHITE}|Linear: {YELLOW}AA/BB/AAB/BBA{RESET}  |
-        {BWHITE}|Shifted: {YELLOW}AB/BA/ABA/BAB{RESET} |
+        {fcl.BWHITE_FG}|Linear: {fcl.YELLOW_FG}AA/BB/AAB/BBA{RESET}  |
+        {fcl.BWHITE_FG}|Shifted: {fcl.YELLOW_FG}AB/BA/ABA/BAB{RESET} |
         _________________________"""
 
     helper = f"""\n\t---------------------------------------------------------------------------------------------
-        {BWHITE}|Currently There are 2 supported methods: {FCYAN}Linear and Alternating/shifting.{RESET}\t\t    |
+        {fcl.BWHITE_FG}|Currently There are 2 supported methods: {FCYAN}Linear and Alternating/shifting.{RESET}\t\t    |
         |-------------------------------------------------------------------------------------------|
-        {BWHITE}|->Linear pages are ordered in form of: {CYAN}File1Page1,...Fil1Pagen{RESET} then {CYAN}File2Page1,...Fil2Pagen{RESET}|\n\t{BWHITE}|File2 is joined at the end of the file1.\t\t\t\t\t\t    |
+        {fcl.BWHITE_FG}|->Linear pages are ordered in form of: {CYAN}File1Page1,...Fil1Pagen{RESET} then {fcl.CYAN_FG}File2Page1,...Fil2Pagen{RESET}|\n\t{fcl.BWHITE_FG}|File2 is joined at the end of the file1.\t\t\t\t\t\t    |
         |-------------------------------------------------------------------------------------------|
-        {BWHITE}|->Shifting method Picks: {CYAN}File1Page1, File2Page1...File1pagen,File2Pagen{RESET}\t\t    |
+        {fcl.BWHITE_FG}|->Shifting method Picks: {fcl.CYAN_FG}File1Page1, File2Page1...File1pagen,File2Pagen{RESET}\t\t    |
         |--------------------------------------------------------------------------------------------"""
 
     ex = f"""\t_____________________________________________________
-    \t|->{DBLUE}filemac --pdfjoin file1.pdf file2.pdf --order AAB{RESET}|
+    \t|->{fcl.BBLUE_FG}filemac --pdfjoin file1.pdf file2.pdf --order AAB{RESET}|
     \t-----------------------------------------------------"""
     return options, helper, ex
 

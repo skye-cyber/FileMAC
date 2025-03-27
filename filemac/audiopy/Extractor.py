@@ -5,7 +5,10 @@ import sys
 
 from moviepy import VideoFileClip
 
-from utils.colors import DCYAN, DYELLOW, RED, RESET
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 ###############################################################################
 logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")
@@ -24,7 +27,7 @@ class ExtractAudio:
                 files_to_process.append(self.input_file)
             elif os.path.isdir(self.input_file):
                 if os.listdir(self.input_file) is None:
-                    print(f"{RED}Cannot work with empty folder{RESET}")
+                    print(f"{fcl.RED_FG}Cannot work with empty folder{RESET}")
                     sys.exit(1)
                 for file in os.listdir(self.input_file):
                     file_path = os.path.join(self.input_file, file)
@@ -42,7 +45,7 @@ class ExtractAudio:
         try:
             video_list = self.preprocess()
             for input_video in video_list:
-                print(f"{DYELLOW}Extracting..{DCYAN}")
+                print(f"{fcl.BYELLOW_FG}Extracting..{fcl.DCYAN_FG}")
                 video = VideoFileClip(input_video)
                 audio = video.audio
                 basename, _ = os.path.splitext(input_video)

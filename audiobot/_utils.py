@@ -3,7 +3,10 @@ import soundfile as sf
 import speech_recognition as sr
 import ffmpeg
 from .logging_config import setup_colored_logger
-from utils.colors import YELLOW, RESET
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 Clogger = setup_colored_logger()
 
@@ -25,7 +28,7 @@ def get_bitrate(input_file, verbosity=False):
     """
     if verbosity:
         Clogger.info(
-            f"Fetch the original bitrate of the video file using {YELLOW}ffmpeg{RESET}."
+            f"Fetch the original bitrate of the video file using {fcl.YELLOW_FG}ffmpeg{RESET}."
         )
     try:
         try:

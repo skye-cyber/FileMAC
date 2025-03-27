@@ -4,13 +4,16 @@ import sys
 import pydub
 from tqdm import tqdm
 
-from utils.colors import DGREEN, DMAGENTA, DYELLOW, RED, RESET
+from utils.colors import foreground
 from ..audiopy.m4a_converter import m4a
 from utils.formats import SUPPORTED_AUDIO_FORMATS, SUPPORTED_AUDIO_FORMATS_DIRECT
 
 ###############################################################################
 # Convert Audio file to from one format to another'''
 ###############################################################################
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class AudioConverter:
@@ -25,7 +28,7 @@ class AudioConverter:
             files_to_process.append(self.input_file)
         elif os.path.isdir(self.input_file):
             if os.listdir(self.input_file) is None:
-                print(f"{RED}Cannot work with empty folder{RESET}")
+                print(f"{fcl.RED_FG}Cannot work with empty folder{RESET}")
                 sys.exit(1)
             for file in os.listdir(self.input_file):
                 file_path = os.path.join(self.input_file, file)
@@ -43,7 +46,7 @@ class AudioConverter:
                 for item in input_list
                 if any(item.lower().endswith(ext) for ext in SUPPORTED_AUDIO_FORMATS)
             ]
-            print(f"{DYELLOW}Initializing conversion..{RESET}")
+            print(f"{fcl.BYELLOW_FG}Initializing conversion..{RESET}")
 
             def wav_redudancy():
                 # Load the mp3 file using Pydub
@@ -58,10 +61,10 @@ class AudioConverter:
                     fmt = ext[1:]
                     # print(fmt, out_f)
                     audio = pydub.AudioSegment.from_file(file, fmt)
-                    print(f"{DMAGENTA}Converting to {output_filename}{RESET}")
+                    print(f"{fcl.BMAGENTA_FG}Converting to {output_filename}{RESET}")
                     audio.export(output_filename, format=out_f)
                     # new_audio = pydub.AudioSegment.from_file('output_audio.')
-                    print(f"{DGREEN}Done{RESET}")
+                    print(f"{fcl.BGREEN_FG}Done{RESET}")
 
                 elif file[-3:].lower() == "m4a" or out_f.lower() == "m4a":
                     m4a(file, out_f)
@@ -73,11 +76,11 @@ class AudioConverter:
                     print("Pending Implemantation For the format")
 
                 else:
-                    print(f"{RED}Unsupported output format{RESET}")
+                    print(f"{fcl.RED_FG}Unsupported output format{RESET}")
                     sys.exit(1)
 
         except KeyboardInterrupt:
             print("\nQuit❕")
             sys.exit(1)
         except Exception as e:
-            print(f"{RED}{e}{RED}")
+            print(f"{fcl.RED_FG}{e}{RESET}")

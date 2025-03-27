@@ -6,8 +6,11 @@ import sys
 from pdf2image import convert_from_path
 from PIL import Image  # ImageSequence
 
-from utils.colors import DCYAN, DGREEN, DMAGENTA, DBLUE, DYELLOW, RED, RESET
+from utils.colors import foreground
 from .pydocs import DocConverter
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class LImage:
@@ -28,7 +31,7 @@ class LImage:
             return LI
         elif ext == "odt":
             # pdf_file = ext = doc.split('.')[0] + 'docx'
-            print(f"{DCYAN}Call soffice and wait ..{RESET}")
+            print(f"{fcl.DCYAN_FG}Call soffice and wait ..{RESET}")
             subprocess.call(
                 [
                     "soffice",
@@ -48,27 +51,27 @@ class LImage:
     @staticmethod
     def pdf_2L_Img(pdf_file):
         try:
-            print(f"{DYELLOW}Read pdf{RESET}")
+            print(f"{fcl.BYELLOW_FG}Read pdf{RESET}")
             images = convert_from_path(pdf_file)
             out_img = pdf_file[:-4] + ".png"
             heights = [img.size[1] for img in images]
             total_height = sum(heights)
             max_width = max([img.size[0] for img in images])
 
-            print(f"{DCYAN}Draw image ..{RESET}")
+            print(f"{fcl.DCYAN_FG}Draw image ..{RESET}")
             new_im = Image.new("RGB", (max_width, total_height))
 
             y_offset = 0
             for i, img in enumerate(images):
-                print(f"{DBLUE}{i}{RESET}", end="\r")
+                print(f"{fcl.BBLUE_FG}{i}{RESET}", end="\r")
                 new_im.paste(img, (0, y_offset))
                 y_offset += img.size[1]
-            print(f"{DYELLOW}Save dest: {DMAGENTA}{out_img}{RESET}")
+            print(f"{fcl.BYELLOW_FG}Save dest: {fcl.BMAGENTA_FG}{out_img}{RESET}")
             new_im.save(out_img)
-            print(f"{DGREEN}Success😇✅{RESET}")
+            print(f"{fcl.BGREEN_FG}Success😇✅{RESET}")
             return out_img
         except FileNotFoundError:
-            print(f"{RED}File not found!{RESET}")
+            print(f"{fcl.RED_FG}File not found!{RESET}")
         except KeyboardInterrupt:
             print("\nQuit❕")
             sys.exit()
