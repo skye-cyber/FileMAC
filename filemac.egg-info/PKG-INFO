@@ -1,4 +1,4 @@
-Metadata-Version: 2.2
+Metadata-Version: 2.4
 Name: filemac
 Version: 1.1.7
 Summary: Open source Python CLI toolkit for conversion, manipulation, Analysis of files (All major file operations)
@@ -6,7 +6,7 @@ Home-page: https://pypi.org/project/filemac/
 Author: wambua
 Author-email: swskye17@gmail.com
 License: GNU v3
-Keywords: file-conversion,file-analysis,file-manipulation,ocr,image-conversion
+Keywords: file-conversion,file-analysis,file-manipulation,ocr,image-conversion,audio_effects,voice_shift,pdf,docx
 Classifier: Environment :: Console
 Classifier: Natural Language :: English
 Classifier: Operating System :: OS Independent
@@ -54,7 +54,10 @@ Requires-Dist: SpeechRecognition
 Requires-Dist: colorama
 Requires-Dist: scipy
 Requires-Dist: PyMuPDF
+Requires-Dist: pyautogui
 Requires-Dist: imageio
+Requires-Dist: pynput
+Requires-Dist: pyaudio
 Dynamic: author
 Dynamic: author-email
 Dynamic: classifier
@@ -63,6 +66,7 @@ Dynamic: description-content-type
 Dynamic: home-page
 Dynamic: keywords
 Dynamic: license
+Dynamic: license-file
 Dynamic: requires-dist
 Dynamic: requires-python
 Dynamic: summary

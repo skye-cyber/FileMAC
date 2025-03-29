@@ -1,4 +1,3 @@
 include LICENCE
 include version.txt
 include README.md
-# recursively-include MDART

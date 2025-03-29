@@ -24,15 +24,16 @@ def dos_req():
 
 
 DESCRIPTION = "Open source Python CLI toolkit for conversion, manipulation, Analysis of files (All major file operations)"
-EXCLUDE_FROM_PACKAGES = ["build", "dist", "test", "src"]
+EXCLUDE_FROM_PACKAGES = ["build", "dist", "test", "src", "*~"]
 
 sri()
 dos_req()
+
 setup(
     name="filemac",
     author="wambua",
     author_email="swskye17@gmail.com",
-    version=open("version.txt").read(),
+    version=open(os.path.abspath("version.txt")).read(),
     packages=find_namespace_packages(exclude=EXCLUDE_FROM_PACKAGES),
     description=DESCRIPTION,
     long_description=open("README.md").read(),
@@ -79,7 +80,10 @@ setup(
         "colorama",
         "scipy",
         "PyMuPDF",
+        "pyautogui",
         "imageio",
+        "pynput",
+        "pyaudio",
     ],
     include_package_data=True,
     zip_safe=False,
@@ -90,6 +94,10 @@ setup(
         "file-manipulation",
         "ocr",
         "image-conversion",
+        "audio_effects",
+        "voice_shift",
+        "pdf",
+        "docx",
     ],
     classifiers=[
         "Environment :: Console",

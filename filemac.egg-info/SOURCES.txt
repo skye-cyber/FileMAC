@@ -1,6 +1,8 @@
 LICENSE
+MANIFEST.in
 README.md
 setup.py
+version.txt
 audiobot/__init__.py
 audiobot/cli.py
 audiobot/codec.py
