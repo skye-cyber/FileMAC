@@ -10,7 +10,7 @@ __pycache__/
 
 # Ignore temporary files
 *~
-
+filemac.egg-info/**
 # Ignore build directories
 **/build/
 **/dist/
