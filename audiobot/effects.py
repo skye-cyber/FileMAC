@@ -26,6 +26,9 @@ class VoiceEffectProcessor:
     def _apply_lowpass(self):
         return Modulator().lowpass(self.audio_segment)
 
+    def _apply_highpass(self):
+        return Modulator().highpass(self.audio_segment)
+
     def _apply_robotic(self):
         return Modulator().pitch_shift(
             effects.speedup(self.audio_segment, 1.01), n_steps=-10
@@ -100,6 +103,7 @@ class VoiceEffectProcessor:
             "whisper": self._apply_whisper,
             "reverb": self._apply_reverb,
             "denoise": self.denoise,
+            "highpass": self._apply_highpass,
         }
 
     def apply_effect(self):

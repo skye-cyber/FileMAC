@@ -10,7 +10,7 @@ from typing import List, Union
 from audiobot.cli import Argsmain
 from .imagepy.converter import ImageConverter
 
-from utils.colors import foreground
+from utils.colors import foreground, background
 from utils.formats import (
     SUPPORTED_AUDIO_FORMATS_DIRECT,
     SUPPORTED_AUDIO_FORMATS_SHOW,
@@ -29,6 +29,7 @@ from .Simple_v_Analyzer import SA
 from .videopy.pyVideo import VideoConverter
 
 fcl = foreground()
+bcl = background()
 RESET = fcl.RESET
 
 
@@ -440,6 +441,12 @@ def Cmd_arg_Handler():
         nargs="+",
         help=f"Convert Images to grayscale. {fcl.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fcl.BYELLOW_FG}filemac --image2gray image1 image2{RESET}`",
     )
+    parser.add_argument(
+        "-vt",
+        "--voicetype",
+        action="store_true",
+        help=f"Use your voice to type text. e.g `{fcl.BYELLOW_FG}filemac --voicetype{RESET}`",
+    )
 
     parser.add_argument(
         "-V",
@@ -477,6 +484,12 @@ class argsOPMaper:
         self._DIR_CONVERSION_ = _DIR_CONVERSION_
         self.Eval = Eval
 
+    def ensure_target_format(self):
+        print(
+            f"{bcl.YELLOW_BG}[Warning]{fcl.YELLOW_FG}Please provide target format{RESET}"
+        )
+        return
+
     def pdfjoin(self):
         from .pdf.combine import pdfmaster
 
@@ -489,19 +502,25 @@ class argsOPMaper:
         init = pdfmaster(self.args.pdfjoin, None, None, self.args.order)
         init.controller()
 
-    def imageConv(self):
+    def image_converter(self):
+        if self.agrs.target_format is None:
+            self.ensure_target_format()
+            return
         if self.args.convert_image == "help":
             print(self.SUPPORTED_IMAGE_FORMATS_SHOW)
-            sys.exit(1)
+            return
         if self.args.target_format is None:
             print(
                 f"{fcl.RED_FG}Please provide output format specified by{fcl.CYAN_FG} '-tf'{RESET}"
             )
-            sys.exit(1)
+            return
         conv = self.ImageConverter(self.args.convert_image, self.args.target_format)
         conv.convert_image()
 
-    def docConv(self):
+    def doc_converter(self):
+        if self.agrs.target_format is None:
+            self.ensure_target_format()
+            return
         if self.args.use_extras:
             self.DocConverter.word2pdf_extra(self.args.convert_doc)
         if (
@@ -529,26 +548,31 @@ class argsOPMaper:
     def handle_help(self):
         if not self.args and not self.remaining_args:
             self.parser.print_help()
-            sys.exit(0)
+            return
 
     def handle_audio_help(self):
         if self.args.audio_help:
             self.Argsmain(["--help"])
+        return
 
     def handle_audio_effect(self):
         self.Argsmain(self.remaining_args)
+        return
 
     def handle_doc_conversion_help(self):
         if self.args.convert_doc and self.args.convert_doc[0] == "help":
             print(self.SUPPORTED_DOC_FORMATS)
-            sys.exit(1)
+        return
 
     def handle_video_conversion_help(self):
         if self.args.convert_video and self.args.convert_video == "help":
             print(self.SUPPORTED_VIDEO_FORMATS_SHOW)
-            sys.exit(1)
+        return
 
     def handle_video_conversion(self):
+        if self.agrs.target_format is None:
+            self.ensure_target_format()
+            return
         ev = self.VideoConverter(self.args.convert_video, self.args.target_format)
         ev.CONVERT_VIDEO()
 
@@ -563,9 +587,12 @@ class argsOPMaper:
     def handle_audio_conversion_help(self):
         if self.args.convert_audio == "help":
             print(self.SUPPORTED_AUDIO_FORMATS_SHOW)
-            sys.exit(1)
+        return
 
     def handle_audio_conversion(self):
+        if self.agrs.target_format is None:
+            self.ensure_target_format()
+            return
         ev = self.AudioConverter(self.args.convert_audio, self.args.target_format)
         ev.pydub_conv()
 
@@ -646,44 +673,24 @@ class argsOPMaper:
             converter.run()
 
     def display_version(self):
-        if self.args.version:
-            version = "1.1.7"
+        version = "1.1.7"
 
-            return print(f"{fcl.BLUE_FG}filemac: V-{fcl.BGREEN_FG}{version}{RESET}")
-        return
+        return print(f"{fcl.BLUE_FG}filemac: V-{fcl.BGREEN_FG}{version}{RESET}")
 
-    def process_target(self):
-        if self.args.Analyze_video:
-            self.handle_video_analysis()
-            return
+    def voicetype(self):
+        from voice.VoiceType import VoiceTypeEngine
 
-        if self.args.AudioJoin:
-            self.handle_audio_join()
+        try:
+            engine = VoiceTypeEngine()
+            engine.start()
+        except KeyboardInterrupt:
+            print("Quit")
             return
-
-        if self.args.Atext2word:
-            self.handle_advanced_text_to_word()
-            return
-
-        if self.args.pdfjoin:
-            self.pdfjoin()
-            return
-
-        if self.args.extract_pages:
-            self.handle_extract_pages()
-            return
-
-        if self.args.image2pdf:
-            self.image2pdf()
-            return
-        if self.args.OCR:
-            self.handle_ocr()
-            return
-        if self.args.image2word:
-            self.image2word()
-            return
-        if self.args.image2gray:
-            self.image2grayscale()
+        except Exception as e:
+            logging.critical("Critical failure: %s", e)
+            print(
+                f"{bcl.YELLOW_BG}{bcl.BRED_BG}Critical error:{RESET} {fcl.RED_FG}{str(e)}{RESET}"
+            )
             return
 
     def run(self):
@@ -703,72 +710,49 @@ class argsOPMaper:
         """Check for audio conversion help argument by calling help method"""
         self.handle_audio_conversion_help()
 
-        """Call version printer"""
-        self.display_version()
+        method_mapper = {
+            args.version: self.display_version,
+            args.audio_effect: self.handle_audio_effect,
+            args.convert_doc: self.doc_converter,
+            args.convert_video: self.handle_video_conversion,
+            args.convert_image: self.image_converter,
+            args.resize_image: self.handle_image_resize,
+            args.convert_doc2image: self.handle_doc_to_image_conversion,
+            args.convert_audio: self.handle_audio_conversion,
+            args.extract_audio: self.handle_audio_extraction,
+            args.scan: self.handle_scan_pdf,
+            args.scanAsImg: self.handle_scan_images,
+            args.doc_long_image: self.handle_scan_long_image,
+            args.scanAsLong_Image: self.handle_doc_to_long_image,
+            args.voicetype: self.voicetype,
+            args.OCR: self.handle_ocr,
+            args.Analyze_video: self.handle_video_analysis,
+            args.AudioJoin: self.handle_audio_join,
+            args.Atext2word: self.handle_advanced_text_to_word,
+            args.pdfjoin: self.pdfjoin,
+            args.extract_pages: self.handle_extract_pages,
+            args.image2pdf: self.image2pdf,
+            args.image2word: self.image2word,
+            args.image2gray: self.image2grayscale,
+        }
 
-        if args.audio_effect:
-            self.handle_audio_effect()
-            return
+        # Find the first non-empty key in method_mapper and execute its corresponding method
+        try:
+            """
+            audio effects must take precedence due to thenested arguments which
+            might possibly conflict with the original arguments
+            """
+            if args.audio_effect:
+                self.handle_audio_effect()
+                return
+            method = next((method_mapper[key] for key in method_mapper if key), None)
+            if method:
+                method()
+        except Exception as e:
+            # Handle any exceptions that occur during method execution
+            print(f"An error occurred: {e}")
 
-        if args.convert_doc and args.target_format is not None:
-            self.docConv()
-            return
-
-        if args.convert_video and args.target_format is not None:
-            self.handle_video_conversion()
-            return
-
-        if args.convert_image:
-            self.imageConv()
-            return
-
-        if args.resize_image:
-            self.handle_image_resize()
-            return
-
-        if args.convert_doc2image:
-            self.handle_doc_to_image_conversion()
-            return
-
-        if args.convert_audio and args.target_format is not None:
-            self.handle_audio_conversion()
-            return
-
-        if args.extract_audio:
-            self.handle_audio_extraction()
-            return
-
-        if args.scan:
-            self.handle_scan_pdf()
-            return
-
-        if args.scanAsImg:
-            self.handle_scan_images()
-            return
-
-        if args.scanAsLong_Image:
-            self.handle_scan_long_image()
-            return
-
-        if args.doc_long_image:
-            self.handle_doc_to_long_image()
-            return
-
-        if any(
-            (
-                args.OCR,
-                args.Analyze_video,
-                args.AudioJoin,
-                args.Atext2word,
-                args.pdfjoin,
-                args.extract_pages,
-                args.image2pdf,
-                args.image2word,
-                args.image2gray,
-            )
-        ):
-            self.process_target()
-            return
+        return
 
 
 if __name__ == "__main__":

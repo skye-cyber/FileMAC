@@ -28,6 +28,7 @@ Requires-Dist: python-docx
 Requires-Dist: python-pptx
 Requires-Dist: gTTS
 Requires-Dist: pypandoc
+Requires-Dist: fitz
 Requires-Dist: pydub
 Requires-Dist: Pillow
 Requires-Dist: pandas
@@ -53,6 +54,7 @@ Requires-Dist: SpeechRecognition
 Requires-Dist: colorama
 Requires-Dist: scipy
 Requires-Dist: PyMuPDF
+Requires-Dist: imageio
 Dynamic: author
 Dynamic: author-email
 Dynamic: classifier

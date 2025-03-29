@@ -191,6 +191,8 @@ class background:
         LWHITE_BG = "\033[4;47m"  # Underlined white
         UWHITE_BG = "\033[5;47m"  # Blinking white
 
+        BLACK_BG = "\033[40m"  # Black Background
+
     if os.name == "nt":
         RESET = Style.RESET_ALL
 

@@ -15,7 +15,7 @@ config = Config()
 
 class Modulator:
     def __init__(self):
-        pass
+        self._cutoff = config.options.get("cutoff")
 
     def pitch_shift(self, audio_segment, n_steps):
         # Convert the audio samples to a NumPy array in float32
@@ -138,6 +138,9 @@ class Modulator:
         Returns:
             numpy.ndarray: The filtered audio samples as a NumPy array.
         """
+
+        cutoff = self._cutoff if self._cutoff else cutoff
+        Clogger.debug(f"{fcl.BLUE_FG}cutoff: {fcl.CYAN_FG}{cutoff}{RESET}")
         Clogger.info("Apply a low-pass filter to remove frequencies higher than cutoff")
         nyquist = 0.5 * sample_rate
         normal_cutoff = cutoff / nyquist
@@ -146,7 +149,7 @@ class Modulator:
 
         return filtered_samples
 
-    def distort(self, samples, gain=20, threshold=0.3):
+    def distort(self, samples, gain=10, threshold=0.3):
         """Apply distortion by clipping the waveform."""
         Clogger.info("Apply distortion by clipping the waveform.")
         samples = samples * gain
@@ -156,8 +159,15 @@ class Modulator:
     def whisper(self, audio_segment):
         return effects.low_pass_filter(audio_segment, 70).apply_gain(-10)
 
-    def lowpass(self, audio_segment):
-        return effects.low_pass_filter(audio_segment, cutoff=2200)
+    def highpass(self, audio_segment, cutoff: int = 200):
+        cutoff = self._cutoff if self._cutoff else cutoff
+        Clogger.info(f"Cutoff: {fcl.BBLUE_FG}{cutoff}{RESET}")
+        return effects.high_pass_filter(audio_segment, cutoff=cutoff)
+
+    def lowpass(self, audio_segment, cutoff: int = 2200):
+        cutoff = self._cutoff if self._cutoff else cutoff
+        Clogger.info(f"Cutoff: {fcl.BBLUE_FG}{cutoff}{RESET}")
+        return effects.low_pass_filter(audio_segment, cutoff=cutoff)
 
     def normalize(self, audio_segment):
         return effects.normalize(audio_segment)

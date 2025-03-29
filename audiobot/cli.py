@@ -42,7 +42,7 @@ class Processor:
     def mono_processor(self):
         try:
             file_type = self.mime.from_file(self.args.file)
-            Clogger.info(f"{fcl.BLUE_FG_FG}Detected file type: {file_type}{RESET}")
+            Clogger.info(f"{fcl.BLUE_FG}Detected file type: {file_type}{RESET}")
             if file_type.startswith("audio"):
                 if self.args.transcribe:
                     transcribe_audio(self.args.file)
@@ -74,9 +74,7 @@ class Processor:
                 for file in files:
                     full_path = os.path.join(root, file)
                     file_type = self.mime.from_file(full_path)
-                    Clogger.info(
-                        f"{fcl.Bfcl.BLUE_FG_FG}Detected file type: {file_type}{RESET}"
-                    )
+                    Clogger.info(f"{fcl.BLUE_FG}Detected file type: {file_type}{RESET}")
                     if file_type.startswith("audio"):
                         if self.args.transcribe:
                             transcribe_audio(full_path)
@@ -114,7 +112,7 @@ def Argsmain(argsv=None):
     )
     parser.add_argument(
         "file",
-        help=f"{fcl.fcl.CYAN_FG_FG}The input audio, video file, or directory.{RESET}",
+        help=f"{fcl.CYAN_FG}The input audio, video file, or directory.{RESET}",
     )
     parser.add_argument(
         "-e",
@@ -130,6 +128,7 @@ def Argsmain(argsv=None):
             "chipmunk",
             "hacker",
             "lowpass",
+            "highpass",
             "distortion",
             "denoise",
         ],

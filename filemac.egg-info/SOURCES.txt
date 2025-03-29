@@ -2,7 +2,6 @@ LICENSE
 README.md
 setup.py
 audiobot/__init__.py
-audiobot/_utils.py
 audiobot/cli.py
 audiobot/codec.py
 audiobot/config.py
@@ -10,6 +9,8 @@ audiobot/effects.py
 audiobot/logging_config.py
 audiobot/modulator.py
 audiobot/processor.py
+audiobot/audioutils/utils.py
+audiobot/audioutils/visualizer.py
 filemac/AT2Word.py
 filemac/Atxt2word.py
 filemac/Simple_v_Analyzer.py
@@ -53,3 +54,5 @@ utils/dirbuster.py
 utils/formats.py
 utils/namerule.py
 utils/overwrite.py
+voice/VoiceType.py
+voice/__init__.py

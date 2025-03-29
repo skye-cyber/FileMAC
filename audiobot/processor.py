@@ -3,7 +3,8 @@ from .modulator import Modulator
 from moviepy import AudioFileClip, VideoFileClip
 from .logging_config import setup_colored_logger
 from pydub import AudioSegment
-from ._utils import visualize_audio, get_bitrate
+from .audioutils.visualizer import visualize_audio_wave
+from .audioutils.utils import get_bitrate
 from .effects import VoiceEffectProcessor
 from utils.colors import foreground
 import sys
@@ -108,7 +109,7 @@ class VideoProcessor:
             Clogger.debug(f"Final bitrate = {get_bitrate(output_file)}")
             # Optional: visualize the before and after audio
             if visualize:
-                visualize_audio(audio_file, "modified_audio.wav")
+                visualize_audio_wave(audio_file, "modified_audio.wav")
 
             # Clean up temporary files
             if os.path.exists(audio_file):
@@ -132,7 +133,7 @@ class AudioProcessor:
     ):
         Clogger.info(f"Set Voice effect : {fcl.MAGENTA_FG}{effect}{RESET}")
 
-        Clogger.info(f"Processing audio file: {input_file}")
+        Clogger.info(f"Processing audio file: {fcl.MAGENTA_FG}{input_file}{RESET}")
 
         try:
             audio_segment = AudioSegment.from_file(input_file)
@@ -148,8 +149,7 @@ class AudioProcessor:
             Clogger.info(f"Modified audio saved as: {output_file}")
 
             if visualize:
-                visualize_audio(input_file, output_file)
+                visualize_audio_wave(input_file, output_file)
 
         except Exception as e:
-            # raise
             Clogger.error(f"Error processing audio file {input_file}: {e}")

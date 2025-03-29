@@ -5,7 +5,9 @@ SpeechRecognition
 argparse
 colorama
 ffmpeg-python
+fitz
 gTTS
+imageio
 librosa
 matplotlib
 moviepy
