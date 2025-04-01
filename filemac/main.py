@@ -411,6 +411,7 @@ def Cmd_arg_Handler():
         dest="no_resume",
         help=f"Don't Resume previous File operation {fcl.BYELLOW_FG}filemac --convert_doc simpledir --no-resume{RESET}",
     )
+
     parser.add_argument(
         "--t",
         "-threads",
@@ -518,7 +519,7 @@ class argsOPMaper:
         conv.convert_image()
 
     def doc_converter(self):
-        if self.agrs.target_format is None:
+        if self.args.target_format is None:
             self.ensure_target_format()
             return
         if self.args.use_extras:
@@ -713,7 +714,9 @@ class argsOPMaper:
         method_mapper = {
             args.version: self.display_version,
             args.audio_effect: self.handle_audio_effect,
-            args.convert_doc: self.doc_converter,
+            tuple(args.convert_doc)
+            if isinstance(args.convert_doc, list)
+            else args.convert_doc: self.doc_converter,
             args.convert_video: self.handle_video_conversion,
             args.convert_image: self.image_converter,
             args.resize_image: self.handle_image_resize,
@@ -725,15 +728,29 @@ class argsOPMaper:
             args.doc_long_image: self.handle_scan_long_image,
             args.scanAsLong_Image: self.handle_doc_to_long_image,
             args.voicetype: self.voicetype,
-            args.OCR: self.handle_ocr,
+            tuple(args.OCR)
+            if isinstance(args.OCR, list)
+            else args.OCR: self.handle_ocr,
             args.Analyze_video: self.handle_video_analysis,
-            args.AudioJoin: self.handle_audio_join,
+            tuple(args.AudioJoin)
+            if isinstance(args.AudioJoin, list)
+            else args.AudioJoin: self.handle_audio_join,
             args.Atext2word: self.handle_advanced_text_to_word,
-            args.pdfjoin: self.pdfjoin,
-            args.extract_pages: self.handle_extract_pages,
-            args.image2pdf: self.image2pdf,
-            args.image2word: self.image2word,
-            args.image2gray: self.image2grayscale,
+            tuple(args.pdfjoin)
+            if isinstance(args.pdfjoin, list)
+            else args.pdfjoin: self.pdfjoin,
+            tuple(args.extract_pages)
+            if isinstance(args.extract_pages, list)
+            else args.extract_pages: self.handle_extract_pages,
+            tuple(args.image2pdf)
+            if isinstance(args.image2pdf, list)
+            else args.image2pdf: self.image2pdf,
+            tuple(args.image2word)
+            if isinstance(args.image2word, list)
+            else args.image2word: self.image2word,
+            tuple(args.image2gray)
+            if isinstance(args.image2gray, list)
+            else args.image2gray: self.image2grayscale,
         }
 
         # Find the first non-empty key in method_mapper and execute its corresponding method

@@ -5,7 +5,7 @@ import logging
 import os
 
 import magic
-from ._utils import transcribe_audio
+from .audioutils.utils import transcribe_audio
 from utils.colors import foreground
 from .processor import VideoProcessor, AudioProcessor
 from .logging_config import setup_colored_logger

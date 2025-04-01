@@ -148,7 +148,7 @@ class DocConverter:
                 sys.exit(0)
             except ImportError:
                 logger.warning(
-                    f"{fcl.RED_FG}docx2pdf Not found. {fcl.CYAN_FG_FG}Run pip install docx2pdf{RESET}"
+                    f"{fcl.RED_FG}docx2pdf Not found. {fcl.CYAN_FG}Run pip install docx2pdf{RESET}"
                 )
             except Exception as e:
                 raise
@@ -166,11 +166,18 @@ class DocConverter:
             )
 
             try:
+                command = [
+                    "lowriter",
+                    "--headless",
+                    '--infilter="writer_pdf_import"',
+                    "--convert-to" 'doc:"MS Word 97"',
+                    pdf_file,
+                ]
                 print(f"{fcl.BYELLOW_FG}Parse the pdf document..{RESET}")
                 parse(pdf_file, word_file, start=0, end=None)
 
                 logger.info(
-                    f"{fcl.MAGENTA_FG}New file is {fcl.fcl.CYAN_FG_FG}{word_file}{RESET}"
+                    f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{word_file}{RESET}"
                 )
                 logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
             except KeyboardInterrupt:
@@ -229,9 +236,7 @@ class DocConverter:
             # Build and write the PDF document
             logger.info(f"{fcl.BYELLOW_FG}Build and write the PDF document{RESET}")
             doc.build(story)
-            logger.info(
-                f"{fcl.MAGENTA_FG}New file is {fcl.fcl.CYAN_FG_FG}{_pdf_}{RESET}"
-            )
+            logger.info(f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{_pdf_}{RESET}")
             print(f"\n{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
 
     def word_to_pptx(self):
@@ -291,7 +296,7 @@ class DocConverter:
                 # Save the PowerPoint presentation
                 prs.save(pptx_file)
                 logger.info(
-                    f"{fcl.MAGENTA_FG}New file is {fcl.fcl.CYAN_FG_FG}{pptx_file}{RESET}"
+                    f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{pptx_file}{RESET}"
                 )
                 print(f"\n{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
             except KeyboardInterrupt:
