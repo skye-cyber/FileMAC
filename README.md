@@ -126,7 +126,7 @@ filemac --audio_effect 'demo.mp3' --effect high
   [Listen to Original Audio](https://skye-cyber.github.io/FileMAC/res/demo.html)
 
 **Result**<br/>
-  [Listen to Original Audio](https://skye-cyber.github.io/FileMAC/res/demo.html)
+  [Listen to Modified Audio](https://skye-cyber.github.io/FileMAC/res/demo.html)
   
 ---
 
@@ -138,7 +138,7 @@ filemac --audio_effect 'demo.mp4' --effect high
   [Listen to Original Video](https://skye-cyber.github.io/FileMAC/res/demo.html)
   
 **Result**<br/>
-  [Listen to Original Video](https://skye-cyber.github.io/FileMAC/res/demo.html)
+  [Listen to Modified Video](https://skye-cyber.github.io/FileMAC/res/demo.html)
   
 ---
 
