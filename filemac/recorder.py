@@ -46,8 +46,6 @@ def record_audio():
     start_time = time.time()
 
     def callback(indata, frames, callback_time, status):
-        nonlocal paused  # Use nonlocal for nested functions
-        nonlocal elapsed_time, start_time
         if not paused:
             recording.append(indata.copy())
             elapsed_time = time.time() - start_time
