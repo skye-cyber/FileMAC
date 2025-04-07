@@ -11,7 +11,7 @@ dtype = np.int16  # Data type for the recording
 
 paused = False  # Global flag for pause
 recording = []  # Buffer for recorded chunks
-start_time = None  # Start time for elapsed time tracking
+start_time = 0  # Start time for elapsed time tracking
 elapsed_time = 0  # Track elapsed time
 running = True  # Track recording status
 

@@ -72,7 +72,7 @@ Replace `[options]` with the appropriate command-line options based on the funct
        `7`. XLSX to (Sql, CSV, TXT, word)
 
 
-  This promt parses convert_doc signifying that the inteded operation id document conversion then parses ```example.docx``` as the input file(file path can also be provided) to be converted to format ```pdf```.
+    This promt parses convert_doc signifying that the inteded operation id document conversion then parses ```example.docx``` as the input file(file path can also be provided) to be converted to format ```pdf```.
 the output file assumes the base name of the input file but the extension conforms to the parsed format```pdf```
 
 2. converting text mp3 to wav
@@ -100,7 +100,7 @@ the output file assumes the base name of the input file but the extension confor
    ```shell
    filemac --convert_image example.png -t jpg
     ```
-   **Supported formats For audio conversion**
+#### Supported formats For audio conversion
        `1`.JPEG: `.jpg`
        `2`.PNG": `.png`
        `3`.GIF": `.gif`
@@ -120,24 +120,25 @@ the output file assumes the base name of the input file but the extension confor
 ```shell
 filemac --audio_effect 'file.mp3' --effect high
 ```
-    - **Original**
+- Original
         <audio controls src="res/audio_effect/demo.mp3">
         Your browser does not support the audio element.
         </audio>
-    - **Result**
+- Result
         <audio controls src="res/audio_effect/chipmunk_demo.mp3">
         Your browser does not support the audio element.
         </audio>
     
 #### Video
-    - **Original**
-        <video controls src="res/audio_effect/demo.mp4">
-        Your browser does not support the video element.
-        </video>
-    - **Result**
-        <video controls src="res/audio_effect/high_demo.mp4">
-        Your browser does not support the video element.
-        </video>
+- Original
+    <video controls src="res/audio_effect/demo.mp4">
+    Your browser does not support the video element.
+    </video>
+- Result
+    <video controls src="res/audio_effect/high_demo.mp4">
+    Your browser does not support the video element.
+    </video>
+    
 ## Help
 in any case you can pass the string help to an option to see its supported operations or inputs nd output formats.
 ```shell
