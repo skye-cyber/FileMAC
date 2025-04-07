@@ -114,16 +114,20 @@ the output file assumes the base name of the input file but the extension confor
        `11`.SVG: `.svg`
        `12`.EPS: `.eps`
 
-       
-6. Manipulate audio
+
+### Manipulate audio
+---
 #### Audio 
 ```shell
 filemac --audio_effect 'demo.mp3' --effect high
 ```
+
 **Original**<br/>
   [Listen to Original Audio](res/demo.html)
-<br/>**Result**<br/>
+
+**Result**<br/>
   [Listen to Original Audio](res/demo.html)
+  
 ---
 
 #### Video
@@ -132,9 +136,12 @@ filemac --audio_effect 'demo.mp4' --effect high
 ```
 **Original**<br/>
   [Listen to Original Audio](res/demo.html)
-<br/>**Result**<br/>
+  
+**Result**<br/>
   [Listen to Original Audio](res/demo.html)
   
+---
+
 ## Help
 in any case you can pass the string help to an option to see its supported operations or inputs nd output formats.
 ```shell
