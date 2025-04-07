@@ -123,13 +123,13 @@ filemac --audio_effect 'demo.mp3' --effect high
 
 - **Original:**
     <audio controls>
-        <source src="res/audio_effects/demo.mp3" type="audio/mpeg">
+        <source src="./res/audio_effects/demo.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
 - **Result:**
     <audio controls>
-        <source src="res/audio_effects/high_demo.mp3" type="audio/mpeg">
+        <source src="./res/audio_effects/high_demo.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
@@ -142,13 +142,13 @@ filemac --audio_effect 'demo.mp4' --effect high
 
 - **Original:**
     <video controls> 
-        <source src="res/audio_effects/demo.mp4" type="video/mpeg">
+        <source src="./res/audio_effects/demo.mp4" type="video/mpeg">
         Your browser does not support the video element.
     </video>
 
 - **Result:**
     <video controls>
-        <source src="res/audio_effects/chipmunk_demo.mp4" type="video/mpeg">
+        <source src="./res/audio_effects/chipmunk_demo.mp4" type="video/mpeg">
         Your browser does not support the video element.
     </video>
     
