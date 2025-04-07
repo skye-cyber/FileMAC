@@ -24,7 +24,7 @@ def format_time(seconds):
 
 
 def on_press(key):
-    global paused, running, start_time, elapsed_time
+    global paused, running
     try:
         if key == keyboard.Key.space:
             paused = not paused  # Toggle pause/resume
@@ -46,7 +46,7 @@ def record_audio():
     start_time = time.time()
 
     def callback(indata, frames, callback_time, status):
-        global elapsed_time
+        global elapsed_time, start_time
         if not paused:
             recording.append(indata.copy())
             elapsed_time = time.time() - start_time

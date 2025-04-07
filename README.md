@@ -118,26 +118,41 @@ the output file assumes the base name of the input file but the extension confor
 6. Manipulate audio
 #### Audio 
 ```shell
-filemac --audio_effect 'file.mp3' --effect high
+filemac --audio_effect 'demo.mp3' --effect high
 ```
-- Original
-        <audio controls src="res/audio_effect/demo.mp3">
+
+- **Original:**
+    ```html
+    <audio controls src="res/audio_effect/demo.mp3">
         Your browser does not support the audio element.
-        </audio>
-- Result
-        <audio controls src="res/audio_effect/chipmunk_demo.mp3">
+    </audio>
+    ```
+
+- **Result:**
+    ```html
+    <audio controls src="res/audio_effect/chipmunk_demo.mp3">
         Your browser does not support the audio element.
-        </audio>
-    
-#### Video
-- Original
+    </audio>
+    ```
+
+### Video
+```shell
+filemac --audio_effect 'demo.mp4' --effect high
+```
+
+- **Original:**
+    ```html
     <video controls src="res/audio_effect/demo.mp4">
-    Your browser does not support the video element.
+        Your browser does not support the video element.
     </video>
-- Result
+    ```
+
+- **Result:**
+    ```html
     <video controls src="res/audio_effect/high_demo.mp4">
-    Your browser does not support the video element.
+        Your browser does not support the video element.
     </video>
+    ```
     
 ## Help
 in any case you can pass the string help to an option to see its supported operations or inputs nd output formats.
