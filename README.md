@@ -121,38 +121,30 @@ the output file assumes the base name of the input file but the extension confor
 filemac --audio_effect 'demo.mp3' --effect high
 ```
 
-- **Original:**
-    ```html
-    <audio controls src="res/audio_effect/demo.mp3">
+- **Original:**<br/>
+    <audio controls src="res/audio_effects/demo.mp3">
         Your browser does not support the audio element.
     </audio>
-    ```
 
-- **Result:**
-    ```html
-    <audio controls src="res/audio_effect/chipmunk_demo.mp3">
+- **Result:**<br/>
+    <audio controls src="res/audio_effects/chipmunk_demo.mp3">
         Your browser does not support the audio element.
     </audio>
-    ```
 
 ### Video
 ```shell
 filemac --audio_effect 'demo.mp4' --effect high
 ```
 
-- **Original:**
-    ```html
-    <video controls src="res/audio_effect/demo.mp4">
+- **Original:**<br/>
+    <video controls src="res/audio_effects/demo.mp4">
         Your browser does not support the video element.
     </video>
-    ```
 
-- **Result:**
-    ```html
-    <video controls src="res/audio_effect/high_demo.mp4">
+- **Result:**<br/>
+    <video controls src="res/audio_effects/chipmunk_demo.mp4">
         Your browser does not support the video element.
     </video>
-    ```
     
 ## Help
 in any case you can pass the string help to an option to see its supported operations or inputs nd output formats.
