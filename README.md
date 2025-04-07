@@ -42,15 +42,19 @@ Replace `[options]` with the appropriate command-line options based on the funct
 - `8`:  --OCR
 - `9`:  --convert_doc2image
 - `10`: --extract_audio
-- `11`: --Analyze_video
+- `11`: --AudioJoin (join audio files to one master file)
 - `12`: --resize_image
 - `13`: --doc_long_image      (convert pdf/doc/docx to long image)
-- `14`: --scanAsImg           (scan text from pdf)
-- `15`: --scanAsLong_Image    (scan text from pdf)
-- `15`: --AudioJoin
-- `15`: --extract_pages
-- `15`: --manipulate_audio
-- `15`: --pdfjoin
+- `14`: --image2pdf (convert image(s) to pdf)
+- `15`: --image2word (convert image(s) to word document)
+- `16`: --image2gray (convert image(s) to grayscale)
+- `17`: --extract_pages (extract pages from pdf selectively)
+- `18`: --scanAsImg (convert pdf to images then extract text, number of images=number of pages)
+- `19`: --scanAsLong_Image (convert pdf to long image then extract text-good for continuous text extraction)
+- `20`: --pdfjoin
+- `21`: --audio_effect (manipulate audio/video voice)
+- `22`: --voicetype (voice typing) - upcoming
+
 ## Examples
 
 1. Example command 1:
@@ -58,22 +62,15 @@ Replace `[options]` with the appropriate command-line options based on the funct
    ```shell
    filemac --convert_doc example.docx -t pdf
    ```
-        ``Supported formats For document conversion``
-             `1`.  PDF to DOCX
-             `2`.  PDF to TXT
-             `3`.  PDF to Audio(ogg,mp3,wav..*)
-             `4`.  DOCX to PDF
-             `5`.  DOCX to pptx
-             `6`.  DOCX to TXT
-             `7`.  DOCX to Audio(ogg,mp3,wav..*)
-             `8`.  TXT to PDF
-             `9`.  TXT to DOCX
-             `10`' TXT to Audio(ogg,mp3,wav..*)
-             `11`. PPTX to DOCX
-             `12`. XLSX to Sql
-             `13`. XLSX to CSV
-             `14`. XLSX to TXT
-             `15`. XLSX to DOCX
+    **Supported formats For document conversion**
+       `1`.  PDF to (word, txt, audio\[tts\]) 
+       `2`.  PDF to TXT
+       `3`.  PDF to Audio(ogg,mp3,wav..*)
+       `4`.  DOCX to (PDF, pptx/ppt, txt, audio,
+       `5`.  TXT to (PDF, word, audio)
+       `6`. PPTX to DOCX
+       `7`. XLSX to (Sql, CSV, TXT, word)
+
 
   This promt parses convert_doc signifying that the inteded operation id document conversion then parses ```example.docx``` as the input file(file path can also be provided) to be converted to format ```pdf```.
 the output file assumes the base name of the input file but the extension conforms to the parsed format```pdf```
@@ -82,54 +79,65 @@ the output file assumes the base name of the input file but the extension confor
    ```shell
    filemac --convert_audio example.mp3 -t wav
     ```
-            ``Supported formats For audio conversion``
-                `1`. wav
-                `2`. mp3
-                `3`. ogg
-                `4`. flv
-                `5`. avi
-                `6`. ogv
-                `7`. matroska
-                `8`. mov
-                `9`. webm
+    **Supported formats For audio conversion**
+    - (``wav, mp3, ogg, flv, ogv, avi, mkv, mov, webm``)
+
 
 3. Extract text from images
     ```shell
     filemac --OCR image.jpg
     ```
 
-    2. converting videos
+4. converting videos
    ```shell
    filemac --convert_video example.mp4 -t wav
     ```
-            ``Supported formats For video conversion``
-                `1`. MP4
-                `2`. AVI
-                `3`. OGV
-                `4`. WEBM
-                `5`. MOV
-                `6`. MKV
-                `7`. FLV
-                `8`. WMV
+    **Supported formats For video conversion**
+    (``mp4, avi, ogv, webm, mov, mkv, flv, wmv``)
 
-2. converting images
+
+5. converting images
    ```shell
    filemac --convert_image example.png -t jpg
     ```
-            ``Supported formats For audio conversion``
-                `1`.JPEG: `.jpg`
-                `2`.PNG": `.png`
-                `3`.GIF": `.gif`
-                `4`.BM":  `.bmp`
-                `5`.TIFF: `.tiff`
-                `6`.EXR   `.exr`
-                `7`.PDF:  `.pdf`
-                `8`.WebP: `.webp`
-                `9`.ICNS: `.icns`
-                `10`.PSD: `.psd`
-                `11`.SVG: `.svg`
-                `12`.EPS: `.eps`
+   **Supported formats For audio conversion**
+       `1`.JPEG: `.jpg`
+       `2`.PNG": `.png`
+       `3`.GIF": `.gif`
+       `4`.BM":  `.bmp`
+       `5`.TIFF: `.tiff`
+       `6`.EXR   `.exr`
+       `7`.PDF:  `.pdf`
+       `8`.WebP: `.webp`
+       `9`.ICNS: `.icns`
+       `10`.PSD: `.psd`
+       `11`.SVG: `.svg`
+       `12`.EPS: `.eps`
 
+       
+6. Manipulate audio
+#### Audio 
+```shell
+filemac --audio_effect 'file.mp3' --effect high
+```
+    - **Original**
+        <audio controls src="res/audio_effect/demo.mp3">
+        Your browser does not support the audio element.
+        </audio>
+    - **Result**
+        <audio controls src="res/audio_effect/chipmunk_demo.mp3">
+        Your browser does not support the audio element.
+        </audio>
+    
+#### Video
+    - **Original**
+        <video controls src="res/audio_effect/demo.mp4">
+        Your browser does not support the video element.
+        </video>
+    - **Result**
+        <video controls src="res/audio_effect/high_demo.mp4">
+        Your browser does not support the video element.
+        </video>
 ## Help
 in any case you can pass the string help to an option to see its supported operations or inputs nd output formats.
 ```shell

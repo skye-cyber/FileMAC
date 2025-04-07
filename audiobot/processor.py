@@ -32,7 +32,7 @@ class VideoProcessor:
         Process video file by applying audio effects and retaining original bitrate.
         """
 
-        Clogger.info(f"Set Voice effect : {fcl.MAGENTA_FG_FG}{effect}{RESET}")
+        Clogger.info(f"Set Voice effect : {fcl.MAGENTA_FG}{effect}{RESET}")
         Clogger.info(f"Processing video file: {input_file}")
 
         try:
@@ -65,7 +65,7 @@ class VideoProcessor:
 
             # Apply the selected voice effect
             Clogger.info(
-                f"Applying the [{fcl.BBWHITE_FG}{effect}{RESET}{fcl.GREEN_FG_FG}] effect"
+                f"Applying the [{fcl.BBWHITE_FG}{effect}{RESET}{fcl.GREEN_FG}] effect"
             )
             modified_audio = VoiceEffectProcessor(audio_segment, effect).apply_effect()
 
@@ -93,8 +93,8 @@ class VideoProcessor:
             # Use the original bitrate or default to 5000k if unavailable
             if verbosity:
                 Clogger.info(
-                    f"Set:\n\tCodec = [{fcl.fcl.MAGENTA_FG_FG}libx264{fcl.GREEN_FG}\n"
-                    f"\tCodec type = [{fcl.fcl.MAGENTA_FG_FG}aac{fcl.GREEN_FG}\n"
+                    f"Set:\n\tCodec = [{fcl.fcl.MAGENTA_FG}libx264{fcl.GREEN_FG}\n"
+                    f"\tCodec type = [{fcl.fcl.MAGENTA_FG}aac{fcl.GREEN_FG}\n"
                     f"\tBitrate = [{fcl.MAGENTA_FG}{original_bitrate or '5000k'}{RESET}]"
                 )
 

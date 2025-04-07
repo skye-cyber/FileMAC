@@ -1,6 +1,4 @@
-#!/usr/bin/env python3.11.7
-"""Control file (main script)"""
-
+#!/usr/bin/env python3
 import argparse
 import logging
 import logging.handlers
@@ -71,7 +69,7 @@ class _DIR_CONVERSION_:
 
                     if _ext_ in self._ls_ and os.path.exists(_path_):
                         print(f"INFO\t {fcl.FYELLOW_FG}Parse {
-                            fcl.Ffcl.BLUE_FG_FG}{_path_}{RESET}")
+                            fcl.BLUE_FG}{_path_}{RESET}")
                         init = Eval(_path_, self._format_)
                         init.document_eval()
 
@@ -220,7 +218,7 @@ class Eval:
                     conv.convert_csv_to_xlsx()
 
             else:
-                print(f"{fcl.fcl.BYELLOW_FG_FG}Unsupported Conversion type❌{RESET}")
+                print(f"{fcl.fcl.BYELLOW_FG}Unsupported Conversion type❌{RESET}")
                 pass
         except Exception as e:
             logger.error(e)

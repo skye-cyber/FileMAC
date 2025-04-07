@@ -40,7 +40,7 @@ class FileSynthesis:
     def join_audios(files, output_file):
         masterfile = output_file + "_master.mp3"
         print(
-            f"{fcl.BBLUE_FG_FG}Create a master file {fcl.BMAGENTA_FG}{masterfile}{RESET}",
+            f"{fcl.BBLUE_FG}Create a master file {fcl.BMAGENTA_FG}{masterfile}{RESET}",
             end="\r",
         )
         # Create a list to store files
