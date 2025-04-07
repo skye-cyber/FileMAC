@@ -46,7 +46,7 @@ def record_audio():
     start_time = time.time()
 
     def callback(indata, frames, callback_time, status):
-        global elapsed_time, start_time, pause
+        global elapsed_time, start_time, paused
         if not paused:
             recording.append(indata.copy())
             elapsed_time = time.time() - start_time
