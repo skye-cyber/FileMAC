@@ -5,6 +5,7 @@ from PIL import Image
 from io import BytesIO
 from typing import List
 from pathlib import Path
+import os
 
 
 class ImageExtractor:
@@ -12,17 +13,20 @@ class ImageExtractor:
     Base class for extracting images from document files.
     """
 
-    def __init__(self, output_path: str = "extracted_images") -> None:
+    def __init__(self, output_path: str = None) -> None:
         """
         Initializes the ImageExtractor object.
 
         Args:
             output_path: Path to save the extracted images.
         """
-        self.output_path = output_path
-        Path(self.output_path).mkdir(
-            parents=True, exist_ok=True
-        )  # Ensure directory exists
+        base_path = (
+            os.path.join(output_path, "FilemacExctracts")
+            if output_path
+            else os.path.join(os.path.abspath(os.getcwd()), "FilemacExctracts")
+        )
+        self.output_path = base_path
+        Path(base_path).mkdir(parents=True, exist_ok=True)  # Ensure directory exists
 
     def _extract_images(self, file_path: str) -> List[Image.Image]:
         """
@@ -143,7 +147,26 @@ class DocxImageExtractor(ImageExtractor):
         return images
 
 
-def process_files(file_paths: List[str], output_path: str) -> None:
+def dirbuster(_dir_):
+    try:
+        target = []
+        for root, dirs, files in os.walk(_dir_):
+            for file in files:
+                ext = file.split(".")[-1]
+
+                _path_ = os.path.join(root, file)
+                if os.path.exists(_path_) and ext.lower() in ("pdf", "doc", "docx"):
+                    target.append(_path_)
+        return target
+    except FileNotFoundError as e:
+        print(e)
+
+    except KeyboardInterrupt:
+        print("\nQuit!")
+        return
+
+
+def process_files(file_paths: List[str], output_path: str = os.getcwd()) -> None:
     """
     Processes the given files and extracts images from them.
 
@@ -151,15 +174,22 @@ def process_files(file_paths: List[str], output_path: str) -> None:
         file_paths: List of paths to the files to process.
         output_path: Path to save the extracted images.
     """
-    for file_path in file_paths:
-        if file_path.lower().endswith(".pdf"):
-            extractor = PdfImageExtractor(output_path)
-            extractor.extract_and_save_images(file_path)
-        elif file_path.lower().endswith((".docx")):
-            extractor = DocxImageExtractor(output_path)
-            extractor.extract_and_save_images(file_path)
-        else:
-            print(f"Skipping unsupported file format: {file_path}")
+    try:
+        for file_path in file_paths:
+            if os.path.isdir(file_path):
+                files = dirbuster(file_path)
+                process_files(files)
+            if file_path.lower().endswith(".pdf"):
+                extractor = PdfImageExtractor(output_path)
+                extractor.extract_and_save_images(file_path)
+            elif file_path.lower().endswith((".docx")):
+                extractor = DocxImageExtractor(output_path)
+                extractor.extract_and_save_images(file_path)
+            else:
+                print(f"Skipping unsupported file format: {file_path}")
+    except KeyboardInterrupt:
+        print("\nQuit")
+        sys.exit()
 
 
 def main(args: List[str]) -> None:
@@ -197,6 +227,9 @@ def main(args: List[str]) -> None:
                 print(f"Unknown argument: {args[i]}")
                 sys.exit(1)
 
+    file_paths.append(
+        "/home/skye/Downloads/KDEConnect/SPE 2304 Server Side Programming Year III Semester II.pdf"
+    )
     if not file_paths:
         print("No files provided for image extraction.")
         sys.exit(1)

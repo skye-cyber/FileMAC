@@ -25,6 +25,8 @@ from .OCR.Extractor import ExtractText
 from .pdf.Page_Extractor import _entry
 from .Simple_v_Analyzer import SA
 from .videopy.pyVideo import VideoConverter
+from .imagepy.image_extractor import process_files
+
 
 fcl = foreground()
 bcl = background()
@@ -448,6 +450,13 @@ def Cmd_arg_Handler():
     )
 
     parser.add_argument(
+        "-IeX",
+        "--image_extractor",
+        nargs="+",
+        help=f"Convert Images to pdf. {fcl.BWHITE_FG}Accepts file list {RESET} e.g `{fcl.BYELLOW_FG}filemac --image_extractor file1 file2{RESET}`",
+    )
+
+    parser.add_argument(
         "-V",
         "--version",
         action="store_true",
@@ -640,6 +649,9 @@ class argsOPMaper:
     def handle_extract_pages(self):
         self._entry(self.args.extract_pages)
 
+    def ImageExtractor(self):
+        process_files(self.args.image_extractor)
+
     def image2pdf(self):
         from .Imagepdfpy.image_to_pdf import ImageToPdfConverter
 
@@ -749,6 +761,9 @@ class argsOPMaper:
             tuple(args.image2gray)
             if isinstance(args.image2gray, list)
             else args.image2gray: self.image2grayscale,
+            tuple(args.image_extractor)
+            if isinstance(args.image_extractor, list)
+            else args.image_extractor: self.ImageExtractor,
         }
 
         # Find the first non-empty key in method_mapper and execute its corresponding method
