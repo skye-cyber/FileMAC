@@ -511,7 +511,7 @@ class argsOPMaper:
         init.controller()
 
     def image_converter(self):
-        if self.agrs.target_format is None:
+        if self.args.target_format is None:
             self.ensure_target_format()
             return
         if self.args.convert_image == "help":
