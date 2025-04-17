@@ -735,8 +735,8 @@ class argsOPMaper:
             args.extract_audio: self.handle_audio_extraction,
             args.scan: self.handle_scan_pdf,
             args.scanAsImg: self.handle_scan_images,
-            args.doc_long_image: self.handle_scan_long_image,
-            args.scanAsLong_Image: self.handle_doc_to_long_image,
+            args.doc_long_image: self.handle_doc_to_long_image,
+            args.scanAsLong_Image: self.handle_scan_long_image,
             args.voicetype: self.voicetype,
             tuple(args.OCR)
             if isinstance(args.OCR, list)

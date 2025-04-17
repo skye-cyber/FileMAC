@@ -76,5 +76,5 @@ class LImage:
             print("\nQuit❕")
             sys.exit()
         except Exception as e:
-            print(e)
-            sys.exit(1)
+            print(f"{fcl.RED_FG}{e}{RESET}")
+            return
