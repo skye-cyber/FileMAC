@@ -70,7 +70,7 @@ class Extractor:
             print("\n [!] Quit")
             exit(2)
         except FileNotFoundError as e:
-            print(f"[{bcl.BRED_FG}-{RESET}] {fcl.RED_FG}{e}{RESET}")
+            print(f"[{bcl.BRED_BG}-{RESET}] {fcl.RED_FG}{e}{RESET}")
         except Exception as e:
             print(e)
             # raise

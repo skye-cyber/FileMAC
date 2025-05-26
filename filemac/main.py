@@ -655,7 +655,11 @@ class argsOPMaper:
     def image2pdf(self):
         from .Imagepdfpy.image_to_pdf import ImageToPdfConverter
 
-        _input = self.args.image2pdf
+        _input = (
+            list(self.args.image2pdf)
+            if not isinstance(self.args.image2pdf, list)
+            else self.args.image2pdf
+        )
         if isinstance(_input, list):
             if len(_input) > 1 or os.path.isfile(os.path.abspath(_input[0])):
                 converter = ImageToPdfConverter(image_list=_input)
