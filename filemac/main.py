@@ -462,6 +462,32 @@ def Cmd_arg_Handler():
         action="store_true",
         help="Show software version and exit.",
     )
+
+    parser.add_argument(
+        "--sort",
+        action="store_true",
+        help="Order pages by last int before extension.",
+    )
+    parser.add_argument(
+        "--base",
+        action="store_true",
+        help="Base name for image2pdf output",
+    )
+    parser.add_argument(
+        "--size",
+        type=str,
+        help=f"Dimensions for images to be saved by extractor eg {fcl.BBLUE_FG}256x82{fcl.RESET}",
+    )
+    parser.add_argument(
+        "--walk",
+        action="store_true",
+        help="Do an operation on a dirctory and it's subdirectories.",
+    )
+    parser.add_argument(
+        "--clean",
+        action="store_true",
+        help=f"Clean file/dir after an operation eg after {fcl.BMAGENTA_FG}image2pdf clean image dirs{fcl.RESET}.",
+    )
     # Use parse_known_args to allow unknown arguments (for later tunneling)
     args, remaining_args = parser.parse_known_args()
     mapper = argsOPMaper(parser, args, remaining_args)
@@ -650,7 +676,11 @@ class argsOPMaper:
         self._entry(self.args.extract_pages)
 
     def ImageExtractor(self):
-        process_files(self.args.image_extractor)
+        if self.args.size:
+            size = tuple([int(x) for x in self.args.size.lower().split("x")])
+            process_files(self.args.image_extractor, tsize=size)
+        else:
+            process_files(self.args.image_extractor)
 
     def image2pdf(self):
         from .Imagepdfpy.image_to_pdf import ImageToPdfConverter
@@ -664,7 +694,13 @@ class argsOPMaper:
             if len(_input) > 1 or os.path.isfile(os.path.abspath(_input[0])):
                 converter = ImageToPdfConverter(image_list=_input)
             else:
-                converter = ImageToPdfConverter(input_dir=_input[0])
+                converter = ImageToPdfConverter(
+                    input_dir=_input[0],
+                    order=self.args.sort,
+                    base=self.args.base,
+                    walk=self.args.walk,
+                    clean=self.args.clean,
+                )
         converter.run()
 
     def image2word(self):
@@ -783,6 +819,7 @@ class argsOPMaper:
             if method:
                 method()
         except Exception as e:
+            raise
             # Handle any exceptions that occur during method execution
             print(f"An error occurred: {e}")
 

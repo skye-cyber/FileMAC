@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "filemac"
+version = "1.1.9"  # Will be overridden by version.txt in setup.py unless removed from there
+description = "Open source Python CLI toolkit for conversion, manipulation, analysis of files (All major file operations)"
+readme = "README.md"
+requires-python = ">=3.6"
+license = { file = "LICENSE" }
+authors = [
+    { name = "wambua", email = "swskye17@gmail.com" },
+]
+keywords = [
+    "file-conversion",
+    "file-analysis",
+    "file-manipulation",
+    "ocr",
+    "image-conversion",
+    "audio_effects",
+    "voice_shift",
+    "pdf",
+    "docx",
+]
+classifiers = [
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "argparse",
+    "pdfminer.six",
+    "python-docx",
+    "python-pptx",
+    "gTTS",
+    "pypandoc",
+    "fitz",  # Consider replacing with "PyMuPDF" if that's what's actually used
+    "pydub",
+    "Pillow",
+    "pandas",
+    "opencv-python",
+    "pytesseract",
+    "PyPDF2",
+    "pdf2docx",
+    "requests",
+    "moviepy",
+    "reportlab",
+    "numpy",
+    "pdf2image",
+    "openpyxl",
+    "rich",
+    "tqdm",
+    "ffmpeg-python",
+    "librosa",
+    "python-magic",
+    "matplotlib",
+    "soundfile",
+    "SpeechRecognition",
+    "colorama",
+    "scipy",
+    "PyMuPDF",
+    "pyautogui",
+    "imageio",
+    "pynput",
+    "pyaudio",
+]
+
+[project.urls]
+Homepage = "https://pypi.org/project/filemac/"
+Source = "https://github.com/skye-cyber/filemac"
+Issues = "https://github.com/skye-cyber/filemac/issues"
+
+[project.scripts]
+filemac = "filemac:main"
+Filemac = "filemac:main"
+FILEMAC = "filemac:main"

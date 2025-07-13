@@ -8,7 +8,7 @@ import logging
 import html
 import requests
 from dotenv import load_dotenv
-import pkg_resources
+from importlib import resources
 from utils.colors import foreground
 
 fcl = foreground()

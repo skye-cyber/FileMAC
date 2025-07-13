@@ -6,6 +6,10 @@ from io import BytesIO
 from typing import List
 from pathlib import Path
 import os
+from utils.colors import foreground
+
+fcl = foreground()
+RESET = fcl.RESET
 
 
 class ImageExtractor:
@@ -13,7 +17,7 @@ class ImageExtractor:
     Base class for extracting images from document files.
     """
 
-    def __init__(self, output_path: str = None) -> None:
+    def __init__(self, output_path: str = None, tsize: tuple = (20, 20)) -> None:
         """
         Initializes the ImageExtractor object.
 
@@ -26,7 +30,8 @@ class ImageExtractor:
             else os.path.join(os.path.abspath(os.getcwd()), "FilemacExctracts")
         )
         self.output_path = base_path
-        Path(base_path).mkdir(parents=True, exist_ok=True)  # Ensure directory exists
+        self.tsize = tsize
+        self.output_base = None
 
     def _extract_images(self, file_path: str) -> List[Image.Image]:
         """
@@ -51,12 +56,28 @@ class ImageExtractor:
             file_path: Path to the document file.
         """
         images = self._extract_images(file_path)
+        self.output_base = os.path.split(file_path)[0]
         if not images:
             print(f"No images found in {file_path}")
             return
 
         base_filename = Path(file_path).stem
         self._save_images(images, base_filename)
+
+    def is_page_sized_image(self, img, target_size=(595, 842), tolerance=1):
+        """Check if image is approximately page-sized (default: A4 at 72 DPI)."""
+        img_width, img_height = img.size
+        target_width, target_height = self.tsize if self.tsize else target_size
+
+        within_width = (
+            img_width > target_width
+        )  # abs(img_width - target_width) >= target_width * tolerance
+        within_height = (
+            img_height > target_height
+            # abs(img_height - target_height) >= target_height * tolerance
+        )
+
+        return within_width and within_height
 
     def _save_images(self, images: List[Image.Image], base_filename: str) -> None:
         """
@@ -66,15 +87,26 @@ class ImageExtractor:
             images: A list of PIL Image objects.
             base_filename: The base filename to use when saving images (e.g., 'page_1').
         """
+        self.output_path = os.path.join(self.output_base, f"{base_filename}_imgs")
+        os.makedirs(self.output_path, exist_ok=True)  # Ensure directory exists
+
         for i, img in enumerate(images):
             try:
+                if self.tsize and not self.is_page_sized_image(img):
+                    print(
+                        f"Skipping image {i + 1}: ({fcl.CYAN_FG}{img.size}{RESET}) <= {fcl.BLUE_FG}{self.tsize}{RESET}"
+                    )
+                    continue
+
                 # Generate a unique filename for each image
                 img_format = img.format or "PNG"  # Default to PNG if format is None
                 safe_filename = f"{base_filename}_img_{i + 1}.{img_format.lower()}"
+
                 img_path = Path(self.output_path) / safe_filename
                 img.save(img_path)
-                print(f"Saved image: {img_path}")
+                print(f"Saved image: {fcl.GREEN_FG}{img_path}{RESET}")
             except Exception as e:
+                raise
                 print(f"Error saving image {i+1} from {base_filename}: {e}")
 
 
@@ -82,6 +114,11 @@ class PdfImageExtractor(ImageExtractor):
     """
     Extracts images from PDF files.
     """
+
+    def __init__(self, output_path, size):
+        super().__init__(
+            output_path, size or (20, 20)
+        )  # Call Parent.__init__ with value
 
     def _extract_images(self, file_path: str) -> List[Image.Image]:
         """
@@ -93,6 +130,7 @@ class PdfImageExtractor(ImageExtractor):
         Returns:
             A list of PIL Image objects.
         """
+        print(f"{fcl.BWHITE_FG}File: {fcl.BLUE_FG}{file_path}{RESET}")
         images: List[Image.Image] = []
         try:
             pdf_document = fitz.open(file_path)
@@ -120,6 +158,11 @@ class DocxImageExtractor(ImageExtractor):
     """
     Extracts images from DOCX files.
     """
+
+    def __init__(self, output_path, size):
+        super().__init__(
+            output_path, size or (20, 20)
+        )  # Call Parent.__init__ with value
 
     def _extract_images(self, file_path: str) -> List[Image.Image]:
         """
@@ -166,7 +209,9 @@ def dirbuster(_dir_):
         return
 
 
-def process_files(file_paths: List[str], output_path: str = os.getcwd()) -> None:
+def process_files(
+    file_paths: List[str], output_path: str = os.getcwd(), tsize: tuple = None
+) -> None:
     """
     Processes the given files and extracts images from them.
 
@@ -178,12 +223,12 @@ def process_files(file_paths: List[str], output_path: str = os.getcwd()) -> None
         for file_path in file_paths:
             if os.path.isdir(file_path):
                 files = dirbuster(file_path)
-                process_files(files)
+                process_files(files, tsize=tsize)
             if file_path.lower().endswith(".pdf"):
-                extractor = PdfImageExtractor(output_path)
+                extractor = PdfImageExtractor(output_path, tsize)
                 extractor.extract_and_save_images(file_path)
             elif file_path.lower().endswith((".docx")):
-                extractor = DocxImageExtractor(output_path)
+                extractor = DocxImageExtractor(output_path, tsize)
                 extractor.extract_and_save_images(file_path)
             else:
                 print(f"Skipping unsupported file format: {file_path}")
