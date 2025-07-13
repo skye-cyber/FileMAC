@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "filemac"
-version = "1.1.9"  # Will be overridden by version.txt in setup.py unless removed from there
+version = "2.0.0"  # Will be overridden by version.txt in setup.py unless removed from there
 description = "Open source Python CLI toolkit for conversion, manipulation, analysis of files (All major file operations)"
 readme = "README.md"
 requires-python = ">=3.6"
