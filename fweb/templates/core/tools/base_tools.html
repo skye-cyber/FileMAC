@@ -40,7 +40,7 @@ category|title }} Tools - Filemac{% endblock %} {% block content %}
         <div class="space-y-1">
           {% for tool in tools %}
           <button
-            onclick="showTool('{{ tool.id }}', '{{ category }}')"
+            onclick="window.toolHandler.showTool('{{ tool.id }}', '{{ category }}')"
             class="tool-nav tool-{{ tool.id }} w-full text-left p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
           >
             <div class="flex items-center justify-between">
@@ -136,5 +136,4 @@ category|title }} Tools - Filemac{% endblock %} {% block content %}
   </div>
 </div>
 {% endblock %} {% block extra_scripts %}
-<script type="text/javascript" src="{% static 'js/toolsHandler.js' %}"></script>
 {% endblock %}

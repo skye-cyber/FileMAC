@@ -8,8 +8,6 @@
     </title>
       {% load static %}
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
-    <!-- AOS Animation -->
-    <!--<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />-->
 
     <!-- Font Awesome -->
     <link
@@ -104,8 +102,12 @@
     <script type="text/javascript" src="{% static 'js/themes.js' %}" defer></script>
     <script type="text/javascript" src="{% static 'js/UI-X/packed_aosanimate.js' %}" defer></script>
     <script type="text/javascript" src="{% static 'js/FileHandler.js' %}" defer></script>
-    <script type="text/javascript" src="{% static 'js/utils.js' %}" defer></script>
-    <script type="text/javascript" src="{% static 'js/processor.js' %}" defer></script>
+    <script type="text/javascript" src="{% static 'js/ToolsHandler.js' %}" defer></script>
+    <script type="text/javascript" src="{% static 'js/uiManager.js' %}" defer></script>
+    <script type="text/javascript" src="{% static 'js/apiClient.js' %}" defer></script>
+    <script type="text/javascript" src="{% static 'js/main.js' %}" defer></script>
+    <!--<script type="text/javascript" src="{#% static 'js/utils.js' %}" defer></script>-->
+    <!--<script type="text/javascript" src="{% static 'js/processor.js' %}" defer></script>-->
 
     {% block extra_scripts %} {% endblock %}
   </body>
