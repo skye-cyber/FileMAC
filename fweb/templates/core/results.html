@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Processing Results - Filemac{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Results Header -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6" data-aos="fade-up">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-check text-2xl text-green-600 dark:text-green-400"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Processing Complete!</h1>
+                    <p class="text-gray-600 dark:text-gray-400">{{ results|length }} files processed successfully</p>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="downloadAll()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-download mr-2"></i>Download All
+                </button>
+                <a href="{% url 'dashboard' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>New Conversion
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {% for result in results %}
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+            <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium px-2 py-1 rounded
+                        {% if result.status == 'success' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                        {% else %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200{% endif %}">
+                        {{ result.status|title }}
+                    </span>
+                    <span class="text-xs text-gray-500">{{ result.size }}</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-file text-gray-400 mr-2"></i>
+                    <span class="text-sm font-medium truncate">{{ result.original_name }}</span>
+                </div>
+            </div>
+
+            <div class="p-4 bg-gray-50 dark:bg-gray-700">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600 dark:text-gray-400">Original</span>
+                    <i class="fas fa-arrow-right text-gray-400 mx-2"></i>
+                    <span class="text-gray-600 dark:text-gray-400">Converted</span>
+                </div>
+                <div class="flex items-center justify-between mt-2">
+                    <span class="text-xs text-gray-500">{{ result.original_format }}</span>
+                    <span class="text-xs text-green-600 font-medium">{{ result.target_format }}</span>
+                </div>
+            </div>
+
+            <div class="p-4">
+                <div class="flex space-x-2">
+                    <a href="{{ result.download_url }}"
+                       class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded text-sm transition-colors">
+                        <i class="fas fa-download mr-1"></i>Download
+                    </a>
+                    <button onclick="previewFile('{{ result.preview_url }}')"
+                            class="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Processing Summary -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6" data-aos="fade-up">
+        <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Processing Summary</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ total_files }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Total Files</p>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ success_files }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Successful</p>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ failed_files }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Failed</p>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ total_size }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Total Size</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div id="preview-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">File Preview</h3>
+            <button onclick="closePreview()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div id="preview-content" class="text-center">
+            <!-- Preview content will be loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script type="text/javascript" src="{% static 'js/result_utils.js' %}"></script>
+{% endblock %}

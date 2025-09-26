@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.scrollbar-hide {
+  /* Hide scrollbar for Chrome, Safari, and Edge */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+  overflow: -moz-scrollbars-none; /* Older Firefox */
+  overflow-y: scroll; /* Add this to ensure the content is scrollable */
+  &::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Edge */
+  }
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.waveform {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.bar {
+  width: 3px;
+  height: 10px;
+  background-color: #3b82f6;
+  border-radius: 3px;
+  animation: wave 1.2s infinite ease-in-out;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1.8);
+  }
+}
+
+.bar:nth-child(1) {
+  animation-delay: 0s;
+}
+.bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.bar:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.bar:nth-child(6) {
+  animation-delay: 0.5s;
+}
+.bar:nth-child(7) {
+  animation-delay: 0.6s;
+}
+.bar:nth-child(8) {
+  animation-delay: 0.7s;
+}
+.bar:nth-child(9) {
+  animation-delay: 0.8s;
+}
+.bar:nth-child(10) {
+  animation-delay: 0.9s;
+}
