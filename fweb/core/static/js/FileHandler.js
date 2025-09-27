@@ -23,6 +23,11 @@ class FileHandler {
     });
   }
 
+  openFileSelector(dropZoneId) {
+    const inputElement = document.getElementById(`${dropZoneId}-input`);
+    inputElement?.click();
+  }
+
   setupDragAndDrop(dropZone, fileInput, multiple) {
     dropZone.addEventListener("dragover", (e) => {
       e.preventDefault();

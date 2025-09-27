@@ -86,8 +86,8 @@ class ToolHandler {
       scan_pdf: () => this.initPDFScanning(),
       doc_long_image: () => this.initLongImageConversion(),
       extract_pages: () => this.initPageExtraction(),
-      Atext2word: () => this.initTextToWord(),
-      doc2image: () => this.initDocToImage(),
+      //Atext2word: () => this.initTextToWord(),
+      doc2image: () => this.initDocToImages(),
 
       // Image Tools
       convert_image: () => this.initImageConversion(),
@@ -122,6 +122,7 @@ class ToolHandler {
   }
 
   // Tool-specific initialization methods
+  ///=====Doc Operation==//
   initDocumentConversion() {
     fileHandler.setupFileDropZone("doc-drop-zone", "doc-file-input", true);
     this.setupFormatSelector("doc-target-format", [
@@ -129,9 +130,122 @@ class ToolHandler {
       "docx",
       "txt",
       "html",
+      "xls",
+      "xlsx",
+      "ppt",
+      "pptx",
+    ]);
+    this.setupAcceptedFiles("doc", [
+      "pdf",
+      "docx",
+      "txt",
+      "html",
+      "xls",
+      "xlsx",
+      "ppt",
+      "pptx",
     ]);
   }
 
+  initPDFJoining() {
+    fileHandler.setupFileDropZone(
+      "ppf_join-drop-zone",
+      "pdf_join-file-input",
+      false,
+    );
+  }
+
+  initPDFScanning() {
+    fileHandler.setupFileDropZone(
+      "scan_pdf-drop-zone",
+      "scan_pdf-file-input",
+      false,
+    );
+  }
+
+  initPageExtraction() {
+    fileHandler.setupFileDropZone(
+      "extract_pages-drop-zone",
+      "extract_pages-file-input",
+      false,
+    );
+  }
+
+  initDocToImages() {
+    fileHandler.setupFileDropZone(
+      "doc2image-drop-zone",
+      "doc2image-file-input",
+      false,
+    );
+  }
+
+  initLongImageConversion() {
+    fileHandler.setupFileDropZone(
+      "doc_long_image-drop-zone",
+      "doc_long_image-file-input",
+      false,
+    );
+  }
+
+  ///=====OCR Operation==//
+  initOCR() {
+    fileHandler.setupFileDropZone("ocr-drop-zone", "ocr-file-input", true);
+    this.setupLanguageSelector();
+  }
+
+  ///=====Audio Operation==//
+  initAudioConversion() {
+    fileHandler.setupFileDropZone("audio-drop-zone", "audio-file-input", true);
+    this.setupFormatSelector("audio-target-format", [
+      "mp3",
+      "wav",
+      "flac",
+      "m4a",
+      "ogg",
+      "aac",
+      "raw",
+      "aiff",
+      "ogv",
+    ]);
+    this.setupAcceptedFiles("audio", [
+      "mp3",
+      "wav",
+      "flac",
+      "m4a",
+      "ogg",
+      "aac",
+      "raw",
+      "aiff",
+      "ogv",
+    ]);
+  }
+
+  ///=====Video Operation==//
+  initVideoConversion() {
+    fileHandler.setupFileDropZone("video-drop-zone", "video-file-input", true);
+    this.setupFormatSelector("video-target-format", [
+      "mp4",
+      "mkv",
+      "webm",
+      "mov",
+      "avi",
+      "flv",
+      "wmv",
+      ,
+    ]);
+    this.setupAcceptedFiles("video", [
+      "mp4",
+      "mkv",
+      "webm",
+      "mov",
+      "avi",
+      "flv",
+      "wmv",
+      ,
+    ]);
+  }
+
+  ///=====Image Operation==//
   initImageConversion() {
     fileHandler.setupFileDropZone("image-drop-zone", "image-file-input", true);
     this.setupFormatSelector("image-target-format", [
@@ -140,36 +254,34 @@ class ToolHandler {
       "jpeg",
       "webp",
       "gif",
+      "eps",
+      "pic",
+      "tiff",
+      "dib",
+      "bmp",
+    ]);
+    this.setupAcceptedFiles("image", [
+      "png",
+      "jpg",
+      "jpeg",
+      "webp",
+      "gif",
+      "eps",
+      "pic",
+      "tiff",
+      "dib",
+      "bmp",
     ]);
     this.setupQualitySlider();
   }
 
-  initAudioConversion() {
-    fileHandler.setupFileDropZone("audio-drop-zone", "audio-file-input", true);
-    this.setupFormatSelector("audio-target-format", [
-      "mp3",
-      "wav",
-      "flac",
-      "m4a",
-    ]);
+  initImageToPDF() {
+    fileHandler.setupFileDropZone(
+      "image2pdf-drop-zone",
+      "image2pdf-file-input",
+      false,
+    );
   }
-
-  initVideoConversion() {
-    fileHandler.setupFileDropZone("video-drop-zone", "video-file-input", false);
-    this.setupFormatSelector("video-target-format", [
-      "mp4",
-      "mkv",
-      "avi",
-      "mov",
-    ]);
-  }
-
-  initOCR() {
-    fileHandler.setupFileDropZone("ocr-drop-zone", "ocr-file-input", true);
-    this.setupLanguageSelector();
-  }
-
-  // Add more tool initialization methods as needed...
 
   // Utility methods for tool setup
   setupFormatSelector(selectId, formats) {
@@ -181,6 +293,18 @@ class ToolHandler {
             `<option value="${format}">${format.toUpperCase()}</option>`,
         )
         .join("");
+    }
+  }
+
+  setupAcceptedFiles(inputId, accepts) {
+    if (accepts) {
+      const Finput = document.getElementById(`${inputId}-file-input`);
+      Finput
+        ? Finput.setAttribute(
+            "accept",
+            accepts.map((format) => `.${format}`).join(","),
+          )
+        : "";
     }
   }
 

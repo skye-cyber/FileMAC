@@ -14,6 +14,7 @@ from utils.formats import (
     SUPPORTED_AUDIO_FORMATS_SHOW,
     SUPPORTED_DOC_FORMATS,
     SUPPORTED_IMAGE_FORMATS_SHOW,
+    SUPPORTED_VIDEO_FORMATS_SHOW,
 )
 from . import warnings_handler
 from .audiopy.audio import AudioConverter
@@ -503,6 +504,7 @@ class argsOPMaper:
         self.SUPPORTED_DOC_FORMATS = SUPPORTED_DOC_FORMATS
         self.SUPPORTED_AUDIO_FORMATS_SHOW = SUPPORTED_AUDIO_FORMATS_SHOW
         self.SUPPORTED_AUDIO_FORMATS_DIRECT = SUPPORTED_AUDIO_FORMATS_DIRECT
+        self.SUPPORTED_VIDEO_FORMATS_SHOW = SUPPORTED_VIDEO_FORMATS_SHOW
         self.Argsmain = Argsmain
         self.VideoConverter = VideoConverter
         self.AudioConverter = AudioConverter
@@ -537,11 +539,11 @@ class argsOPMaper:
         init.controller()
 
     def image_converter(self):
-        if self.args.target_format is None:
-            self.ensure_target_format()
-            return
         if self.args.convert_image == "help":
             print(self.SUPPORTED_IMAGE_FORMATS_SHOW)
+            return
+        if self.args.target_format is None:
+            self.ensure_target_format()
             return
         if self.args.target_format is None:
             print(
@@ -604,7 +606,7 @@ class argsOPMaper:
         return
 
     def handle_video_conversion(self):
-        if self.agrs.target_format is None:
+        if hasattr(self, "agrs") and self.agrs.target_format is None:
             self.ensure_target_format()
             return
         ev = self.VideoConverter(self.args.convert_video, self.args.target_format)
