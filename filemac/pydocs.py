@@ -20,7 +20,7 @@ from rich.progress import Progress
 from tqdm import tqdm
 
 # from pathlib import Path
-from utils.colors import foreground, background
+from filemac_utils.colors import foreground, background
 
 fcl = foreground()
 bcl = background()
@@ -1007,7 +1007,7 @@ class Scanner:
 
         # Do clean up
         _cleaner_()
-        from utils.overwrite import clear_screen
+        from filemac_utils.overwrite import clear_screen
 
         clear_screen()
         print(f"{bcl.GREEN_BG}Full Text{RESET}")

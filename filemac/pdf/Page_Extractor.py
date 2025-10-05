@@ -3,7 +3,7 @@
 
 import PyPDF2
 
-from utils.colors import foreground, background
+from filemac_utils.colors import foreground, background
 
 fcl = foreground()
 bcl = background()

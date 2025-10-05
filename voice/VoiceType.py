@@ -76,7 +76,7 @@ class VoiceTypeEngine:
                 audio_data = self.audio_queue.get(timeout=1)
                 text = self.r.recognize_google(audio_data, language=CONFIG["lang"])
                 logging.info("Recognized: %s", text)
-                print(f"Recognized: {text}")
+                print(f"Recognized: \033[1m{text}\033[0m")
                 self.safe_type_text(text)
             except sr.UnknownValueError:
                 logging.warning("Speech not recognized")

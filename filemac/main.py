@@ -8,8 +8,8 @@ from typing import List, Union
 from audiobot.cli import Argsmain
 from .imagepy.converter import ImageConverter
 
-from utils.colors import foreground, background
-from utils.formats import (
+from filemac_utils.colors import foreground, background
+from filemac_utils.formats import (
     SUPPORTED_AUDIO_FORMATS_DIRECT,
     SUPPORTED_AUDIO_FORMATS_SHOW,
     SUPPORTED_DOC_FORMATS,
@@ -24,10 +24,10 @@ from .pydocs import DocConverter, Scanner
 from .imagepy.compress import Compress_Size
 from .OCR.Extractor import ExtractText
 from .pdf.Page_Extractor import _entry
-from .Simple_v_Analyzer import SA
+from .video_analyzer import SimpleAnalyzer
 from .videopy.pyVideo import VideoConverter
 from .imagepy.image_extractor import process_files
-
+from .exceptions.handler import FilemacException
 
 fcl = foreground()
 bcl = background()
@@ -231,6 +231,7 @@ def Cmd_arg_Handler():
     """Define main functions to create commandline arguments for different operations"""
     parser = argparse.ArgumentParser(
         description="Filemac: A file management tool with audio effects. Supporting wide range of Multimedia Operations",
+        add_help=False,
         epilog=f"{fcl.BLUE_FG}When using {fcl.MAGENTA_FG}-SALI{fcl.BLUE_FG} long images have maximum height that can be processed{RESET}",
     )
 
@@ -351,8 +352,8 @@ def Cmd_arg_Handler():
 
     """'arguements for Advanced text to word conversion"""
     parser.add_argument(
-        "-AT2W",
-        "--Atext2word",
+        "-RT2W",
+        "--Richtext2word",
         help=f"Advanced Text to word conversion i.e:{
             fcl.BYELLOW_FG}filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}",
     )
@@ -401,7 +402,7 @@ def Cmd_arg_Handler():
         "--audio_effect",
         "-af",
         action="store_true",
-        help=f"Change audio voice/apply effects/reduce noise{fcl.BYELLOW_FG}-MA --help for options{RESET}",
+        help=f"Change audio voice/apply effects/reduce noise {fcl.BYELLOW_FG}-MA --help for options{RESET}",
     )
     parser.add_argument(
         "--audio_help", action="store_true", help="Show help for audiobot"
@@ -489,6 +490,12 @@ def Cmd_arg_Handler():
         action="store_true",
         help=f"Clean file/dir after an operation eg after {fcl.BMAGENTA_FG}image2pdf clean image dirs{fcl.RESET}.",
     )
+    parser.add_argument("--record", action="store_true", help="Record Audio from mic")
+
+    parser.add_argument(
+        "-h", "--help", action="store_true", help="Show this help message and exit."
+    )
+
     # Use parse_known_args to allow unknown arguments (for later tunneling)
     args, remaining_args = parser.parse_known_args()
     mapper = argsOPMaper(parser, args, remaining_args)
@@ -513,7 +520,7 @@ class argsOPMaper:
         self.DocConverter = DocConverter
         self.Compress_Size = Compress_Size
         self.ExtractText = ExtractText
-        self.SA = SA
+        self.SimpleAnalyzer = SimpleAnalyzer
         self._entry = _entry
         self.ImageConverter = ImageConverter
         self.Batch_Audiofy = Batch_Audiofy
@@ -659,7 +666,7 @@ class argsOPMaper:
         ocr.run()
 
     def handle_video_analysis(self):
-        analyzer = self.SA(self.args.Analyze_video)
+        analyzer = self.SimpleAnalyzer(self.args.Analyze_video)
         analyzer.SimpleAnalyzer()
 
     def handle_audio_join(self):
@@ -669,8 +676,10 @@ class argsOPMaper:
         joiner.worker()
 
     def handle_advanced_text_to_word(self):
-        init = self.AdvancedT2word(
-            self.args.Atext2word, None, self.args.font_size, self.args.font_name
+        from .text2word import StyledText
+
+        init = StyledText(
+            self.args.Richtext2word, None, self.args.font_size, self.args.font_name
         )
         init.text_to_word()
 
@@ -746,6 +755,12 @@ class argsOPMaper:
             )
             return
 
+    def handle_recording(self):
+        from .recorder import Recorder
+
+        rec = Recorder()
+        return rec.run()
+
     def run(self):
         args = self.args
         """Check for help argument by calling help method"""
@@ -787,7 +802,7 @@ class argsOPMaper:
             tuple(args.AudioJoin)
             if isinstance(args.AudioJoin, list)
             else args.AudioJoin: self.handle_audio_join,
-            args.Atext2word: self.handle_advanced_text_to_word,
+            args.Richtext2word: self.handle_advanced_text_to_word,
             tuple(args.pdfjoin)
             if isinstance(args.pdfjoin, list)
             else args.pdfjoin: self.pdfjoin,
@@ -806,20 +821,35 @@ class argsOPMaper:
             tuple(args.image_extractor)
             if isinstance(args.image_extractor, list)
             else args.image_extractor: self.ImageExtractor,
+            args.record: self.handle_recording,
         }
 
         # Find the first non-empty key in method_mapper and execute its corresponding method
         try:
             """
-            audio effects must take precedence due to thenested arguments which
+            audio effects must take precedence due to the nested arguments which
             might possibly conflict with the original arguments
             """
             if args.audio_effect:
-                self.handle_audio_effect()
-                return
+                return self.handle_audio_effect()
+
+            if args.help and not args.audio_effect:
+                self.parser.print_help()
+                sys.exit()
+
             method = next((method_mapper[key] for key in method_mapper if key), None)
             if method:
                 method()
+            else:
+                self.parser.print_help()
+                raise FilemacException("Invalid arguments")
+        except KeyboardInterrupt:
+            print("\nQuit")
+            sys.exit()
+        except FilemacException as e:
+            # Handle any exceptions that occur during method execution
+            print(e)
+
         except Exception as e:
             raise
             # Handle any exceptions that occur during method execution

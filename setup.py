@@ -24,7 +24,7 @@ def dos_req():
 
 
 DESCRIPTION = "Open source Python CLI toolkit for conversion, manipulation, Analysis of files (All major file operations)"
-EXCLUDE_FROM_PACKAGES = ["build", "dist", "test", "src", "*~"]
+EXCLUDE_FROM_PACKAGES = ["build", "dist", "test", "src", "*~", "fweb"]
 
 sri()
 dos_req()

@@ -3,7 +3,7 @@ import sys
 
 import PyPDF2
 
-from utils.colors import foreground
+from filemac_utils.colors import foreground
 
 fcl = foreground()
 RESET = fcl.RESET

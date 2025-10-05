@@ -6,7 +6,7 @@ import sys
 from pdf2image import convert_from_path
 from PIL import Image  # ImageSequence
 
-from utils.colors import foreground
+from filemac_utils.colors import foreground
 from .pydocs import DocConverter
 
 fcl = foreground()

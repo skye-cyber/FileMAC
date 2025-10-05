@@ -3,11 +3,11 @@ from PIL import Image
 import cv2
 import logging
 from typing import Optional, Union
-from utils.dirbuster import Unbundle
-from utils.decorators import Decorators
-from utils.colors import foreground
-from utils.formats import SUPPORTED_IMAGE_FORMATS
-from utils.namerule import modify_filename_if_exists
+from filemac_utils.dirbuster import Unbundle
+from filemac_utils.decorators import Decorators
+from filemac_utils.colors import foreground
+from filemac_utils.formats import SUPPORTED_IMAGE_FORMATS
+from filemac_utils.namerule import modify_filename_if_exists
 
 fcl = foreground()
 RESET = fcl.RESET

@@ -5,7 +5,7 @@ from PIL import Image
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from pathlib import Path
-from utils.colors import foreground
+from filemac_utils.colors import foreground
 import shutil
 
 fcl = foreground()

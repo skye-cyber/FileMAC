@@ -5,8 +5,8 @@ from typing import List, Tuple, Union
 from docx import Document
 from docx.shared import Inches, Mm
 from pathlib import Path
-from utils.formats import SUPPORTED_IMAGE_FORMATS
-from utils.colors import foreground
+from filemac_utils.formats import SUPPORTED_IMAGE_FORMATS
+from filemac_utils.colors import foreground
 
 fcl = foreground()
 RESET = fcl.RESET

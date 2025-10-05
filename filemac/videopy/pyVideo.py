@@ -10,8 +10,8 @@ from moviepy import VideoFileClip
 from pydub import AudioSegment
 from tqdm import tqdm
 
-from utils.colors import foreground, background
-from utils.formats import SUPPORTED_VIDEO_FORMATS, Video_codecs
+from filemac_utils.colors import foreground, background
+from filemac_utils.formats import SUPPORTED_VIDEO_FORMATS, Video_codecs
 
 fcl = foreground()
 bcl = background()

@@ -6,7 +6,7 @@ from io import BytesIO
 from typing import List
 from pathlib import Path
 import os
-from utils.colors import foreground
+from filemac_utils.colors import foreground
 
 fcl = foreground()
 RESET = fcl.RESET

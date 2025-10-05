@@ -7,9 +7,9 @@ import cv2
 import pytesseract
 from PIL import Image
 from rich.progress import Progress
-from utils.colors import foreground, background
-from utils.dirbuster import Unbundle
-from utils.namerule import modify_filename_if_exists
+from filemac_utils.colors import foreground, background
+from filemac_utils.dirbuster import Unbundle
+from filemac_utils.namerule import modify_filename_if_exists
 
 fcl = foreground()
 bcl = background()
