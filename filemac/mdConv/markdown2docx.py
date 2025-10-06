@@ -243,38 +243,6 @@ class MarkdownToDocxConverter:
             parts.append(child.content or "")
         return "".join(parts)
 
-    def _inline_to_runs(self, inline_token: Token) -> List[Tuple[str, dict]]:
-        """
-        Returns a list of (text, style_dict) where style_dict may include 'bold', 'italic', 'code', 'link' etc.
-        """
-        runs = []
-        if inline_token.type != "inline":
-            return runs
-        for child in inline_token.children or []:
-            style = {}
-            if child.type == "text":
-                runs.append((child.content, style))
-            elif child.type == "softbreak":
-                runs.append(("\n", style))
-            elif child.type == "code_inline":
-                style["code"] = True
-                runs.append((child.content, style))
-            elif child.type == "strong_open":
-                # strong_open doesn't carry text; style applies to subsequent text nodes until strong_close
-                # The markdown-it tokens structure: strong_open, text, strong_close. To be simple, check siblings content.
-                # We'll detect by wrapping next text nodes — but for simplicity, set a marker and rely on child.markup? Simpler:
-                # We'll look ahead for the text that follows and mark it as bold.
-                pass
-            elif child.type == "link_open":
-                # link handling: store href in child.attrs; subsequent text nodes are link text
-                pass
-            # Fallback: for other token types use its content
-            else:
-                runs.append((child.content or "", style))
-        # A simple but more robust approach: use the rendered HTML for inline formatting or extend this function.
-        # For now, this provides plain text with inline code detection.
-        return runs
-
     def _inline_to_runs(
         self, inline_token: Token, active_styles=None
     ) -> List[Tuple[str, dict]]:
@@ -368,20 +336,20 @@ class MarkdownToDocxConverter:
         p = self.document.add_paragraph()
         for txt, style in text_runs:
             r = p.add_run(txt)
-            if style.get("bold"):
+            if style.get("bold", None):
                 r.bold = True
-            if style.get("italic"):
+            if style.get("italic", None):
                 r.italic = True
-            if style.get("code"):
+            if style.get("code", None):
                 r.font.name = "Consolas"
                 r.font.size = Pt(9)
-            if style.get("link"):
+            if style.get("link", None):
                 # Python-docx doesn’t natively support clickable hyperlinks, so we underline + color blue
                 r.font.color.rgb = (0x00, 0x00, 0xFF)
                 r.underline = True
         logger.debug("Added paragraph with styled runs")
 
-    def _add_paragraph_with_runs(self, text_runs: List[Tuple[str, dict]]):
+    def _add_paragraph_with_runs_dummy(self, text_runs: List[Tuple[str, dict]]):
         p = self.document.add_paragraph()
         for txt, style in text_runs:
             r = p.add_run(txt)
