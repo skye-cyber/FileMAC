@@ -181,11 +181,13 @@ class MarkdownToDocxConverter:
 
         return self.document
 
-    def convert_file(self, md_path: str, docx_path: str):
+    def convert_file(self, md_path: str, docx_path: str) -> Path:
         md_text = Path(md_path).read_text(encoding="utf-8")
         doc = self.convert_text(md_text)
         doc.save(docx_path)
         logger.info("Saved DOCX: %s", docx_path)
+
+        return docx_path
 
     # ---------- Handlers for specific blocks ----------
     def _add_heading(self, text: str, level: int):

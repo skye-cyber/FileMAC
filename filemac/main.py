@@ -28,6 +28,7 @@ from .video_analyzer import SimpleAnalyzer
 from .videopy.pyVideo import VideoConverter
 from .imagepy.image_extractor import process_files
 from .exceptions.handler import FilemacException
+from filemac_utils.filenames import generate_filename
 
 fcl = foreground()
 bcl = background()
@@ -266,6 +267,12 @@ def Cmd_arg_Handler():
         example: {fcl.BYELLOW_FG}filemac --convert_doc2image example.pdf -tf png{RESET}",
     )
 
+    parser.add_argument(
+        "-md",
+        "--markdown2docx",
+        help=f"Convert Markdown to DOCX with Mermaid rendering.\
+            example: {fcl.BYELLOW_FG}filemac --markdown2docx example.md{RESET}",
+    )
     parser.add_argument(
         "-xA",
         "--extract_audio",
@@ -755,6 +762,17 @@ class argsOPMaper:
             )
             return
 
+    def handle_markdown2docx(self):
+        from .mdConv.markdown2docx import MermaidRenderer, MarkdownToDocxConverter
+
+        output_file = generate_filename(ext="docx")
+
+        renderer = MermaidRenderer()
+
+        converter = MarkdownToDocxConverter(mermaid_renderer=renderer)
+
+        return converter.convert_file(self.args.markdown2docx, docx_path=output_file)
+
     def handle_recording(self):
         from .recorder import Recorder
 
@@ -786,6 +804,7 @@ class argsOPMaper:
             else args.convert_doc: self.doc_converter,
             args.convert_video: self.handle_video_conversion,
             args.convert_image: self.image_converter,
+            args.markdown2docx: self.handle_markdown2docx,
             args.resize_image: self.handle_image_resize,
             args.convert_doc2image: self.handle_doc_to_image_conversion,
             args.convert_audio: self.handle_audio_conversion,
