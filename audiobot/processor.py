@@ -3,15 +3,14 @@ from .modulator import Modulator
 from moviepy import AudioFileClip, VideoFileClip
 from .logging_config import setup_colored_logger
 from pydub import AudioSegment
-from .audioutils.visualizer import visualize_audio_wave
-from .audioutils.utils import get_bitrate
+from .utils.visualizer import visualize_audio_wave
+from .utils.metadata_utils import get_bitrate
 from .effects import VoiceEffectProcessor
-from filemac.utils.colors import foreground
+from filemac.utils.colors import fg, rs
 import sys
 import io
 
-fcl = foreground()
-RESET = fcl.RESET
+RESET = rs
 
 Clogger = setup_colored_logger()
 
@@ -32,7 +31,7 @@ class VideoProcessor:
         Process video file by applying audio effects and retaining original bitrate.
         """
 
-        Clogger.info(f"Set Voice effect : {fcl.MAGENTA_FG}{effect}{RESET}")
+        Clogger.info(f"Set Voice effect : {fg.MAGENTA_FG}{effect}{RESET}")
         Clogger.info(f"Processing video file: {input_file}")
 
         try:
@@ -40,7 +39,7 @@ class VideoProcessor:
             original_bitrate = get_bitrate(input_file, verbosity)
             if verbosity and original_bitrate:
                 Clogger.info(
-                    f"Original video bitrate: {fcl.YELLOW_FG}{original_bitrate}{RESET}"
+                    f"Original video bitrate: {fg.YELLOW_FG}{original_bitrate}{RESET}"
                 )
 
             # Capture stdout and stderr
@@ -65,7 +64,7 @@ class VideoProcessor:
 
             # Apply the selected voice effect
             Clogger.info(
-                f"Applying the [{fcl.BBWHITE_FG}{effect}{RESET}{fcl.GREEN_FG}] effect"
+                f"Applying the [{fg.BBWHITE_FG}{effect}{RESET}{fg.GREEN_FG}] effect"
             )
             modified_audio = VoiceEffectProcessor(audio_segment, effect).apply_effect()
 
@@ -93,9 +92,9 @@ class VideoProcessor:
             # Use the original bitrate or default to 5000k if unavailable
             if verbosity:
                 Clogger.info(
-                    f"Set:\n\tCodec = [{fcl.fcl.MAGENTA_FG}libx264{fcl.GREEN_FG}\n"
-                    f"\tCodec type = [{fcl.fcl.MAGENTA_FG}aac{fcl.GREEN_FG}\n"
-                    f"\tBitrate = [{fcl.MAGENTA_FG}{original_bitrate or '5000k'}{RESET}]"
+                    f"Set:\n\tCodec = [{fg.fg.MAGENTA_FG}libx264{fg.GREEN_FG}\n"
+                    f"\tCodec type = [{fg.fg.MAGENTA_FG}aac{fg.GREEN_FG}\n"
+                    f"\tBitrate = [{fg.MAGENTA_FG}{original_bitrate or '5000k'}{RESET}]"
                 )
 
             final_video.write_videofile(
@@ -131,9 +130,9 @@ class AudioProcessor:
     def process_audio_file(
         self, input_file, effect, output_dir, verbosity, visualize=False
     ):
-        Clogger.info(f"Set Voice effect : {fcl.MAGENTA_FG}{effect}{RESET}")
+        Clogger.info(f"Set Voice effect : {fg.MAGENTA_FG}{effect}{RESET}")
 
-        Clogger.info(f"Processing audio file: {fcl.MAGENTA_FG}{input_file}{RESET}")
+        Clogger.info(f"Processing audio file: {fg.MAGENTA_FG}{input_file}{RESET}")
 
         try:
             audio_segment = AudioSegment.from_file(input_file)

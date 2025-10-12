@@ -3,10 +3,9 @@
 from docx import Document
 from docx.shared import Pt, RGBColor
 
-from ...utils.colors import foreground
+from ...utils.colors import fg, rs
 
-fcl = foreground()
-RESET = fcl.RESET
+RESET = rs
 
 
 class StyledText:
@@ -47,8 +46,8 @@ class StyledText:
         Set body font to fstyle and font size to fsize.
         """
 
-        print(f"{fcl.BWHITE_FG}Set Font: {fcl.CYAN_FG}{self.fsize}{RESET}")
-        print(f"{fcl.BWHITE_FG}Set Style: {fcl.CYAN_FG}{self.fstyle}{RESET}")
+        print(f"{fg.BWHITE_FG}Set Font: {fg.CYAN_FG}{self.fsize}{RESET}")
+        print(f"{fg.BWHITE_FG}Set Style: {fg.CYAN_FG}{self.fstyle}{RESET}")
         # Create a new Document
         doc = Document()
 
@@ -75,7 +74,7 @@ class StyledText:
 
         for i, line in enumerate(lines):
             print(
-                f"{fcl.BWHITE_FG}Line: {fcl.DCYAN_FG}{i}{fcl.YELLOW_FG} of {fcl.BLUE_FG}{len(lines)}{RESET}",
+                f"{fg.BWHITE_FG}Line: {fg.DCYAN_FG}{i}{fg.YELLOW_FG} of {fg.BLUE_FG}{len(lines)}{RESET}",
                 end="\r",
             )
             # Determine heading level or body text
@@ -101,7 +100,7 @@ class StyledText:
         print("\n")
         doc.save(self.out_obj)
         print(
-            f"{fcl.BWHITE_FG}Text file converted to Word document: {fcl.MAGENTA_FG}{self.out_obj}{RESET}"
+            f"{fg.BWHITE_FG}Text file converted to Word document: {fg.MAGENTA_FG}{self.out_obj}{RESET}"
         )
 
 

@@ -1,18 +1,20 @@
 import os
 import subprocess
 import sqlite3
-import shlex
+
+# import shlex
 import json
 import tempfile
 import logging
 import html
 import requests
 from dotenv import load_dotenv
-from importlib import resources
-from ..colors import foreground
+from ...core.exceptions import ValidationError
 
-fcl = foreground()
-RESET = fcl.RESET
+# from importlib import resources
+from ..colors import fg, rs
+
+RESET = rs
 
 
 class SecurePython:
@@ -25,7 +27,7 @@ class SecurePython:
     def secure_subprocess(self, command_list):
         """Runs a secure subprocess command using a list format to prevent command injection."""
         if not isinstance(command_list, list):
-            raise ValueError("Command must be a list")
+            raise ValidationError("Command must be a list")
         try:
             result = subprocess.run(
                 command_list, check=True, capture_output=True, text=True
@@ -42,7 +44,7 @@ class SecurePython:
 
         if not full_path.startswith(os.path.abspath(base_dir)):
             raise ValueError("Invalid file path: Path traversal attempt detected")
-        print(f"{fcl.BBLUE_FG}Return safe path: {fcl.BGREEN_FG}{full_path}{RESET}")
+        print(f"{fg.BBLUE_FG}Return safe path: {fg.BGREEN_FG}{full_path}{RESET}")
         return full_path
 
     # ✅ 3. Prevent SQL Injection

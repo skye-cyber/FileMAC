@@ -4,10 +4,9 @@ import librosa
 from pydub import AudioSegment, effects
 from scipy.signal import butter, lfilter, sosfilt
 from .config import Config
-from filemac.utils.colors import foreground
+from filemac.utils.colors import fg, rs
 
-fcl = foreground()
-RESET = fcl.RESET
+RESET = rs
 
 Clogger = setup_colored_logger()
 config = Config()
@@ -140,7 +139,7 @@ class Modulator:
         """
 
         cutoff = self._cutoff if self._cutoff else cutoff
-        Clogger.debug(f"{fcl.BLUE_FG}cutoff: {fcl.CYAN_FG}{cutoff}{RESET}")
+        Clogger.debug(f"{fg.BLUE_FG}cutoff: {fg.CYAN_FG}{cutoff}{RESET}")
         Clogger.info("Apply a low-pass filter to remove frequencies higher than cutoff")
         nyquist = 0.5 * sample_rate
         normal_cutoff = cutoff / nyquist
@@ -161,12 +160,12 @@ class Modulator:
 
     def highpass(self, audio_segment, cutoff: int = 200):
         cutoff = self._cutoff if self._cutoff else cutoff
-        Clogger.info(f"Cutoff: {fcl.BBLUE_FG}{cutoff}{RESET}")
+        Clogger.info(f"Cutoff: {fg.BBLUE_FG}{cutoff}{RESET}")
         return effects.high_pass_filter(audio_segment, cutoff=cutoff)
 
     def lowpass(self, audio_segment, cutoff: int = 2200):
         cutoff = self._cutoff if self._cutoff else cutoff
-        Clogger.info(f"Cutoff: {fcl.BBLUE_FG}{cutoff}{RESET}")
+        Clogger.info(f"Cutoff: {fg.BBLUE_FG}{cutoff}{RESET}")
         return effects.low_pass_filter(audio_segment, cutoff=cutoff)
 
     def normalize(self, audio_segment):
@@ -180,7 +179,7 @@ class Denoiser:
         self._sos_low = {}
         self._sos_high = {}
         self._cutoff = config.options.get("cutoff")
-        Clogger.debug(f"{fcl.BLUE_FG}cutoff: {fcl.CYAN_FG}{self._cutoff}{RESET}")
+        Clogger.debug(f"{fg.BLUE_FG}cutoff: {fg.CYAN_FG}{self._cutoff}{RESET}")
 
     def lowpass_filter(
         self, samples: np.ndarray, cutoff: int = 2200, order: int = 6
@@ -269,7 +268,7 @@ class Denoiser:
         noise = config.options.get("noise") if config.options.get("noise") else "low"
 
         Clogger.info(
-            f"{fcl.BLUE_FG}Noise: {fcl.CYAN_FG}{config.options.get("noise")}{RESET}"
+            f"{fg.BLUE_FG}Noise: {fg.CYAN_FG}{config.options.get('noise')}{RESET}"
         )
         if noise == "low":
             # Remove high-frequency noise

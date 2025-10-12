@@ -11,12 +11,11 @@ from moviepy import VideoFileClip
 from pydub import AudioSegment
 from tqdm import tqdm
 
-from ...utils.colors import foreground, background
+from ...utils.colors import fg, bg, rs
 from ...utils.formats import SUPPORTED_VIDEO_FORMATS, Video_codecs
 
-fcl = foreground()
-bcl = background()
-RESET = fcl.RESET
+
+RESET = rs
 
 
 class VideoConverter:
@@ -33,7 +32,7 @@ class VideoConverter:
             files_to_process.append(self.input_file)
         elif os.path.isdir(self.input_file):
             if os.listdir(self.input_file) is None:
-                print(f"{bcl.RED_BG}Cannot work with empty folder{RESET}")
+                print(f"{bg.RED_BG}Cannot work with empty folder{RESET}")
                 sys.exit(1)
             for file in os.listdir(self.input_file):
                 file_path = os.path.join(self.input_file, file)
@@ -150,7 +149,7 @@ class VideoConverter:
                 for item in input_list
                 if any(item.upper().endswith(ext) for ext in SUPPORTED_VIDEO_FORMATS)
             ]
-            print(f"{fcl.BYELLOW_FG}Initializing conversion..{RESET}")
+            print(f"{fg.BYELLOW_FG}Initializing conversion..{RESET}")
 
             for file in tqdm(input_list):
                 if out_f.upper() in Video_codecs.keys():
@@ -162,21 +161,22 @@ class VideoConverter:
                     and out_f.upper() not in Video_codecs.keys()
                 ):
                     print(
-                        f"{fcl.RED_FG}Unsupported output format --> Pending Implementation{RESET}"
+                        f"{fg.RED_FG}Unsupported output format --> Pending Implementation{RESET}"
                     )
                     sys.exit(1)
                 else:
-                    print(f"{fcl.RED_FG}Unsupported output format{RESET}")
+                    print(f"{fg.RED_FG}Unsupported output format{RESET}")
                     sys.exit(1)
 
                 """Load the video file"""
-                print(f"{fcl.BBLUE_FG}Load file{RESET}")
                 video = VideoFileClip(file)
+
                 """Export the video to a different format"""
-                print(f"{fcl.BMAGENTA_FG}Converting file to {output_filename}{RESET}")
+                print(f"Converting file to: {fg.BMAGENTA_FG}{output_filename}{RESET}")
                 video.write_videofile(output_filename, codec=Video_codecs[out_f])
+
                 """Close the video file"""
-                print(f"{fcl.BGREEN_FG}Done{RESET}")
+                print(f"{fg.BGREEN_FG}Done{RESET}")
                 video.close()
         except KeyboardInterrupt:
             print("\nQuit❕")

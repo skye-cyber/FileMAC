@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 import argparse
-import logging
-import logging.handlers
 import os
 import sys
-from typing import List, Union
-from audiobot.cli import Argsmain
-from ..core.converter import ImageConverter
+from ..core.document import DocConverter
+from ..core.audio.core import AudioConverter
+from ..core.audio.core import AudioExtracter
+from ..core.image.core import ImageCompressor, ImageConverter
+from ..core.ocr import ExtractText
+from ..core.pdf.core import PageExtractor
+from ..core.video.core import VideoConverter
+from ..core.exceptions import FileSystemError, FilemacError
+from ..miscellaneous.video_analyzer import SimpleAnalyzer
+from .converter import MethodMappingEngine, DirectoryConverter, Batch_Audiofy
 
-from ..utils.colors import foreground, background
 from ..utils.formats import (
     SUPPORTED_AUDIO_FORMATS_DIRECT,
     SUPPORTED_AUDIO_FORMATS_SHOW,
@@ -16,283 +20,85 @@ from ..utils.formats import (
     SUPPORTED_IMAGE_FORMATS_SHOW,
     SUPPORTED_VIDEO_FORMATS_SHOW,
 )
-from .. import warnings_handler
-from ..core.document.audio import AudioConverter
-from ..core.document.pyTTS import FileSynthesis
-from ..core.document.Extractor import ExtractAudio
-from ...core.document import DocConverter, Scanner
-from ..core.image.core import ImageCompressor
-from ..core.ocr.Extractor import ExtractText
-from ..core.pdf.core import PageExtractor
-from ..miscellaneous.video_analyzer import SimpleAnalyzer
-from ..core.video.core import VideoConverter
-from ..core.image.extractor import PdfImageExtractor
-from ..exceptions.handler import FilemacException
-from ..utils.file_utils import generate_filename
+from ..utils.colors import fg, bg, rs
+from ..core.image.extractor import process_files
 
-fcl = foreground()
-bcl = background()
-RESET = fcl.RESET
+from ..utils.simple import logger
+
+try:
+    from audiobot.cli import Argsmain
+except ImportError:
+    pass
+
+_entry_ = PageExtractor._entry_
+
+RESET = rs
 
 
-warnings_handler
-logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")
-logger = logging.getLogger(__name__)
-
-"""If the input file in convert_doc argument is a directory, walk throught the directory and
-converter all the surported files to the target format"""
-
-
-class _DIR_CONVERSION_:
-    def __init__(self, _dir_, _format_, no_resume, threads, _isolate_=None):
-        self._dir_ = _dir_
-        self._format_ = _format_
-        self._isolate_ = _isolate_
-        self.no_resume = no_resume
-        self.threads = threads
-        # Handle isolation and non isolation modes distinctively
-        self._ls_ = (
-            ["pdf", "docx", "doc", "xlsx", "ppt", "pptxxls", "txt"]
-            if _isolate_ is None
-            else [_isolate_]
-        )
-        if self._isolate_:
-            print(
-                f"INFO\t {fcl.FMAGENTA_FG}Isolate {fcl.DCYAN_FG}{self._isolate_}{RESET}"
-            )
-
-    def _unbundle_dir_(self):
-        if self._format_ in SUPPORTED_AUDIO_FORMATS_DIRECT:
-            return Batch_Audiofy(self._dir_, self.no_resume, self.threads)
-        try:
-            for root, dirs, files in os.walk(self._dir_):
-                for file in files:
-                    _ext_ = file.split(".")[-1]
-
-                    _path_ = os.path.join(root, file)
-
-                    if _ext_ in self._ls_ and os.path.exists(_path_):
-                        print(
-                            f"INFO\t {fcl.FYELLOW_FG}Parse {fcl.BLUE_FG}{_path_}{RESET}"
-                        )
-                        init = Eval(_path_, self._format_)
-                        init.document_eval()
-
-        except FileNotFoundError as e:
-            print(e)
-
-        except KeyboardInterrupt:
-            print("\nQuit!")
-            sys.exit(1)
-
-        except Exception as e:
-            print(e)
-            pass
-
-
-def _isolate_(_dir_, target):
-    try:
-        isolated_files = []
-        for root, dirs, files in os.walk(_dir_):
-            for file in files:
-                if file.lower().endswith(target):
-                    _path_ = os.path.join(root, file)
-                    isolated_files.append(_path_)
-        return isolated_files
-    except FileNotFoundError as e:
-        print(e)
-    except KeyboardInterrupt:
-        print("\nQuit!")
-        sys.exit(1)
-    except Exception as e:
-        print(e)
-
-
-class Batch_Audiofy:
-    def __init__(
-        self,
-        obj: Union[os.PathLike, str, List[Union[os.PathLike, str]]],
-        no_resume: bool,
-        threads: int = 3,
-    ):
-        self.folder = obj
-        self.no_resume = no_resume
-        self.threads = threads
-        self.worker()
-
-    def worker(self):
-        conv = FileSynthesis(self.folder, resume=self.no_resume)
-        inst = conv.THAudio(conv)
-        inst.audiofy(num_threads=self.threads)
-
-
-class Eval:
-    """
-    Class to handle document conversions based on their extensions and the target
-        output document format
-    """
-
-    def __init__(self, file, outf):
-        self.file = file
-        self.outf = outf
-
-    def spreedsheet(self, conv):
-        if self.outf.lower() == "csv":
-            conv.convert_xlsx_to_csv()
-        elif self.outf.lower() in ("txt", "text"):
-            conv.convert_xls_to_text()
-        elif self.outf.lower() in list(self.doc_ls):
-            conv.convert_xls_to_word()
-        elif self.outf.lower() == "db":
-            conv.convert_xlsx_to_database()
-        else:
-            print(f"{fcl.RED_FG}Unsupported output format❌{RESET}")
-
-    def word(self, conv):
-        if self.outf.lower() in ("txt", "text"):
-            conv.word_to_txt()
-        elif self.outf.lower() == "pdf":
-            conv.word_to_pdf()
-        elif self.outf.lower() in ("pptx", "ppt"):
-            conv.word_to_pptx()
-        elif self.outf.lower() in ("audio", "ogg"):
-            conv = FileSynthesis(self.file)
-            conv.audiofy()
-        else:
-            print(f"{fcl.RED_FG}Unsupported output format❌{RESET}")
-
-    def text(self, conv):
-        if self.outf.lower() == "pdf":
-            conv.txt_to_pdf()
-        elif self.outf.lower() in ("doc", "docx", "word"):
-            conv.text_to_word()
-        elif self.outf.lower() in ("audio", "ogg"):
-            conv = FileSynthesis(self.file)
-            conv.audiofy()
-        else:
-            print(f"{fcl.RED_FG}Unsupported output format❌{RESET}")
-
-    def ppt(self, conv):
-        if self.outf.lower() in ("doc", "docx", "word"):
-            conv.ppt_to_word()
-        elif self.outf.lower() in ("text", "txt"):
-            word = conv.ppt_to_word()
-            conv = DocConverter(word)
-            conv.word_to_txt()
-        elif self.outf.lower() in ("pptx"):
-            conv.convert_ppt_to_pptx(self.file)
-        elif self.outf.lower() in ("audio", "ogg", "mp3", "wav"):
-            conv = FileSynthesis(self.file)
-            conv.audiofy()
-        else:
-            print(f"{fcl.RED_FG}Unsupported output format❌{RESET}")
-
-    def pdf(self, conv):
-        if self.outf.lower() in ("doc", "docx", "word"):
-            conv.pdf_to_word()
-        elif self.outf.lower() in ("txt", "text"):
-            conv.pdf_to_txt()
-        elif self.outf.lower() in ("audio", "ogg", "mp3", "wav"):
-            conv = FileSynthesis(self.file)
-            conv.audiofy()
-        else:
-            print(f"{fcl.RED_FG}Unsupported output format❌{RESET}")
-
-    def document_eval(self):
-        self.doc_ls = ["docx", "doc"]
-        sheetls = ["xlsx", "xls"]
-        try:
-            conv = DocConverter(self.file)
-            if self.file.lower().endswith(tuple(sheetls)):
-                self.spreedsheet(conv=conv)
-
-            elif self.file.lower().endswith(tuple(self.doc_ls)):
-                self.word(conv=conv)
-
-            elif self.file.endswith("txt"):
-                self.text(conv=conv)
-
-            elif self.file.split(".")[-1].lower() in ("ppt", "pptx"):
-                self.ppt(conv)
-
-            elif self.file.lower().endswith("pdf"):
-                self.pdf(conv)
-
-            elif self.file.lower().endswith("csv"):
-                if self.outf.lower() in ("xls", "xlsx", "excel"):
-                    conv.convert_csv_to_xlsx()
-
-            else:
-                print(f"{fcl.fcl.BYELLOW_FG}Unsupported Conversion type❌{RESET}")
-                pass
-        except Exception as e:
-            logger.error(e)
-
-
-def Cmd_arg_Handler():
+def CliInit():
     """Define main functions to create commandline arguments for different operations"""
     parser = argparse.ArgumentParser(
         description="Filemac: A file management tool with audio effects. Supporting wide range of Multimedia Operations",
         add_help=False,
-        epilog=f"{fcl.BLUE_FG}When using {fcl.MAGENTA_FG}-SALI{fcl.BLUE_FG} long images have maximum height that can be processed{RESET}",
+        epilog=f"{fg.BLUE_FG}When using {fg.MAGENTA_FG}-SALI{fg.BLUE_FG} long images have maximum height that can be processed{RESET}",
     )
 
     parser.add_argument(
         "--convert_doc",
         nargs="+",
         help=f"Converter document file(s) to different format ie pdf_to_docx.\
-       example: {fcl.BYELLOW_FG}filemac --convert_doc example.docx -tff pdf{RESET}",
+       example: {fg.BYELLOW_FG}filemac --convert_doc example.docx -tff pdf{RESET}",
     )
 
     parser.add_argument(
         "--convert_audio",
         help=f"Convert audio file(s) to and from different format ie mp3 to wav\
-        example: {fcl.BYELLOW_FG}filemac --convert_audio example.mp3 -tff wav{RESET}",
+        example: {fg.BYELLOW_FG}filemac --convert_audio example.mp3 -tff wav{RESET}",
     )
 
     parser.add_argument(
         "--convert_video",
         help=f"Convert video file(s) to and from different format ie mp4 to mkv.\
-        example: {fcl.BYELLOW_FG}filemac --convert_video example.mp4 -tf mkv{RESET}",
+        example: {fg.BYELLOW_FG}filemac --convert_video example.mp4 -tf mkv{RESET}",
     )
 
     parser.add_argument(
         "--convert_image",
         help=f"Convert image file(s) to and from different format ie png to jpg.\
-        example: {fcl.BYELLOW_FG}filemac --convert_image example.jpg -tf png{RESET}",
+        example: {fg.BYELLOW_FG}filemac --convert_image example.jpg -tf png{RESET}",
     )
 
     parser.add_argument(
         "--convert_doc2image",
         help=f"Convert documents to images ie png to jpg.\
-        example: {fcl.BYELLOW_FG}filemac --convert_doc2image example.pdf -tf png{RESET}",
+        example: {fg.BYELLOW_FG}filemac --convert_doc2image example.pdf -tf png{RESET}",
     )
 
     parser.add_argument(
         "-md",
         "--markdown2docx",
         help=f"Convert Markdown to DOCX with Mermaid rendering.\
-            example: {fcl.BYELLOW_FG}filemac --markdown2docx example.md{RESET}",
+            example: {fg.BYELLOW_FG}filemac --markdown2docx example.md{RESET}",
     )
     parser.add_argument(
         "-xA",
         "--extract_audio",
         help=f"Extract audio from a video.\
-                        example: {fcl.BYELLOW_FG}filemac -xA example.mp4 {RESET}",
+                        example: {fg.BYELLOW_FG}filemac -xA example.mp4 {RESET}",
     )
 
     parser.add_argument(
         "-iso",
         "--isolate",
         help=f"Specify file types to isolate\
-                        for conversion, only works if directory is provided as input for the {fcl.FCYAN_FG}convert_doc{RESET} argument example: {fcl.BYELLOW_FG}filemac --convert_doc /home/user/Documents/ --isolate pdf -tf txt{RESET}",
+                        for conversion, only works if directory is provided as input for the {fg.FCYAN_FG}convert_doc{RESET} argument example: {fg.BYELLOW_FG}filemac --convert_doc /home/user/Documents/ --isolate pdf -tf txt{RESET}",
     )
 
     parser.add_argument(
         "-Av",
         "--Analyze_video",
         help=f"Analyze a given video.\
-        example: {fcl.BYELLOW_FG}filemac --analyze_video example.mp4 {RESET}",
+        example: {fg.BYELLOW_FG}filemac --analyze_video example.mp4 {RESET}",
     )
 
     parser.add_argument(
@@ -302,7 +108,7 @@ def Cmd_arg_Handler():
     parser.add_argument(
         "--resize_image",
         help=f"change size of an image compress/decompress \
-        example: {fcl.BYELLOW_FG}filemac --resize_image example.png -tf_size 2mb -tf png {RESET}",
+        example: {fg.BYELLOW_FG}filemac --resize_image example.png -tf_size 2mb -tf png {RESET}",
     )
 
     parser.add_argument(
@@ -315,36 +121,36 @@ def Cmd_arg_Handler():
         "-S",
         "--scan",
         help=f"Scan pdf file and extract text\
-                        example: {fcl.BYELLOW_FG}filemac --scan example.pdf {RESET}",
+                        example: {fg.BYELLOW_FG}filemac --scan example.pdf {RESET}",
     )
 
     parser.add_argument(
         "-doc2L",
         "--doc_long_image",
         help=f"Convert pdf file to long image\
-                        example: {fcl.BYELLOW_FG}filemac --doc_long_image example.pdf {RESET}",
+                        example: {fg.BYELLOW_FG}filemac --doc_long_image example.pdf {RESET}",
     )
 
     parser.add_argument(
         "-SA",
         "--scanAsImg",
         help=f"Convert pdf to image then extract text\
-                        example: {fcl.BYELLOW_FG}filemac --scanAsImg example.pdf {RESET}",
+                        example: {fg.BYELLOW_FG}filemac --scanAsImg example.pdf {RESET}",
     )
 
     parser.add_argument(
         "-SALI",
         "--scanAsLong_Image",
-        help=f"Scan {fcl.CYAN_FG}[doc, docx, pdf]\
+        help=f"Scan {fg.CYAN_FG}[doc, docx, pdf]\
         {RESET} file and extract text by first converting them to long image,-> very effective\
-                    example: {fcl.BYELLOW_FG}filemac --scanAsImg example.pdf {RESET}",
+                    example: {fg.BYELLOW_FG}filemac --scanAsImg example.pdf {RESET}",
     )
 
     parser.add_argument(
         "--OCR",
         nargs="+",
         help=f"Extract text from an image.\
-        example: {fcl.BYELLOW_FG}filemac --OCR image.png{RESET}",
+        example: {fg.BYELLOW_FG}filemac --OCR image.png{RESET}",
     )
 
     """Audio join  arguements"""
@@ -353,8 +159,8 @@ def Cmd_arg_Handler():
         "--AudioJoin",
         "-AJ",
         nargs="*",
-        help=f"{fcl.YELLOW_FG}Join Audio files{RESET} into one master file.\
-            Provide a {fcl.BLUE_FG}list{RESET} of audio file paths.  If no paths are provided, the program will still run.",
+        help=f"{fg.YELLOW_FG}Join Audio files{RESET} into one master file.\
+            Provide a {fg.BLUE_FG}list{RESET} of audio file paths.  If no paths are provided, the program will still run.",
         metavar="audio_file_path",
     )
 
@@ -363,7 +169,7 @@ def Cmd_arg_Handler():
         "-RT2W",
         "--Richtext2word",
         help=f"Advanced Text to word conversion i.e:{
-            fcl.BYELLOW_FG
+            fg.BYELLOW_FG
         }filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}",
     )
 
@@ -372,13 +178,13 @@ def Cmd_arg_Handler():
         "--font_size",
         type=int,
         default=12,
-        help=f"Font size to be used default: {fcl.CYAN_FG}12{RESET}",
+        help=f"Font size to be used default: {fg.CYAN_FG}12{RESET}",
     )
     parser.add_argument(
         "--font_name",
         type=str,
         default="Times New Roman",
-        help=f"Font name default: {fcl.FCYAN_FG}Times New Roman{RESET}",
+        help=f"Font name default: {fg.FCYAN_FG}Times New Roman{RESET}",
     )
 
     """Alternative sequence args, critical redundancy measure"""
@@ -387,7 +193,7 @@ def Cmd_arg_Handler():
         "--use_extras",
         action="store_true",
         help=f"Use alternative conversion method: Overides\
-                        default method i.e: {fcl.BYELLOW_FG}filemac --convert_doc example.docx --use_extras -tf pdf{RESET}",
+                        default method i.e: {fg.BYELLOW_FG}filemac --convert_doc example.docx --use_extras -tf pdf{RESET}",
     )
 
     """Pdf join arguements--> Accepts atleast 1 arguement"""
@@ -396,7 +202,7 @@ def Cmd_arg_Handler():
         "--order",
         type=str,
         default="AAB",
-        help=f"Order of pages when joining the pdf use: {fcl.BYELLOW_FG}filemac\
+        help=f"Order of pages when joining the pdf use: {fg.BYELLOW_FG}filemac\
                         -pj help for more details{RESET}",
     )
     parser.add_argument(
@@ -404,9 +210,9 @@ def Cmd_arg_Handler():
         "-p",
         nargs="+",
         help=f"Extract given pages from pdf: {
-            fcl.BYELLOW_FG
+            fg.BYELLOW_FG
         }filemac --extract_pages file.pdf 6 10{RESET} for one page: {
-            fcl.BYELLOW_FG
+            fg.BYELLOW_FG
         }filemac --extract_pages file.pdf 5{RESET}",
     )
 
@@ -414,7 +220,7 @@ def Cmd_arg_Handler():
         "--audio_effect",
         "-af",
         action="store_true",
-        help=f"Change audio voice/apply effects/reduce noise {fcl.BYELLOW_FG}-MA --help for options{RESET}",
+        help=f"Change audio voice/apply effects/reduce noise {fg.BYELLOW_FG}-MA --help for options{RESET}",
     )
     parser.add_argument(
         "--audio_help", action="store_true", help="Show help for audiobot"
@@ -423,7 +229,7 @@ def Cmd_arg_Handler():
         "--no-resume",
         action="store_false",
         dest="no_resume",
-        help=f"Don't Resume previous File operation {fcl.BYELLOW_FG}filemac --convert_doc simpledir --no-resume{RESET}",
+        help=f"Don't Resume previous File operation {fg.BYELLOW_FG}filemac --convert_doc simpledir --no-resume{RESET}",
     )
 
     parser.add_argument(
@@ -431,7 +237,7 @@ def Cmd_arg_Handler():
         "-threads",
         type=int,
         default=3,
-        help=f"Number of threads for text to speech  {fcl.BYELLOW_FG}filemac --convert_doc simpledir --no-resume -t 2{RESET}",
+        help=f"Number of threads for text to speech  {fg.BYELLOW_FG}filemac --convert_doc simpledir --no-resume -t 2{RESET}",
     )
     parser.add_argument(
         "-sep",
@@ -444,30 +250,30 @@ def Cmd_arg_Handler():
     parser.add_argument(
         "--image2pdf",
         nargs="+",
-        help=f"Convert Images to pdf. {fcl.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fcl.BYELLOW_FG}filemac --image2pdf image1 image2{RESET}`",
+        help=f"Convert Images to pdf. {fg.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fg.BYELLOW_FG}filemac --image2pdf image1 image2{RESET}`",
     )
     parser.add_argument(
         "--image2word",
         nargs="+",
-        help=f"Convert Images to word document. {fcl.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fcl.BYELLOW_FG}filemac --image2word image1 image2{RESET}`",
+        help=f"Convert Images to word document. {fg.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fg.BYELLOW_FG}filemac --image2word image1 image2{RESET}`",
     )
     parser.add_argument(
         "--image2gray",
         nargs="+",
-        help=f"Convert Images to grayscale. {fcl.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fcl.BYELLOW_FG}filemac --image2gray image1 image2{RESET}`",
+        help=f"Convert Images to grayscale. {fg.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fg.BYELLOW_FG}filemac --image2gray image1 image2{RESET}`",
     )
     parser.add_argument(
         "-vt",
         "--voicetype",
         action="store_true",
-        help=f"Use your voice to type text. e.g `{fcl.BYELLOW_FG}filemac --voicetype{RESET}`",
+        help=f"Use your voice to type text. e.g `{fg.BYELLOW_FG}filemac --voicetype{RESET}`",
     )
 
     parser.add_argument(
         "-IeX",
         "--image_extractor",
         nargs="+",
-        help=f"Convert Images to pdf. {fcl.BWHITE_FG}Accepts file list {RESET} e.g `{fcl.BYELLOW_FG}filemac --image_extractor file1 file2{RESET}`",
+        help=f"Convert Images to pdf. {fg.BWHITE_FG}Accepts file list {RESET} e.g `{fg.BYELLOW_FG}filemac --image_extractor file1 file2{RESET}`",
     )
 
     parser.add_argument(
@@ -490,7 +296,7 @@ def Cmd_arg_Handler():
     parser.add_argument(
         "--size",
         type=str,
-        help=f"Dimensions for images to be saved by extractor eg {fcl.BBLUE_FG}256x82{fcl.RESET}",
+        help=f"Dimensions for images to be saved by extractor eg {fg.BBLUE_FG}256x82{fg.RESET}",
     )
     parser.add_argument(
         "--walk",
@@ -500,7 +306,7 @@ def Cmd_arg_Handler():
     parser.add_argument(
         "--clean",
         action="store_true",
-        help=f"Clean file/dir after an operation eg after {fcl.BMAGENTA_FG}image2pdf clean image dirs{fcl.RESET}.",
+        help=f"Clean file/dir after an operation eg after {fg.BMAGENTA_FG}image2pdf clean image dirs{fg.RESET}.",
     )
     parser.add_argument("--record", action="store_true", help="Record Audio from mic")
 
@@ -510,11 +316,11 @@ def Cmd_arg_Handler():
 
     # Use parse_known_args to allow unknown arguments (for later tunneling)
     args, remaining_args = parser.parse_known_args()
-    mapper = argsOPMaper(parser, args, remaining_args)
+    mapper = OperationMapper(parser, args, remaining_args)
     mapper.run()
 
 
-class argsOPMaper:
+class OperationMapper:
     def __init__(self, parser, args, remaining_args) -> None:
         self.parser = parser
         self.args = args
@@ -527,34 +333,34 @@ class argsOPMaper:
         self.Argsmain = Argsmain
         self.VideoConverter = VideoConverter
         self.AudioConverter = AudioConverter
-        self.ExtractAudio = ExtractAudio
-        self.Scanner = Scanner
+        self.AudioExtracter = AudioExtracter
+        self.PageExtractor = PageExtractor
         self.DocConverter = DocConverter
         self.ImageCompressor = ImageCompressor
         self.ExtractText = ExtractText
         self.SimpleAnalyzer = SimpleAnalyzer
-        self._entry = _entry
+        self._entry = _entry_
         self.ImageConverter = ImageConverter
         self.Batch_Audiofy = Batch_Audiofy
-        self._DIR_CONVERSION_ = _DIR_CONVERSION_
-        self.Eval = Eval
+        self.DirectoryConverter = DirectoryConverter
+        self.MethodMappingEngine = MethodMappingEngine
 
     def ensure_target_format(self):
         print(
-            f"{bcl.YELLOW_BG}[Warning]{fcl.YELLOW_FG}Please provide target format{RESET}"
+            f"{bg.YELLOW_BG}[Warning]{fg.YELLOW_FG}Please provide target format{RESET}"
         )
         return
 
     def pdfjoin(self):
-        from .pdf.combine import pdfmaster
+        from ..core.pdf.core import PDFCombine
 
         if self.args.pdfjoin[0].lower().strip() == "help":
-            from .pdf.combine import helpmaster
+            from ..utils.helpmaster import pdf_combine_help
 
-            opts, helper, example = helpmaster()
+            opts, helper, example = pdf_combine_help()
             print(f"{opts}\n {helper}\n {example}")
             sys.exit(0)
-        init = pdfmaster(self.args.pdfjoin, None, None, self.args.order)
+        init = PDFCombine(self.args.pdfjoin, None, None, self.args.order)
         init.controller()
 
     def image_converter(self):
@@ -566,7 +372,7 @@ class argsOPMaper:
             return
         if self.args.target_format is None:
             print(
-                f"{fcl.RED_FG}Please provide output format specified by{fcl.CYAN_FG} '-tf'{RESET}"
+                f"{fg.RED_FG}Please provide output format specified by{fg.CYAN_FG} '-tf'{RESET}"
             )
             return
         conv = self.ImageConverter(self.args.convert_image, self.args.target_format)
@@ -588,7 +394,7 @@ class argsOPMaper:
                 self.args.convert_doc, self.args.no_resume, self.args.threads
             )
         elif os.path.isdir(self.args.convert_doc[0]):
-            conv = self._DIR_CONVERSION_(
+            conv = self.DirectoryConverter(
                 self.args.convert_doc[0],
                 self.args.target_format,
                 self.args.no_resume,
@@ -597,7 +403,9 @@ class argsOPMaper:
             )
             conv._unbundle_dir_()
         elif os.path.isfile(self.args.convert_doc[0]):
-            ev = self.Eval(self.args.convert_doc[0], self.args.target_format)
+            ev = self.MethodMappingEngine(
+                self.args.convert_doc[0], self.args.target_format
+            )
             ev.document_eval()
 
     def handle_help(self):
@@ -652,25 +460,25 @@ class argsOPMaper:
         ev.pydub_conv()
 
     def handle_audio_extraction(self):
-        vi = self.ExtractAudio(self.args.extract_audio)
+        vi = self.AudioExtracter(self.args.extract_audio)
         vi.moviepyextract()
 
     def handle_scan_pdf(self):
-        sc = self.Scanner(self.args.scan)
+        sc = self.PageExtractor(self.args.scan)
         sc.scanPDF()
 
     def handle_scan_images(self):
-        sc = self.Scanner(self.args.scanAsImg, self.args.no_strip)
+        sc = self.PageExtractor(self.args.scanAsImg, self.args.no_strip)
         sc.scanAsImgs()
 
     def handle_scan_long_image(self):
-        sc = self.Scanner(self.args.scanAsLong_Image, self.args.separator)
+        sc = self.PageExtractor(self.args.scanAsLong_Image, self.args.separator)
         sc.scanAsLongImg()
 
     def handle_doc_to_long_image(self):
-        from .longImg import LImage
+        from ..core.pdf.core import PDF2LongImageConverter
 
-        conv = LImage(self.args.doc_long_image)
+        conv = PDF2LongImageConverter(self.args.doc_long_image)
         conv.preprocess()
 
     def handle_ocr(self):
@@ -682,13 +490,13 @@ class argsOPMaper:
         analyzer.SimpleAnalyzer()
 
     def handle_audio_join(self):
-        from .audiopy.Join import JoinAudios
+        from ..core.audio.core import AudioJoiner
 
-        joiner = JoinAudios(self.args.AudioJoin)
+        joiner = AudioJoiner(self.args.AudioJoin)
         joiner.worker()
 
     def handle_advanced_text_to_word(self):
-        from .text2word import StyledText
+        from ..core.text.core import StyledText
 
         init = StyledText(
             self.args.Richtext2word, None, self.args.font_size, self.args.font_name
@@ -706,7 +514,7 @@ class argsOPMaper:
             process_files(self.args.image_extractor)
 
     def image2pdf(self):
-        from .Imagepdfpy.image_to_pdf import ImageToPdfConverter
+        from ..core.image.core import ImagePdfConverter
 
         _input = (
             list(self.args.image2pdf)
@@ -715,9 +523,9 @@ class argsOPMaper:
         )
         if isinstance(_input, list):
             if len(_input) > 1 or os.path.isfile(os.path.abspath(_input[0])):
-                converter = ImageToPdfConverter(image_list=_input)
+                converter = ImagePdfConverter(image_list=_input)
             else:
-                converter = ImageToPdfConverter(
+                converter = ImagePdfConverter(
                     input_dir=_input[0],
                     order=self.args.sort,
                     base=self.args.base,
@@ -727,18 +535,18 @@ class argsOPMaper:
         converter.run()
 
     def image2word(self):
-        from .Image2docx.image_to_word import ImageToDocxConverter
+        from ..core.image.core import ImageDocxConverter
 
         _input = self.args.image2word
         if isinstance(_input, list):
             if len(_input) > 1:
-                converter = ImageToDocxConverter(image_list=_input)
+                converter = ImageDocxConverter(image_list=_input)
             else:
-                converter = ImageToDocxConverter(input_dir=_input[0])
+                converter = ImageDocxConverter(input_dir=_input[0])
         converter.run()
 
     def image2grayscale(self):
-        from .imagepy.grayscale import GrayscaleConverter
+        from ..core.image.core import GrayscaleConverter
 
         _input = self.args.image2gray
 
@@ -753,7 +561,7 @@ class argsOPMaper:
     def display_version(self):
         version = "1.1.7"
 
-        return print(f"{fcl.BLUE_FG}filemac: V-{fcl.BGREEN_FG}{version}{RESET}")
+        return print(f"{fg.BLUE_FG}filemac: V-{fg.BGREEN_FG}{version}{RESET}")
 
     def voicetype(self):
         from voice.VoiceType import VoiceTypeEngine
@@ -765,16 +573,16 @@ class argsOPMaper:
             print("Quit")
             return
         except Exception as e:
-            logging.critical("Critical failure: %s", e)
+            logger.critical("Critical failure: %s", e)
             print(
-                f"{bcl.YELLOW_BG}{bcl.BRED_BG}Critical error:{RESET} {fcl.RED_FG}{str(e)}{RESET}"
+                f"{bg.YELLOW_BG}{bg.BRED_BG}Critical error:{RESET} {fg.RED_FG}{str(e)}{RESET}"
             )
             return
 
     def handle_recording(self):
-        from .recorder import Recorder
+        from ..core.recorder import SoundRecorder
 
-        rec = Recorder()
+        rec = SoundRecorder()
         return rec.run()
 
     def run(self):
@@ -858,21 +666,20 @@ class argsOPMaper:
                 method()
             else:
                 self.parser.print_help()
-                raise FilemacException("Invalid arguments")
+                raise FilemacError("Invalid arguments")
         except KeyboardInterrupt:
-            print("\nQuit")
+            logger.info("\nQuit")
             sys.exit()
-        except FilemacException as e:
+        except (FilemacError, FileSystemError) as e:
             # Handle any exceptions that occur during method execution
-            print(e)
+            logger.error(e)
 
         except Exception as e:
-            raise
             # Handle any exceptions that occur during method execution
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
 
         return
 
 
 if __name__ == "__main__":
-    Cmd_arg_Handler()
+    CliInit()

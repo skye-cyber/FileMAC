@@ -1,23 +1,22 @@
-# multimedia_cli/formats.py
-from .colors import foreground, background
+# multimedia_cli/formats
+from .colors import fg, bg, rs
 
-fcl = foreground()
-bcl = background()
-RESET = fcl.RESET
+
+RESET = rs
 
 SUPPORTED_DOC_FORMATS = f"""
 |---------------------------------------------------------------------------
-|{bcl.BBLUE_BG}Input format{RESET}                    |{bcl.BBLUE_BG}Output format{RESET}                             |
+|{bg.BBLUE_BG}Input format{RESET}                    |{bg.BBLUE_BG}Output format{RESET}                             |
 |________________________________|__________________________________________|
-|   xlsx    {fcl.BYELLOW_FG}-------------------->{RESET}|csv txt doc/docx db(sql)                  |
+|   xlsx    {fg.BYELLOW_FG}-------------------->{RESET}|csv txt doc/docx db(sql)                  |
 |                                |                                          |
-|   doc/docx{fcl.BYELLOW_FG}-------------------->{RESET}|txt pdf ppt/pptx audio(ogg)               |
+|   doc/docx{fg.BYELLOW_FG}-------------------->{RESET}|txt pdf ppt/pptx audio(ogg)               |
 |                                |                                          |
-|   txt     {fcl.BYELLOW_FG}-------------------->{RESET}|pdf docx/doc audio(ogg)                   |
+|   txt     {fg.BYELLOW_FG}-------------------->{RESET}|pdf docx/doc audio(ogg)                   |
 |                                |                                          |
-|   pdf     {fcl.BYELLOW_FG}-------------------->{RESET}|doc/docx txt audio(ogg)                   |
+|   pdf     {fg.BYELLOW_FG}-------------------->{RESET}|doc/docx txt audio(ogg)                   |
 |                                |                                          |
-|   pptx/ppt{fcl.BYELLOW_FG}-------------------->{RESET}|doc/docx                                  |
+|   pptx/ppt{fg.BYELLOW_FG}-------------------->{RESET}|doc/docx                                  |
 |                                                                           |
 |___________________________________________________________________________|
 """
@@ -52,20 +51,20 @@ SUPPORTED_AUDIO_FORMATS_DIRECT = [
 ]  # Video
 SUPPORTED_AUDIO_FORMATS_SHOW = f"""
 |==============================|
-|  {bcl.BBLUE_BG}Supported I/O formats {RESET}      |
+|  {bg.BBLUE_BG}Supported I/O formats {RESET}      |
 |==============================|
-|          {fcl.CYAN_FG} wav {fcl.BYELLOW_FG}               |
-|          {fcl.CYAN_FG} mp3 {fcl.BYELLOW_FG}               |
-|          {fcl.CYAN_FG} ogg {fcl.BYELLOW_FG}               |
-|          {fcl.CYAN_FG} flv {fcl.BYELLOW_FG}               |
-|          {fcl.CYAN_FG} ogv {fcl.BYELLOW_FG}               |
-|          {fcl.CYAN_FG} mov {fcl.BYELLOW_FG}               |
-|          {fcl.CYAN_FG} webm {fcl.BYELLOW_FG}              |
-|          {fcl.CYAN_FG} aac {fcl.BYELLOW_FG}-------------->|{bcl.IMAGENTA_BG}Pending Implementation{RESET}{fcl.BYELLOW_FG}
-|          {fcl.CYAN_FG} bpf {fcl.BYELLOW_FG}-------------->|{bcl.IMAGENTA_BG}Pending Implementation{RESET}{fcl.BYELLOW_FG}
-|          {fcl.CYAN_FG} m4a {fcl.BYELLOW_FG}               |
-|          {fcl.CYAN_FG} raw {fcl.BYELLOW_FG}               |
-|          {fcl.CYAN_FG} aiff {fcl.BYELLOW_FG}              |
+|          {fg.CYAN_FG} wav {fg.BYELLOW_FG}               |
+|          {fg.CYAN_FG} mp3 {fg.BYELLOW_FG}               |
+|          {fg.CYAN_FG} ogg {fg.BYELLOW_FG}               |
+|          {fg.CYAN_FG} flv {fg.BYELLOW_FG}               |
+|          {fg.CYAN_FG} ogv {fg.BYELLOW_FG}               |
+|          {fg.CYAN_FG} mov {fg.BYELLOW_FG}               |
+|          {fg.CYAN_FG} webm {fg.BYELLOW_FG}              |
+|          {fg.CYAN_FG} aac {fg.BYELLOW_FG}-------------->|{bg.IMAGENTA_BG}Pending Implementation{RESET}{fg.BYELLOW_FG}
+|          {fg.CYAN_FG} bpf {fg.BYELLOW_FG}-------------->|{bg.IMAGENTA_BG}Pending Implementation{RESET}{fg.BYELLOW_FG}
+|          {fg.CYAN_FG} m4a {fg.BYELLOW_FG}               |
+|          {fg.CYAN_FG} raw {fg.BYELLOW_FG}               |
+|          {fg.CYAN_FG} aiff {fg.BYELLOW_FG}              |
 --------------------------------
 
 """
@@ -94,23 +93,23 @@ Video_codecs = {
 }
 SUPPORTED_VIDEO_FORMATS_SHOW = f"""
 ,_______________________________________,
-|x| {bcl.BBLUE_BG}Supported I/O formats{RESET}             |x|
-|x|-----------------------------------{fcl.BYELLOW_FG}|x|
-|x|               {fcl.BMAGENTA_FG} MP4 {fcl.BYELLOW_FG}               |x|
-|x|               {fcl.BMAGENTA_FG} AVI {fcl.BYELLOW_FG}               |x|
-|x|               {fcl.BMAGENTA_FG} OGV {fcl.BYELLOW_FG}-------------->|x|{fcl.IMAGENTA_FG}Pending Implementation{RESET}{fcl.BYELLOW_FG}
-|x|               {fcl.BMAGENTA_FG} WEBM{fcl.BYELLOW_FG}               |x|
-|x|               {fcl.BMAGENTA_FG} MOV {fcl.BYELLOW_FG}               |x|
-|x|               {fcl.BMAGENTA_FG} MKV {fcl.BYELLOW_FG}               |x|
-|x|               {fcl.BMAGENTA_FG} FLV {fcl.BYELLOW_FG}               |x|
-|x|               {fcl.BMAGENTA_FG} WMV {fcl.BYELLOW_FG}-------------->|x|{fcl.IMAGENTA_FG}Pending Implementation{RESET}{fcl.BYELLOW_FG}
-|,|___________________.BMAGENTA_FG________________|,|{fcl.BYELLOW_FG}
+|x| {bg.BBLUE_BG}Supported I/O formats{RESET}             |x|
+|x|-----------------------------------{fg.BYELLOW_FG}|x|
+|x|               {fg.BMAGENTA_FG} MP4 {fg.BYELLOW_FG}               |x|
+|x|               {fg.BMAGENTA_FG} AVI {fg.BYELLOW_FG}               |x|
+|x|               {fg.BMAGENTA_FG} OGV {fg.BYELLOW_FG}-------------->|x|{fg.IMAGENTA_FG}Pending Implementation{RESET}{fg.BYELLOW_FG}
+|x|               {fg.BMAGENTA_FG} WEBM{fg.BYELLOW_FG}               |x|
+|x|               {fg.BMAGENTA_FG} MOV {fg.BYELLOW_FG}               |x|
+|x|               {fg.BMAGENTA_FG} MKV {fg.BYELLOW_FG}               |x|
+|x|               {fg.BMAGENTA_FG} FLV {fg.BYELLOW_FG}               |x|
+|x|               {fg.BMAGENTA_FG} WMV {fg.BYELLOW_FG}-------------->|x|{fg.IMAGENTA_FG}Pending Implementation{RESET}{fg.BYELLOW_FG}
+|,|___________________.BMAGENTA_FG________________|,|{fg.BYELLOW_FG}
 """
 
 SUPPORTED_IMAGE_FORMATS = {
     "JPEG": ".jpeg",  # Joint Photographic Experts Group -Lossy compression
-    "JPG": ".jpg",
-    "PNG": ".png",  # Joint Photographic Experts Group - not lossy
+    "JPG": ".jpg",  # Joint Photographic Experts Group - not lossy
+    "PNG": ".png",
     "GIF": ".gif",  # Graphics Interchange Format
     "BMP": ".bmp",  # Windows BMP image
     "DIB": ".dib",  # Windows BMP image
@@ -125,31 +124,31 @@ SUPPORTED_IMAGE_FORMATS = {
     "SVG": ".svg",  # Scalable vector Graphics
     "EXR": ".exr",
     "DXF": ".dxf",  # Autocad format 2D
-    "PICT": "pct",
+    "PICT": ".pct",
     "PS": ".ps",  # PostSciript
     "POSTSCRIPT": ".ps",
 }
 
 SUPPORTED_IMAGE_FORMATS_SHOW = f"""
 __________________________________________
-|x|{bcl.BBLUE_BG}Supported I/O formats{RESET}                |x|
-|x|_____________________________________{fcl.BYELLOW_FG}|x|
-|x|               {fcl.BMAGENTA_FG} JPEG {fcl.BYELLOW_FG}                |x|
-|x|               {fcl.BMAGENTA_FG} PNG  {fcl.BYELLOW_FG}                 |x|
-|x|               {fcl.BMAGENTA_FG} GIF  {fcl.BYELLOW_FG}                 |x|
-|x|               {fcl.BMAGENTA_FG} BMP  {fcl.BYELLOW_FG}                 |x|
-|x|               {fcl.BMAGENTA_FG} DIB  {fcl.BYELLOW_FG}                 |x|
-|x|               {fcl.BMAGENTA_FG} TIFF {fcl.BYELLOW_FG}                 |x|
-|x|               {fcl.BMAGENTA_FG} PIC  {fcl.BYELLOW_FG}                 |x|
-|x|               {fcl.BMAGENTA_FG} EXR  {fcl.FMAGENTA_FG}---------------->|x|{fcl.FCYAN_FG} Pending Implementation{RESET}{fcl.BYELLOW_FG}
-|x|               {fcl.BMAGENTA_FG} PDF  {fcl.BYELLOW_FG}                 |x|
-|x|               {fcl.BMAGENTA_FG} WebP {fcl.BYELLOW_FG}                 |x|
-|x|               {fcl.BMAGENTA_FG} ICNS {fcl.BYELLOW_FG}                 |x|
-|x|               {fcl.BMAGENTA_FG} PSD  {fcl.FMAGENTA_FG}---------------->|x|{fcl.FCYAN_FG} Pending Implementation{RESET}{fcl.BYELLOW_FG}
-|x|               {fcl.BMAGENTA_FG} SVG  {fcl.FMAGENTA_FG}---------------->|x|{fcl.FCYAN_FG} Pending Implementation{RESET}{fcl.BYELLOW_FG}
-|x|               {fcl.BMAGENTA_FG} EPS  {fcl.BYELLOW_FG}                 |x|
-|x|               {fcl.BMAGENTA_FG} Postscript {fcl.FMAGENTA_FG}---------->|x|{fcl.FCYAN_FG} Pending Implementation{RESET}{fcl.BYELLOW_FG}
-|x|               {fcl.BMAGENTA_FG} PICT {fcl.FMAGENTA_FG}---------------->|x|{fcl.FCYAN_FG} Pending Implementation{RESET}{fcl.BYELLOW_FG}
+|x|{bg.BBLUE_BG}Supported I/O formats{RESET}                |x|
+|x|_____________________________________{fg.BYELLOW_FG}|x|
+|x|               {fg.BMAGENTA_FG} JPEG {fg.BYELLOW_FG}                |x|
+|x|               {fg.BMAGENTA_FG} PNG  {fg.BYELLOW_FG}                 |x|
+|x|               {fg.BMAGENTA_FG} GIF  {fg.BYELLOW_FG}                 |x|
+|x|               {fg.BMAGENTA_FG} BMP  {fg.BYELLOW_FG}                 |x|
+|x|               {fg.BMAGENTA_FG} DIB  {fg.BYELLOW_FG}                 |x|
+|x|               {fg.BMAGENTA_FG} TIFF {fg.BYELLOW_FG}                 |x|
+|x|               {fg.BMAGENTA_FG} PIC  {fg.BYELLOW_FG}                 |x|
+|x|               {fg.BMAGENTA_FG} EXR  {fg.FMAGENTA_FG}---------------->|x|{fg.FCYAN_FG} Pending Implementation{RESET}{fg.BYELLOW_FG}
+|x|               {fg.BMAGENTA_FG} PDF  {fg.BYELLOW_FG}                 |x|
+|x|               {fg.BMAGENTA_FG} WebP {fg.BYELLOW_FG}                 |x|
+|x|               {fg.BMAGENTA_FG} ICNS {fg.BYELLOW_FG}                 |x|
+|x|               {fg.BMAGENTA_FG} PSD  {fg.FMAGENTA_FG}---------------->|x|{fg.FCYAN_FG} Pending Implementation{RESET}{fg.BYELLOW_FG}
+|x|               {fg.BMAGENTA_FG} SVG  {fg.FMAGENTA_FG}---------------->|x|{fg.FCYAN_FG} Pending Implementation{RESET}{fg.BYELLOW_FG}
+|x|               {fg.BMAGENTA_FG} EPS  {fg.BYELLOW_FG}                 |x|
+|x|               {fg.BMAGENTA_FG} Postscript {fg.FMAGENTA_FG}---------->|x|{fg.FCYAN_FG} Pending Implementation{RESET}{fg.BYELLOW_FG}
+|x|               {fg.BMAGENTA_FG} PICT {fg.FMAGENTA_FG}---------------->|x|{fg.FCYAN_FG} Pending Implementation{RESET}{fg.BYELLOW_FG}
 |_|_____________________________________|x|
 """
 

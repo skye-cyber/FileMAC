@@ -1,6 +1,5 @@
-#############################################################################
-import logging
-import logging.handlers
+"""Handler for dcoument conversion operations requested by the cli entry"""
+
 import os
 import re
 import sqlite3
@@ -18,13 +17,10 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate
 from rich.progress import Progress
 from tqdm import tqdm
+from ..utils.simple import logger
+from ..utils.colors import fg, bg, rs
 
-# from pathlib import Path
-from .utils.colors import foreground, background
-
-fcl = foreground()
-bcl = background()
-RESET = fcl.RESET
+RESET = rs
 
 DEFAULT_SEPARATOR = "\n"
 
@@ -33,12 +29,10 @@ _ext_ppt_ = ["ppt", "pptx"]
 _ext_xls = ["xls", "xlsx"]
 
 PYGAME_DETECT_AVX2 = 1
-logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")
-logger = logging.getLogger(__name__)
 
 
 class DocConverter:
-    """Implementation for all file conversions"""
+    """Implementats all document conversion methods"""
 
     def __init__(self, input_file):
         self.input_file = input_file
@@ -73,11 +67,9 @@ class DocConverter:
             print(e)
 
     def word_to_pdf(self):
-        ###############################################################################
         """Convert word file to pdf document (docx)
         ->Check if running on Linux
         ->Use subprocess to run the dpkg and grep commands"""
-        ###############################################################################
         word_list = self.preprocess()
 
         word_list = [
@@ -90,16 +82,16 @@ class DocConverter:
             try:
                 if os.name == "posix":  # Check if running on Linux
                     print(
-                        f"{fcl.BLUE_FG}Converting: {RESET}{word_file} {fcl.BLUE_FG}to {RESET}{pdf_file}"
+                        f"{fg.BLUE_FG}Converting: {RESET}{word_file} {fg.BLUE_FG}to {RESET}{pdf_file}"
                     )
                     # Use subprocess to run the dpkg and grep commands
                     result = subprocess.run(
                         ["dpkg", "-l", "libreoffice"], stdout=subprocess.PIPE, text=True
                     )
                     if result.returncode != 0:
-                        logger.exception(f"{fcl.RED_FG}Libreoffice not found !{RESET}")
+                        logger.exception(f"{fg.RED_FG}Libreoffice not found !{RESET}")
                         print(
-                            f"{fcl.CYAN_FG}Initiating critical redundacy measure !{RESET}"
+                            f"{fg.CYAN_FG}Initiating critical redundacy measure !{RESET}"
                         )
                         self.word2pdf_extra(word_file)
                     subprocess.run(
@@ -114,7 +106,7 @@ class DocConverter:
                     )
 
                     print(
-                        f"{fcl.BMAGENTA_FG} Successfully converted {word_file} to {pdf_file}{RESET}"
+                        f"{fg.BMAGENTA_FG} Successfully converted {word_file} to {pdf_file}{RESET}"
                     )
                     return pdf_file
 
@@ -131,7 +123,7 @@ class DocConverter:
         for file in obj:
             file = os.path.abspath(file)
             if file.split(".")[-1] not in ("doc", "docx"):
-                logger.error(f"{fcl.RED_FG}File is not a word file{RESET}")
+                logger.error(f"{fg.RED_FG}File is not a word file{RESET}")
                 sys.exit(1)
             pdf_file = os.path.splitext(file)[0] + ".pdf" if outf is None else outf
             try:
@@ -139,25 +131,23 @@ class DocConverter:
                     print(f"The file {obj} does not exist or is not a valid file.")
                     sys.exit("Exit!")
                 logger.info(
-                    f"{fcl.BLUE_FG}Converting: {RESET}{file} {fcl.BLUE_FG}to {RESET}{pdf_file}"
+                    f"{fg.BLUE_FG}Converting: {RESET}{file} {fg.BLUE_FG}to {RESET}{pdf_file}"
                 )
                 from docx2pdf import convert
 
                 convert(file, pdf_file)
-                print(f"{fcl.GREEN_FG}Conversion ✅{RESET}")
+                print(f"{fg.GREEN_FG}Conversion ✅{RESET}")
                 sys.exit(0)
             except ImportError:
                 logger.warning(
-                    f"{fcl.RED_FG}docx2pdf Not found. {fcl.CYAN_FG}Run pip install docx2pdf{RESET}"
+                    f"{fg.RED_FG}docx2pdf Not found. {fg.CYAN_FG}Run pip install docx2pdf{RESET}"
                 )
             except Exception as e:
                 raise
                 logger.error(e)
 
     def pdf_to_word(self):
-        ###############################################################################
         """Convert pdf file to word document (docx)"""
-        ###############################################################################
         pdf_list = self.preprocess()
         pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
         for pdf_file in pdf_list:
@@ -173,31 +163,28 @@ class DocConverter:
                     '--convert-todoc:"MS Word 97"',
                     pdf_file,
                 ]
-                print(f"{fcl.BYELLOW_FG}Parse the pdf document..{RESET}")
+                print(f"{fg.BYELLOW_FG}Parse the pdf document..{RESET}")
                 parse(pdf_file, word_file, start=0, end=None)
 
                 logger.info(
-                    f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{word_file}{RESET}"
+                    f"{fg.MAGENTA_FG}New file is {fg.CYAN_FG}{word_file}{RESET}"
                 )
-                logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
+                logger.info(f"{fg.BGREEN_FG}Success👨‍💻✅{RESET}")
             except KeyboardInterrupt:
                 print("\nQuit❕")
                 sys.exit(1)
             except Exception as e:
                 logger.info(
-                    f"{bcl.RED_BG}All conversion attempts have failed: \
-{e}{RESET}"
+                    f"{bg.RED_BG}All conversion attempts have failed: {e}{RESET}"
                 )
 
     def txt_to_pdf(self):
-        ###############################################################################
         """Convert text file(s) to pdf document (docx)
         ->Read the contents of the input .txt file
         ->Initialize the PDF document
         ->Create a story to hold the elements of the PDF
         ->Iterate through each line in the input .txt file and add it to the PDF
         ->Build and write the PDF document"""
-        ###############################################################################
         txt_list = self.preprocess()
         _list_ = [item for item in txt_list if item.lower().endswith("txt")]
         for _file_ in _list_:
@@ -207,25 +194,25 @@ class DocConverter:
                 text_contents = file.readlines()
 
             # Initialize the PDF document
-            logger.info(f"{fcl.BYELLOW_FG}Initialize the PDF document{RESET}")
+            logger.info(f"{fg.BYELLOW_FG}Initialize the PDF document{RESET}")
             doc = SimpleDocTemplate(_pdf_, pagesize=letter)
 
             # Create a story to hold the elements of the PDF
             logger.info(
-                f"{fcl.BYELLOW_FG}Create a story to hold the elements of the PDF{RESET}"
+                f"{fg.BYELLOW_FG}Create a story to hold the elements of the PDF{RESET}"
             )
             story = []
 
             # Iterate through each line in the input .txt file and add it to the PDF
             logger.info(
-                f"{fcl.BYELLOW_FG}Iterate through each line in the input .txt file and add it to the PDF{RESET}"
+                f"{fg.BYELLOW_FG}Iterate through each line in the input .txt file and add it to the PDF{RESET}"
             )
             _line_count_ = 0
             try:
                 for line in text_contents:
                     _line_count_ += 1
                     logger.info(
-                        f"Lines {fcl.BBLUE_FG}{_line_count_}{RESET}/{len(text_contents)}"
+                        f"Lines {fg.BBLUE_FG}{_line_count_}{RESET}/{len(text_contents)}"
                     )
                     story.append(Paragraph(line.strip(), style="normalText"))
 
@@ -236,13 +223,12 @@ class DocConverter:
                 logger.error(e)
                 pass
             # Build and write the PDF document
-            logger.info(f"{fcl.BYELLOW_FG}Build and write the PDF document{RESET}")
+            logger.info(f"{fg.BYELLOW_FG}Build and write the PDF document{RESET}")
             doc.build(story)
-            logger.info(f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{_pdf_}{RESET}")
-            print(f"\n{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
+            logger.info(f"{fg.MAGENTA_FG}New file is {fg.CYAN_FG}{_pdf_}{RESET}")
+            print(f"\n{fg.BGREEN_FG}Success👨‍💻✅{RESET}")
 
     def word_to_pptx(self):
-        ###############################################################################
         """Convert word file(s) to pptx document (pptx/ppt)
         -> Load the Word document
         ->Create a new PowerPoint presentation
@@ -250,7 +236,6 @@ class DocConverter:
         ->Create a new slide in the PowerPoint presentation
         ->Add the paragraph text to the slide
         """
-        ###############################################################################
         word_list = self.preprocess()
         word_list = [
             item for item in word_list if item.split(".")[-1].lower() in ("doc", "docx")
@@ -270,23 +255,23 @@ class DocConverter:
 
             try:
                 # Load the Word document
-                print(f"{fcl.BYELLOW_FG}Load the Word document..{RESET}")
+                print(f"{fg.BYELLOW_FG}Load the Word document..{RESET}")
                 doc = Document(word_file)
 
                 # Create a new PowerPoint presentation
-                print(f"{fcl.BYELLOW_FG}Create a new PowerPoint presentation..{RESET}")
+                print(f"{fg.BYELLOW_FG}Create a new PowerPoint presentation..{RESET}")
                 prs = Presentation()
 
                 # Iterate through each paragraph in the Word document
                 print(
-                    f"{fcl.BGREEN_FG}Populating pptx slides with {fcl.BYELLOW_FG}{len(doc.paragraphs)}{fcl.BGREEN_FG} entries..{RESET}"
+                    f"{fg.BGREEN_FG}Populating pptx slides with {fg.BYELLOW_FG}{len(doc.paragraphs)}{fg.BGREEN_FG} entries..{RESET}"
                 )
                 count = 0
                 for paragraph in doc.paragraphs:
                     count += 1
                     perc = (count / len(doc.paragraphs)) * 100
                     print(
-                        f"{fcl.BMAGENTA_FG}Progress:: {fcl.BCYAN_FG}{perc:.2f}%{RESET}",
+                        f"{fg.BMAGENTA_FG}Progress:: {fg.BCYAN_FG}{perc:.2f}%{RESET}",
                         end="\r",
                     )
                     # Create a new slide in the PowerPoint presentation
@@ -298,9 +283,9 @@ class DocConverter:
                 # Save the PowerPoint presentation
                 prs.save(pptx_file)
                 logger.info(
-                    f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{pptx_file}{RESET}"
+                    f"{fg.MAGENTA_FG}New file is {fg.CYAN_FG}{pptx_file}{RESET}"
                 )
-                print(f"\n{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
+                print(f"\n{fg.BGREEN_FG}Success👨‍💻✅{RESET}")
             except KeyboardInterrupt:
                 print("\nQuit❕⌨️")
                 sys.exit(1)
@@ -308,9 +293,7 @@ class DocConverter:
                 logger.error(e)
 
     def word_to_txt(self):
-        ###############################################################################
         """Convert word file to txt file"""
-        ###############################################################################
         word_list = self.preprocess()
         word_list = [
             item for item in word_list if item.split(".")[-1].lower() in ("dox", "docx")
@@ -325,7 +308,7 @@ class DocConverter:
             )
 
             try:
-                logger.info(f"{fcl.BLUE_FG}Create Doument Tablet{RESET}")
+                logger.info(f"{fg.BLUE_FG}Create Doument Tablet{RESET}")
                 doc = Document(file_path)
 
                 with open(txt_file, "w", encoding="utf-8") as f:
@@ -335,64 +318,57 @@ class DocConverter:
                         Par += 1
 
                         print(
-                            f"Par:{fcl.BLUE_FG}{Par}/{len(doc.paragraphs)}{RESET}",
+                            f"Par:{fg.BLUE_FG}{Par}/{len(doc.paragraphs)}{RESET}",
                             end="\r",
                         )
                     logger.info(
-                        f"{fcl.MAGENTA_FG}Conversion of file to txt success{RESET}"
+                        f"{fg.MAGENTA_FG}Conversion of file to txt success{RESET}"
                     )
 
-                logger.info(f"File: {fcl.GREEN_FG}{txt_file}{RESET}")
+                logger.info(f"File: {fg.GREEN_FG}{txt_file}{RESET}")
                 return txt_file
             except KeyboardInterrupt:
                 print("\nQuit❕⌨️")
                 sys.exit()
             except Exception as e:
-                logger.error(f"{fcl.RED_FG}{e}{RESET}")
+                logger.error(f"{fg.RED_FG}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
                     log_file.write(
-                        f"Couldn't convert {file_path} to {txt_file}:\
-REASON->{e}"
+                        f"Couldn't convert {file_path} to {txt_file}:REASON->{e}"
                     )
 
     def pdf_to_txt(self):
-        ###############################################################################
         """Convert pdf file to text file"""
-        ###############################################################################
 
         pdf_list = self.preprocess()
         pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
         for file_path in pdf_list:
             txt_file = file_path[:-3] + "txt"
             try:
-                print(f"{fcl.BYELLOW_FG}Open and read the pdf document..{RESET}")
+                print(f"{fg.BYELLOW_FG}Open and read the pdf document..{RESET}")
                 with open(file_path, "rb") as file:
                     pdf_reader = PyPDF2.PdfReader(file)
                     text = ""
                     _pg_ = 0
-                    print(f"{fcl.YELLOW_FG}Convert pages..{RESET}")
+                    print(f"{fg.YELLOW_FG}Convert pages..{RESET}")
                     for page_num in range(len(pdf_reader.pages)):
                         _pg_ += 1
                         logger.info(
-                            f"Page {fcl.BBLUE_FG}{_pg_}{RESET}/{len(pdf_reader.pages)}"
+                            f"Page {fg.BBLUE_FG}{_pg_}{RESET}/{len(pdf_reader.pages)}"
                         )
                         page = pdf_reader.pages[page_num]
                         text += page.extract_text()
                 with open(txt_file, "w", encoding="utf-8") as f:
                     f.write(text)
-                logger.info(
-                    f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{txt_file}{RESET}"
-                )
-                logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
+                logger.info(f"{fg.MAGENTA_FG}New file is {fg.CYAN_FG}{txt_file}{RESET}")
+                logger.info(f"{fg.BGREEN_FG}Success👨‍💻✅{RESET}")
             except Exception as e:
-                logger.error(f"{fcl.RED_FG}{e}{RESET}")
+                logger.error(f"{fg.RED_FG}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
                     log_file.write(f"Error converting {file_path} to {txt_file}: {e}\n")
 
     def pptx_to_txt(self, dest=None):
-        ###############################################################################
         """Convert ppt file to tetx document"""
-        ###############################################################################
         ppt_list = self.preprocess()
         ppt_list = [
             item for item in ppt_list if item.split(".")[-1].lower() in ("ppt", "pptx")
@@ -413,7 +389,7 @@ REASON->{e}"
                 presentation = Presentation(file_path)
 
                 logger.info(
-                    f"Slide count ={fcl.BMAGENTA_FG} {len(presentation.slides)}{RESET}"
+                    f"Slide count ={fg.BMAGENTA_FG} {len(presentation.slides)}{RESET}"
                 )
 
                 _slide_count_ = 0
@@ -450,12 +426,10 @@ REASON->{e}"
                         print(text_buffer)
                         return text_buffer
 
-                logger.info(
-                    f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{txt_file}{RESET}"
-                )
-                logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
+                logger.info(f"{fg.MAGENTA_FG}New file is {fg.CYAN_FG}{txt_file}{RESET}")
+                logger.info(f"{fg.BGREEN_FG}Success👨‍💻✅{RESET}")
         except Exception as e:
-            logger.error(f"\n❌Oops! {bcl.RED_BG}{e}{RESET}")
+            logger.error(f"\n❌Oops! {bg.RED_BG}{e}{RESET}")
 
     @staticmethod
     def convert_ppt_to_pptx(obj: os.PathLike):
@@ -480,12 +454,12 @@ REASON->{e}"
                     powerpoint.Quit()
                     return pptx_file
             else:
-                print(f"{fcl.RED_FG}Unable to identify the system{RESET}")
+                print(f"{fg.RED_FG}Unable to identify the system{RESET}")
         except KeyboardInterrupt:
             print("\nQuit!")
             sys.exit(1)
         except Exception as e:
-            logger.error(f"{fcl.RED_FG}{e}{RESET}")
+            logger.error(f"{fg.RED_FG}{e}{RESET}")
 
     def ppt_to_word(self):
         from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
@@ -493,11 +467,9 @@ REASON->{e}"
         from docx.shared import RGBColor as docxRGBColor
         from pptx.dml.color import RGBColor as pptxRGBColor
 
-        ###############################################################################
-        """Convert ppt file to word document
-    ->Preserves bold formatting
-    """
-        ###############################################################################
+        """Convert ppt file to word document\n
+        ->Preserves bold formatting
+        """
         ppt_list = self.preprocess()
         ppt_list = [
             item for item in ppt_list if item.split(".")[-1].lower() in ("ppt", "pptx")
@@ -510,7 +482,7 @@ REASON->{e}"
                 else None
             )
             try:
-                logger.info(f"{fcl.BYELLOW_FG}Create Doument Tablet{RESET}")
+                logger.info(f"{fg.BYELLOW_FG}Create Doument Tablet{RESET}")
                 file_path = os.path.abspath(file_path)
                 if ext == "ppt":
                     file_path = self.convert_ppt_to_pptx(
@@ -519,7 +491,7 @@ REASON->{e}"
                 presentation = Presentation(file_path)
                 document = Document()
                 logger.info(
-                    f"Slide count ={fcl.BMAGENTA_FG} {len(presentation.slides)}{RESET}"
+                    f"Slide count ={fg.BMAGENTA_FG} {len(presentation.slides)}{RESET}"
                 )
                 _slide_count_ = 0
                 with Progress() as progress:
@@ -595,23 +567,21 @@ REASON->{e}"
                         progress.update(task, advance=1)
                 document.save(word_file)
                 logger.info(
-                    f"{fcl.MAGENTA_FG}New file is {fcl.CYAN_FG}{word_file}{RESET}"
+                    f"{fg.MAGENTA_FG}New file is {fg.CYAN_FG}{word_file}{RESET}"
                 )
-                logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
+                logger.info(f"{fg.BGREEN_FG}Success👨‍💻✅{RESET}")
                 return word_file
             except Exception as e:
-                logger.error(f"\n❌Oops! {bcl.RED_BG}{e}{RESET}")
+                logger.error(f"\n❌Oops! {bg.RED_BG}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
                     log_file.write(f"\n❌Oops! {e}")
 
     def text_to_word(self):
-        ###############################################################################
-        """Convert text file to word
-        ->Read the text file
-        ->Filter out non-XML characters
-        ->Create a new Word document
+        """Convert text file to word\n
+        ->Read the text file\n
+        ->Filter out non-XML characters\n
+        ->Create a new Word document\n
         ->Add the filtered text content to the document"""
-        ###############################################################################
         flist = self.preprocess()
         flist = [item for item in flist if item.lower().endswith("txt")]
         for file_path in flist:
@@ -620,7 +590,7 @@ REASON->{e}"
 
             try:
                 # Read the text file
-                logger.info(f"{fcl.BCYAN_FG}Open and read the text file{RESET}")
+                logger.info(f"{fg.BCYAN_FG}Open and read the text file{RESET}")
                 with open(file_path, "r", encoding="utf-8", errors="ignore") as file:
                     text_content = file.read()
 
@@ -630,7 +600,7 @@ REASON->{e}"
                 )
 
                 # Create a new Word document
-                logger.info(f"{fcl.BYELLOW_FG}Create Doument Tablet{RESET}")
+                logger.info(f"{fg.BYELLOW_FG}Create Doument Tablet{RESET}")
                 doc = Document()
                 # Add the filtered text content to the document
                 doc.add_paragraph(filtered_content)
@@ -638,32 +608,30 @@ REASON->{e}"
                 # Save the document as a Word file
                 doc.save(word_file)
                 logger.info(
-                    f"{fcl.MAGENTA_FG}New file is {fcl.BCYAN_FG}{word_file}{RESET}"
+                    f"{fg.MAGENTA_FG}New file is {fg.BCYAN_FG}{word_file}{RESET}"
                 )
-                logger.info(f"{fcl.BGREEN_FG}Success👨‍💻✅{RESET}")
+                logger.info(f"{fg.BGREEN_FG}Success👨‍💻✅{RESET}")
             except FileExistsError as e:
                 logger.error(f"{str(e)}📁")
             except Exception as e:
-                logger.error(f"\n❌Oops something went awry {fcl.RED_FG}{e}{RESET}")
+                logger.error(f"\n❌Oops something went awry {fg.RED_FG}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
                     log_file.write(
-                        f"\n❌Oops something went astray{fcl.RED_FG}{e}{RESET}"
+                        f"\n❌Oops something went astray{fg.RED_FG}{e}{RESET}"
                     )
 
     def convert_xls_to_word(self):
-        ###############################################################################
-        """Convert xlsx file(s) to word file(s)
-        ->Read the XLS file using pandas
-        ->Create a new Word document
+        """Convert xlsx file(s) to word file(s)\n
+        ->Read the XLS file using pandas\n
+        ->Create a new Word document\n
         ->Iterate over the rows of the dataframe and add them to the Word document"""
-        ###############################################################################
         xls_list = self.preprocess()
 
         xls_list = [
             item for item in xls_list if item.split(".")[-1].lower() in ("xls", "xlsx")
         ]
 
-        print(f"{fcl.BGREEN_FG}Initializing conversion sequence{RESET}")
+        print(f"{fg.BGREEN_FG}Initializing conversion sequence{RESET}")
 
         for xls_file in xls_list:
             ext = os.path.splitext(xls_file)[-1][1:]
@@ -682,7 +650,7 @@ REASON->{e}"
 
                 """Iterate over the rows of the dataframe and add them to the
                 Word document"""
-                logger.info(f"{fcl.ICYAN_FG}Converting {xls_file}..{RESET}")
+                logger.info(f"{fg.ICYAN_FG}Converting {xls_file}..{RESET}")
                 # time.sleep(2)
                 total_rows = df.shape[0]
                 for _, row in df.iterrows():
@@ -691,28 +659,25 @@ REASON->{e}"
                     for value in row:
                         doc.add_paragraph(str(value))
                     print(
-                        f"Row {fcl.BYELLOW_FG}{current_row}/{total_rows} \
-{fcl.BBLUE_FG}{percentage:.1f}%{RESET}",
+                        f"Row {fg.BYELLOW_FG}{current_row}/{total_rows} {fg.BBLUE_FG}{percentage:.1f}%{RESET}",
                         end="\r",
                     )
                     # print(f"\033[1;36m{row}{RESET}")
 
                 # Save the Word document
                 doc.save(word_file)
-                print(f"{fcl.BGREEN_FG}Conversion successful!{RESET}", end="\n")
+                print(f"{fg.BGREEN_FG}Conversion successful!{RESET}", end="\n")
             except KeyboardInterrupt:
                 print("\nQuit⌨️")
                 sys.exit(1)
             except Exception as e:
-                print(f"{bcl.RED_BG}Oops Conversion failed:❕{RESET}", str(e))
+                print(f"{bg.RED_BG}Oops Conversion failed:❕{RESET}", str(e))
 
     def convert_xls_to_text(self):
-        ###############################################################################
         """Convert xlsx/xls file/files to text file format
         ->Read the XLS file using pandas
         ->Convert the dataframe to plain text
         ->Write the plain text to the output file"""
-        ###############################################################################
         xls_list = self.preprocess()
 
         xls_list = [
@@ -720,7 +685,7 @@ REASON->{e}"
             for item in xls_list
             if any(item.lower().endswith(ext) for ext in _ext_xls)
         ]
-        print(f"{fcl.BGREEN_FG}Initializing conversion sequence{RESET}")
+        print(f"{fg.BGREEN_FG}Initializing conversion sequence{RESET}")
         for xls_file in tqdm(xls_list):
             ext = os.path.splitext(xls_file)[-1][1:]
             txt_file = (
@@ -740,16 +705,14 @@ REASON->{e}"
                 lines = len(text.splitlines())
 
                 print(
-                    f"Preparing to write: {fcl.BYELLOW_FG}{chars} \033[1;30m \
-characters{fcl.BYELLOW_FG} {words}\033[1;30m words {fcl.BYELLOW_FG}{lines}\033[1;30m \
-lines {RESET}",
+                    f"Preparing to write: {fg.BYELLOW_FG}{chars} \033[1;30m characters{fg.BYELLOW_FG} {words}\033[1;30m words {fg.BYELLOW_FG}{lines}\033[1;30m lines {RESET}",
                     end="\n",
                 )
                 # Write the plain text to the output file
                 with open(txt_file, "w") as file:
                     file.write(text)
 
-                print(f"{fcl.BGREEN_FG}Conversion successful!{RESET}", end="\n")
+                print(f"{fg.BGREEN_FG}Conversion successful!{RESET}", end="\n")
             except KeyboardInterrupt:
                 print("\nQuit❕")
                 sys.exit(1)
@@ -757,11 +720,9 @@ lines {RESET}",
                 print("Oops Conversion failed:", str(e))
 
     def convert_xlsx_to_csv(self):
-        ###############################################################################
         """Convert xlsx/xls file to csv(comma seperated values) format
         ->Load the Excel file
         ->Save the DataFrame to CSV"""
-        ###############################################################################
         xls_list = self.preprocess()
 
         xls_list = [
@@ -776,16 +737,16 @@ lines {RESET}",
             )
             try:
                 """Load the Excel file"""
-                print(f"{fcl.BGREEN_FG}Initializing conversion sequence{RESET}")
+                print(f"{fg.BGREEN_FG}Initializing conversion sequence{RESET}")
                 df = pd.read_excel(xls_file)
                 logger.info(f"Converting {xls_file}..")
                 total_rows = df.shape[0]
-                print(f"Writing {fcl.BYELLOW_FG}{total_rows} rows {RESET}", end="\n")
+                print(f"Writing {fg.BYELLOW_FG}{total_rows} rows {RESET}", end="\n")
                 for i in range(101):
                     print(f"Progress: {i}%", end="\r")
                 """Save the DataFrame to CSV"""
                 df.to_csv(csv_file, index=False)
-                print(f"{fcl.BMAGENTA_FG} Conversion successful{RESET}")
+                print(f"{fg.BMAGENTA_FG} Conversion successful{RESET}")
 
             except KeyboardInterrupt:
                 print("\nQuit❕")
@@ -832,13 +793,11 @@ lines {RESET}",
                 progress.update(task, advance=1)
 
     def convert_xlsx_to_database(self):
-        ###############################################################################
         """Convert xlsx file(s) to sqlite
         ->Read the Excel file into a pandas DataFrame
         ->Create a connection to the SQLite database
         ->Insert the DataFrame into a new table in the database
         ->Close the database connection"""
-        ###############################################################################
         xlsx_list = self.preprocess()
         xlsx_list = [
             item for item in xlsx_list if item.split(".")[-1].lower() in ("xls", "xlsx")
@@ -851,7 +810,7 @@ lines {RESET}",
             )
             try:
                 db_file = input(
-                    f"{fcl.BBLUE_FG}Please enter desired sql filename: {RESET}"
+                    f"{fg.BBLUE_FG}Please enter desired sql filename: {RESET}"
                 )
                 table_name = input("Please enter desired table name: ")
                 # res = ["db_file", "table_name"]
@@ -866,11 +825,11 @@ lines {RESET}",
                 # Read the Excel file into a pandas DataFrame
                 print(f"Reading {xlsx_file}...")
                 df = pd.read_excel(xlsx_file)
-                print(f"{fcl.BGREEN_FG}Initializing conversion sequence{RESET}")
-                print(f"{fcl.BGREEN_FG} Connected to sqlite3 database::{RESET}")
+                print(f"{fg.BGREEN_FG}Initializing conversion sequence{RESET}")
+                print(f"{fg.BGREEN_FG} Connected to sqlite3 database::{RESET}")
                 # Create a connection to the SQLite database
                 conn = sqlite3.connect(db_file)
-                print(f"{fcl.BYELLOW_FG} Creating database table::{RESET}")
+                print(f"{fg.BYELLOW_FG} Creating database table::{RESET}")
                 # Insert the DataFrame into a new table in the database
                 df.to_sql(table_name, column, conn, if_exists="replace", index=False)
                 print(
@@ -885,9 +844,7 @@ lines {RESET}",
                 logger.error(f"{e}")
 
     def doc2image(self, outf="png"):
-        ###############################################################################
         """Create image objects from given files"""
-        ###############################################################################
         outf = "png" if outf not in ("png", "jpg") else outf
         path_list = self.preprocess()
         file_list = [
@@ -899,148 +856,23 @@ lines {RESET}",
         for file in file_list:
             if file.lower().endswith("pdf"):
                 # Convert the PDF to a list of PIL image objects
-                print(f"{fcl.BLUE_FG}Generate image objects ..{RESET}")
+                print(f"{fg.BLUE_FG}Generate image objects ..{RESET}")
                 images = convert_from_path(file)
 
                 # Save each image to a file
                 fname = file[:-4]
-                print(f"{fcl.YELLOW_FG}Target images{fcl.BLUE_FG} {len(images)}{RESET}")
+                print(f"{fg.YELLOW_FG}Target images{fg.BLUE_FG} {len(images)}{RESET}")
 
                 with Progress() as progress:
                     task = progress.add_task(
                         "[magenta]Generating images ", total=len(images)
                     )
                     for i, image in enumerate(images):
-                        # print(f"{Bfcl.BLUE_FG}{i}{RESET}", end="\r")
+                        # print(f"{Bfg.BLUE_FG}{i}{RESET}", end="\r")
                         yd = f"{fname}_{i + 1}.{outf}"
                         image.save(yd)
                         imgs.append(yd)
                         progress.update(task, advance=1)
-                # print(f"\n{fcl.GREEN_FG}Ok{RESET}")
+                # print(f"\n{fg.GREEN_FG}Ok{RESET}")
 
         return imgs
-
-
-class Scanner:
-    """Implementation of scanning to extract data from pdf files and images
-    input_file -> file to be scanned pdf,image
-    Args:
-        input_file->file to be scanned
-        no_strip-> Preserves text formating once set to True, default: False
-    Returns:
-        None"""
-
-    def __init__(self, input_file, sep: str = DEFAULT_SEPARATOR):
-        self.input_file = input_file
-        self.sep = sep
-
-    def preprocess(self):
-        files_to_process = []
-
-        if os.path.isfile(self.input_file):
-            files_to_process.append(self.input_file)
-        elif os.path.isdir(self.input_file):
-            for file in os.listdir(self.input_file):
-                file_path = os.path.join(self.input_file, file)
-                if os.path.isfile(file_path):
-                    files_to_process.append(file_path)
-
-        return files_to_process
-
-    def scanPDF(self, obj=None):
-        """Obj - object for scanning where the object is not a list"""
-        pdf_list = self.preprocess()
-        pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
-        if obj:
-            pdf_list = [obj]
-
-        for pdf in pdf_list:
-            out_f = pdf[:-3] + "txt"
-            print(f"{fcl.YELLOW_FG}Read pdf ..{RESET}")
-
-            with open(pdf, "rb") as f:
-                reader = PyPDF2.PdfReader(f)
-                text = ""
-
-                pg = 0
-                for page_num in range(len(reader.pages)):
-                    pg += 1
-
-                    print(f"{fcl.BYELLOW_FG}Progress:{RESET}", end="")
-                    print(f"{fcl.CYAN_FG}{pg}/{len(reader.pages)}{RESET}", end="\r")
-                    page = reader.pages[page_num]
-                    text += page.extract_text()
-
-            print(f"\n{text}")
-            print(f"\n{fcl.YELLOW_FG}Write text to {fcl.GREEN_FG}{out_f}{RESET}")
-            with open(out_f, "w") as f:
-                f.write(text)
-
-            print(f"\n{fcl.BGREEN_FG}Ok{RESET}")
-
-    def scanAsImgs(self):
-        file = self.input_file
-        mc = DocConverter(file)
-        img_objs = mc.doc2image()
-        # print(img_objs)
-        from .OCR.Extractor import ExtractText
-
-        text = ""
-
-        with Progress() as progress:
-            task = progress.add_task("[magenta]Extracting text", totsl=len(img_objs))
-            for i in img_objs:
-                extract = ExtractText(i, self.sep)
-                _text = extract.OCR()
-
-                if _text is not None:
-                    text += _text
-                    with open(f"{self.input_file[:-4]}_filemac.txt", "a") as _writer:
-                        _writer.write(text)
-                progress.update(task, advance=1)
-
-        def _cleaner_():
-            print(f"{fcl.FMAGENTA_FG}Clean")
-            for obj in img_objs:
-                if os.path.exists(obj):
-                    print(obj, end="\r")
-                    os.remove(obj)
-                txt_file = f"{obj[:-4]}.txt"
-                if os.path.exists(txt_file):
-                    print(f"{bcl.CYAN_BG}{txt_file}{RESET}", end="\r")
-                    os.remove(txt_file)
-
-        # Do clean up
-        _cleaner_()
-        from .utils.overwrite import clear_screen
-
-        clear_screen()
-        print(f"{bcl.GREEN_BG}Full Text{RESET}")
-        print(text)
-        print(
-            f"{fcl.BWHITE_FG}Text File ={fcl.IGREEN_FG}{self.input_file[:-4]}_filemac.txt{RESET}"
-        )
-        print(f"{fcl.GREEN_FG}Ok✅{RESET}")
-        return text
-
-    def scanAsLongImg(self) -> bool:
-        try:
-            """Convert the pdf to long image for scanning - text extraction"""
-            pdf_list = self.preprocess()
-            pdf_list = [item for item in pdf_list if item.lower().endswith("pdf")]
-            from .longImg import LImage
-            from .OCR.Extractor import ExtractText
-
-            for file in pdf_list:
-                LI = LImage(file)
-                fl = LI.preprocess()
-
-                # fpath = file.split('.')[0] + '.png'
-                tx = ExtractText(fl, self.sep)
-                text = tx.OCR()
-                if text is not None:
-                    # print(text)
-                    print(f"{fcl.GREEN_FG}Ok{RESET}")
-            return True
-        except Exception as e:
-            print(e)

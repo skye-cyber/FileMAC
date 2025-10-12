@@ -6,11 +6,10 @@ from io import BytesIO
 from typing import List
 from pathlib import Path
 import os
-from ..utils.colors import foreground
+from ...utils.colors import fg, rs
 from ...utils.file_utils import dirbuster
 
-fcl = foreground()
-RESET = fcl.RESET
+RESET = rs
 
 
 class ImageExtractor:
@@ -95,7 +94,7 @@ class ImageExtractor:
             try:
                 if self.tsize and not self.is_page_sized_image(img):
                     print(
-                        f"Skipping image {i + 1}: ({fcl.CYAN_FG}{img.size}{RESET}) <= {fcl.BLUE_FG}{self.tsize}{RESET}"
+                        f"Skipping image {i + 1}: ({fg.CYAN_FG}{img.size}{RESET}) <= {fg.BLUE_FG}{self.tsize}{RESET}"
                     )
                     continue
 
@@ -105,7 +104,7 @@ class ImageExtractor:
 
                 img_path = Path(self.output_path) / safe_filename
                 img.save(img_path)
-                print(f"Saved image: {fcl.GREEN_FG}{img_path}{RESET}")
+                print(f"Saved image: {fg.GREEN_FG}{img_path}{RESET}")
             except Exception as e:
                 raise
                 print(f"Error saving image {i + 1} from {base_filename}: {e}")
@@ -131,7 +130,7 @@ class PdfImageExtractor(ImageExtractor):
         Returns:
             A list of PIL Image objects.
         """
-        print(f"{fcl.BWHITE_FG}File: {fcl.BLUE_FG}{file_path}{RESET}")
+        print(f"{fg.BWHITE_FG}File: {fg.BLUE_FG}{file_path}{RESET}")
         images: List[Image.Image] = []
         try:
             pdf_document = fitz.open(file_path)

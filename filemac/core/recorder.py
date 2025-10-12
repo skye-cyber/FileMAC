@@ -99,7 +99,7 @@ class SoundRecorder:
 if __name__ == "__main__":
     try:
         filename = input("\033[94mEnter Desired File Name\033[0;1;89m:") + ".wav"
-        recorder = Recorder()
+        recorder = SoundRecorder()
         file = recorder.run()
     except KeyboardInterrupt:
         print("\nQuit!")

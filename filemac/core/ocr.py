@@ -7,13 +7,11 @@ import cv2
 import pytesseract
 from PIL import Image
 from rich.progress import Progress
-from ..utils.colors import foreground, background
-from ..utils.file_utils import DirectoryScanner
-from ..utils.namerule import modify_filename_if_exists
+from ..utils.colors import fg, bg, rs
+from ..utils.file_utils import modify_filename_if_exists, DirectoryScanner
 
-fcl = foreground()
-bcl = background()
-RESET = fcl.RESET
+
+RESET = rs
 
 # Define constants for better readability and maintainability
 SUPPORTED_IMAGE_FORMATS = {"png", "jpg", "jpeg"}
@@ -109,7 +107,7 @@ class ExtractText:
             text = self.sep.join(text.splitlines())  # handle empty lines
             logger.info("")
             logger.info(f"Extracted text from {image_path}")
-            print(f"{fcl.YELLOW_FG}{text}{RESET}")
+            print(f"{fg.YELLOW_FG}{text}{RESET}")
 
             # Save text to file
             with open(output_file, "w", encoding="utf-8") as file:  # Specify encoding
@@ -147,7 +145,7 @@ class ExtractText:
             If output_file is provided, returns a list with a single string.
         """
 
-        image_list = Unbundle(self.input_obj).run()
+        image_list = DirectoryScanner(self.input_obj).run()
         num_images = len(image_list)
         extracted_texts = []
 
@@ -193,9 +191,9 @@ class ExtractText:
 
         except KeyboardInterrupt:
             print(
-                f"\n[{bcl.YELLOW_BG}X{RESET}]Operation interrupted by {fcl.UBLUE_FG}user{RESET}.[/]"
+                f"\n[{bg.YELLOW_BG}X{RESET}]Operation interrupted by {fg.UBLUE_FG}user{RESET}.[/]"
             )
             sys.exit(0)
         except Exception as e:
-            logger.error(f"An unexpected error occurred: {bcl.RED_BG}{e}{RESET}")
+            logger.error(f"An unexpected error occurred: {bg.RED_BG}{e}{RESET}")
             return None  # Ensure None is returned on error

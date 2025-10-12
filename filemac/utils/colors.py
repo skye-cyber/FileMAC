@@ -5,7 +5,7 @@ from colorama import Fore, Style, init
 init(autoreset=True)
 
 
-class foreground:
+class ForegroundColor:
     if os.name == "posix":
         RESET = "\033[0m"  # Reset to default text color
 
@@ -129,7 +129,7 @@ class foreground:
         UWHITE_FG = Fore.WHITE  # Blinking not directly supported, using WHITE
 
 
-class background:
+class BackgroundColor:
     if os.name == "posix":
         RESET = "\033[0m"  # Reset to default text color
 
@@ -253,3 +253,19 @@ class background:
         IWHITE_BG = Fore.WHITE  # Indented white (not distinct in colorama)
         LWHITE_BG = Fore.WHITE  # Underlined white (not distinct in colorama)
         UWHITE_BG = Fore.WHITE  # Blinking not directly supported, using WHITE
+
+
+fg = ForegroundColor()
+bg = BackgroundColor()
+rs = fg.RESET
+
+
+class OutputFormater:
+    """ANSI styles for output display"""
+
+    INFO = f"{fg.BLUE_FG}[i]{rs}"
+    WARN = f"{fg.YELLOW_FG}[!]{rs}"
+    ERR = f"{fg.RED_FG}[x]{rs}"
+    EXP = f"{fg.MAGENTA_FG}[⁉️]{rs}"  # For exceptios
+    OK = f"{fg.GREEN_FG}[✓]{rs}"
+    RESET = rs

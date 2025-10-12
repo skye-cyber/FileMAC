@@ -1,21 +1,20 @@
 import logging
-from filemac.utils.colors import foreground
+from filemac.utils.colors import fg, rs
 
-fcl = foreground()
-RESET = fcl.RESET
+RESET = rs
 
 
 class CustomFormatter(logging.Formatter):
     COLORS = {
-        logging.DEBUG: fcl.BBLUE_FG,
-        logging.INFO: fcl.GREEN_FG,
-        logging.WARNING: fcl.YELLOW_FG,
-        logging.ERROR: fcl.RED_FG,
-        logging.CRITICAL: fcl.MAGENTA_FG,
+        logging.DEBUG: fg.BBLUE_FG,
+        logging.INFO: fg.GREEN_FG,
+        logging.WARNING: fg.YELLOW_FG,
+        logging.ERROR: fg.RED_FG,
+        logging.CRITICAL: fg.MAGENTA_FG,
     }
 
     def format(self, record):
-        log_color = self.COLORS.get(record.levelno, fcl.WHITE_FG)
+        log_color = self.COLORS.get(record.levelno, fg.WHITE_FG)
         log_message = super().format(record)
         return f"{log_color}{log_message}{RESET}"
 

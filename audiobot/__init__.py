@@ -15,7 +15,7 @@ Perform audio modifications such as adding voice effect to an audio or video fil
 </ul>
 """
 
-from .cli import Argsmain
+from .cli import Argsmain as main
 
 
 LOGO = """

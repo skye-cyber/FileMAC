@@ -2,21 +2,22 @@
 File utility functions for filemac.
 """
 
-from ..core.exceptions import FileSystemError
-from .simple import logger
-from ..core.styles import SmartStyles as st
 import fnmatch
-from tqdm.auto import tqdm
-from pathlib import Path
-import tempfile
-import shutil
-from typing import Iterator, Optional, Union, List
-from .formats import SUPPORTED_IMAGE_FORMATS
-
 import os
+import shutil
+import tempfile
 import uuid
+from pathlib import Path
+from typing import Iterator, List, Optional, Union
+
+from tqdm.auto import tqdm
+
+# from .colors import fg, rs
+from ..core.exceptions import FileSystemError
+from .colors import OutputFormater as OF
 from .config import OUTPUT_DIR
-from ..utils.simple import logger
+from .formats import SUPPORTED_IMAGE_FORMATS
+from .simple import logger
 
 
 def dirbuster(_dir_):
@@ -151,12 +152,12 @@ class FileSystemHandler:
             for f in files:
                 if f.exists():
                     f.unlink()
-                    print(f"{st.OK} Deleted: {f}")
+                    print(f"{OF.OK} Deleted: {f}")
             return True
         except (PermissionError, OSError) as e:
             raise FileSystemError(e)
         except Exception as e:
-            print(f"{st.ERR} Failed to delete {f}: {e}")
+            print(f"{OF.ERR} Failed to delete {f}: {e}")
             return False
 
     @staticmethod
@@ -165,39 +166,13 @@ class FileSystemHandler:
             for f in files:
                 if f.exists():
                     f.rmdir()
-                    print(f"{st.OK} Deleted: {f}")
+                    print(f"{OF.OK} Deleted: {f}")
             return True
         except (PermissionError, OSError) as e:
             raise FileSystemError(e)
         except Exception as e:
-            print(f"{st.ERR} Failed to delete {f}: {e}")
+            print(f"{OF.ERR} Failed to delete {f}: {e}")
             return False
-
-    @staticmethod
-    def confirm_deletion(files) -> list:
-        print(f"\n{st.INFO} The following files are candidates for deletion:")
-        for i, f in enumerate(files):
-            print(f"  [{i}] {f}")
-
-        while True:
-            print(
-                f"\n{st.WARN} Enter indices (comma-separated) to {st.WARN}exclude{st.RESET} from deletion, or press Enter to proceed with all:"
-            )
-            exclude_input = input("Exclude: ").strip()
-            if not exclude_input:
-                return files
-            try:
-                exclude_indices = set(
-                    int(idx.strip())
-                    for idx in exclude_input.split(",")
-                    if idx.strip().isdigit()
-                )
-                filtered_files = [
-                    f for i, f in enumerate(files) if i not in exclude_indices
-                ]
-                return filtered_files
-            except ValueError:
-                print(f"{st.ERR} Invalid input. Try again.")
 
     @staticmethod
     def ensure_directory(path: Path) -> Path:
@@ -351,3 +326,24 @@ class DirectoryScanner:
     def run(self):
         supported_files = self._get_image_files(self.input_obj)
         return supported_files
+
+
+def modify_filename_if_exists(filename):
+    """
+    Modifies the filename by adding "_filemac" before the extension if the original filename exists.
+
+    Args:
+        filename (str): The filename to modify.
+
+    Returns:
+        str: The modified filename, or the original filename if it doesn't exist or has no extension.
+    """
+    if os.path.exists(filename):
+        parts = filename.rsplit(".", 1)  # Split from the right, at most once
+        if len(parts) == 2:
+            base, ext = parts
+            return f"{base}_filemac.{ext}"
+        else:
+            return f"{filename}_filemac"  # handle files with no extension.
+    else:
+        return filename
