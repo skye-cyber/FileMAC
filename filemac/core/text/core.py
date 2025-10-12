@@ -3,7 +3,7 @@
 from docx import Document
 from docx.shared import Pt, RGBColor
 
-from filemac_utils.colors import foreground
+from ...utils.colors import foreground
 
 fcl = foreground()
 RESET = fcl.RESET

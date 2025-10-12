@@ -3,7 +3,7 @@
 import sys
 import cv2
 import numpy as np
-from filemac_utils.colors import foreground
+from .utils.colors import foreground
 import ffmpeg
 
 fcl = foreground()

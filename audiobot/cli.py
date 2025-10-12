@@ -6,7 +6,7 @@ import os
 
 import magic
 from .audioutils.utils import transcribe_audio
-from filemac_utils.colors import foreground
+from filemac.utils.colors import foreground
 from .processor import VideoProcessor, AudioProcessor
 from .logging_config import setup_colored_logger
 from .config import Config

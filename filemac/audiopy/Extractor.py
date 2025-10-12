@@ -5,7 +5,7 @@ import sys
 
 from moviepy import VideoFileClip
 
-from filemac_utils.colors import foreground
+from ..utils.colors import foreground
 
 fcl = foreground()
 RESET = fcl.RESET

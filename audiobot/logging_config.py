@@ -1,5 +1,5 @@
 import logging
-from filemac_utils.colors import foreground
+from filemac.utils.colors import foreground
 
 fcl = foreground()
 RESET = fcl.RESET

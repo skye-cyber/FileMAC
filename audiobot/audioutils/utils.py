@@ -1,7 +1,7 @@
 import speech_recognition as sr
 import ffmpeg
 from ..logging_config import setup_colored_logger
-from filemac_utils.colors import foreground
+from filemac.utils.colors import foreground
 
 fcl = foreground()
 RESET = fcl.RESET

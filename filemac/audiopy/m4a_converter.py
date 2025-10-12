@@ -1,8 +1,8 @@
 import os
 import subprocess
 
-from filemac_utils.formats import SUPPORTED_AUDIO_FORMATS
-from filemac_utils.security.vul_mitigate import SecurePython
+from ..utils.formats import SUPPORTED_AUDIO_FORMATS
+from ..utils.security.vul_mitigate import SecurePython
 
 
 def convert_m4a_(obj_file, _out_f: str):

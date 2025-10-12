@@ -20,7 +20,7 @@ from rich.progress import Progress
 from tqdm import tqdm
 
 # from pathlib import Path
-from filemac_utils.colors import foreground, background
+from .utils.colors import foreground, background
 
 fcl = foreground()
 bcl = background()
@@ -170,7 +170,7 @@ class DocConverter:
                     "lowriter",
                     "--headless",
                     '--infilter="writer_pdf_import"',
-                    "--convert-to" 'doc:"MS Word 97"',
+                    '--convert-todoc:"MS Word 97"',
                     pdf_file,
                 ]
                 print(f"{fcl.BYELLOW_FG}Parse the pdf document..{RESET}")
@@ -184,8 +184,10 @@ class DocConverter:
                 print("\nQuit❕")
                 sys.exit(1)
             except Exception as e:
-                logger.info(f"{bcl.RED_BG}All conversion attempts have failed: \
-{e}{RESET}")
+                logger.info(
+                    f"{bcl.RED_BG}All conversion attempts have failed: \
+{e}{RESET}"
+                )
 
     def txt_to_pdf(self):
         ###############################################################################
@@ -348,8 +350,10 @@ class DocConverter:
             except Exception as e:
                 logger.error(f"{fcl.RED_FG}{e}{RESET}")
                 with open("conversion.log", "a") as log_file:
-                    log_file.write(f"Couldn't convert {file_path} to {txt_file}:\
-REASON->{e}")
+                    log_file.write(
+                        f"Couldn't convert {file_path} to {txt_file}:\
+REASON->{e}"
+                    )
 
     def pdf_to_txt(self):
         ###############################################################################
@@ -408,8 +412,9 @@ REASON->{e}")
 
                 presentation = Presentation(file_path)
 
-                logger.info(f"Slide count ={fcl.BMAGENTA_FG} {
-                            len(presentation.slides)}{RESET}")
+                logger.info(
+                    f"Slide count ={fcl.BMAGENTA_FG} {len(presentation.slides)}{RESET}"
+                )
 
                 _slide_count_ = 0
 
@@ -907,7 +912,7 @@ lines {RESET}",
                     )
                     for i, image in enumerate(images):
                         # print(f"{Bfcl.BLUE_FG}{i}{RESET}", end="\r")
-                        yd = f"{fname}_{i+1}.{outf}"
+                        yd = f"{fname}_{i + 1}.{outf}"
                         image.save(yd)
                         imgs.append(yd)
                         progress.update(task, advance=1)
@@ -1007,7 +1012,7 @@ class Scanner:
 
         # Do clean up
         _cleaner_()
-        from filemac_utils.overwrite import clear_screen
+        from .utils.overwrite import clear_screen
 
         clear_screen()
         print(f"{bcl.GREEN_BG}Full Text{RESET}")

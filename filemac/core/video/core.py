@@ -1,6 +1,7 @@
-###############################################################################
-# Convert video file to from one format to another'''
-###############################################################################
+"""
+Convert video file to from one format to another
+"""
+
 import os
 import subprocess
 import sys
@@ -10,8 +11,8 @@ from moviepy import VideoFileClip
 from pydub import AudioSegment
 from tqdm import tqdm
 
-from filemac_utils.colors import foreground, background
-from filemac_utils.formats import SUPPORTED_VIDEO_FORMATS, Video_codecs
+from ...utils.colors import foreground, background
+from ...utils.formats import SUPPORTED_VIDEO_FORMATS, Video_codecs
 
 fcl = foreground()
 bcl = background()

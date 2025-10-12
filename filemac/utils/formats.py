@@ -1,5 +1,5 @@
 # multimedia_cli/formats.py
-from filemac_utils.colors import foreground, background
+from .colors import foreground, background
 
 fcl = foreground()
 bcl = background()

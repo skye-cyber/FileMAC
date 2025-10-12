@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import soundfile as sf
 from ..logging_config import setup_colored_logger
-from filemac_utils.colors import foreground
+from filemac.utils.colors import foreground
 
 fcl = foreground()
 RESET = fcl.RESET

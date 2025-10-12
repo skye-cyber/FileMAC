@@ -4,7 +4,7 @@ import librosa
 from pydub import AudioSegment, effects
 from scipy.signal import butter, lfilter, sosfilt
 from .config import Config
-from filemac_utils.colors import foreground
+from filemac.utils.colors import foreground
 
 fcl = foreground()
 RESET = fcl.RESET

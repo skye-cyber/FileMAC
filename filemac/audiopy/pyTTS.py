@@ -14,7 +14,7 @@ from gtts import gTTS
 from pydub import AudioSegment
 from rich.errors import MarkupError
 from ..pydocs import DocConverter
-from filemac_utils.colors import foreground
+from ..utils.colors import foreground
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s")
 logger = logging.getLogger(__name__)

@@ -4,9 +4,9 @@ import sys
 import pydub
 from tqdm import tqdm
 
-from filemac_utils.colors import foreground
+from ..utils.colors import foreground
 from ..audiopy.m4a_converter import m4a
-from filemac_utils.formats import SUPPORTED_AUDIO_FORMATS, SUPPORTED_AUDIO_FORMATS_DIRECT
+from ..utils.formats import SUPPORTED_AUDIO_FORMATS, SUPPORTED_AUDIO_FORMATS_DIRECT
 
 ###############################################################################
 # Convert Audio file to from one format to another'''

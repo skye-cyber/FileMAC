@@ -44,6 +44,7 @@ setup(
             "filemac=filemac:main",
             "Filemac=filemac:main",
             "FILEMAC=filemac:main",
+            "audiobot:filemac:audiobot",
         ],
     },
     python_requires=">=3.6",

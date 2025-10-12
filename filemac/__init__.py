@@ -39,3 +39,30 @@ Extract text from an image.
 """
 
 from .main import Cmd_arg_Handler as main
+from audiobot.cli import Argsmain as audiobot
+from .core.image.core import (
+    ImageCompressor,
+    ImageConverter,
+    GrayscaleConverter,
+    ImageDocxConverter,
+    ImagePdfConverter,
+)
+from .core.pdf.core import PDF2LongImageConverter, PDFCombine, PageExtractor
+from .core.video.core import VideoConverter
+from .core.recorder import SoundRecorder
+
+__version__ = "2.1.0"
+
+__all__ = [
+    "audiobot",
+    "GrayscaleConverter",
+    "ImageConverter",
+    "ImageCompressor",
+    "PDF2LongImageConverter",
+    "ImagePdfConverter",
+    "ImageDocxConverter",
+    "PDFCombine",
+    "PageExtractor",
+    "VideoConverter",
+    "SoundRecorder",
+]

@@ -6,29 +6,29 @@ import os
 import sys
 from typing import List, Union
 from audiobot.cli import Argsmain
-from .imagepy.converter import ImageConverter
+from ..core.converter import ImageConverter
 
-from filemac_utils.colors import foreground, background
-from filemac_utils.formats import (
+from ..utils.colors import foreground, background
+from ..utils.formats import (
     SUPPORTED_AUDIO_FORMATS_DIRECT,
     SUPPORTED_AUDIO_FORMATS_SHOW,
     SUPPORTED_DOC_FORMATS,
     SUPPORTED_IMAGE_FORMATS_SHOW,
     SUPPORTED_VIDEO_FORMATS_SHOW,
 )
-from . import warnings_handler
-from .audiopy.audio import AudioConverter
-from .audiopy.pyTTS import FileSynthesis
-from .audiopy.Extractor import ExtractAudio
-from .pydocs import DocConverter, Scanner
-from .imagepy.compress import Compress_Size
-from .OCR.Extractor import ExtractText
-from .pdf.Page_Extractor import _entry
-from .video_analyzer import SimpleAnalyzer
-from .videopy.pyVideo import VideoConverter
-from .imagepy.image_extractor import process_files
-from .exceptions.handler import FilemacException
-from filemac_utils.filenames import generate_filename
+from .. import warnings_handler
+from ..core.document.audio import AudioConverter
+from ..core.document.pyTTS import FileSynthesis
+from ..core.document.Extractor import ExtractAudio
+from ...core.document import DocConverter, Scanner
+from ..core.image.core import ImageCompressor
+from ..core.ocr.Extractor import ExtractText
+from ..core.pdf.core import PageExtractor
+from ..miscellaneous.video_analyzer import SimpleAnalyzer
+from ..core.video.core import VideoConverter
+from ..core.image.extractor import PdfImageExtractor
+from ..exceptions.handler import FilemacException
+from ..utils.file_utils import generate_filename
 
 fcl = foreground()
 bcl = background()
@@ -52,7 +52,7 @@ class _DIR_CONVERSION_:
         self.threads = threads
         # Handle isolation and non isolation modes distinctively
         self._ls_ = (
-            ["pdf", "docx", "doc", "xlsx", "ppt", "pptx" "xls", "txt"]
+            ["pdf", "docx", "doc", "xlsx", "ppt", "pptxxls", "txt"]
             if _isolate_ is None
             else [_isolate_]
         )
@@ -72,8 +72,9 @@ class _DIR_CONVERSION_:
                     _path_ = os.path.join(root, file)
 
                     if _ext_ in self._ls_ and os.path.exists(_path_):
-                        print(f"INFO\t {fcl.FYELLOW_FG}Parse {
-                            fcl.BLUE_FG}{_path_}{RESET}")
+                        print(
+                            f"INFO\t {fcl.FYELLOW_FG}Parse {fcl.BLUE_FG}{_path_}{RESET}"
+                        )
                         init = Eval(_path_, self._format_)
                         init.document_eval()
 
@@ -362,7 +363,8 @@ def Cmd_arg_Handler():
         "-RT2W",
         "--Richtext2word",
         help=f"Advanced Text to word conversion i.e:{
-            fcl.BYELLOW_FG}filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}",
+            fcl.BYELLOW_FG
+        }filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}",
     )
 
     # Add arguments that must accompany the "obj" command
@@ -402,7 +404,10 @@ def Cmd_arg_Handler():
         "-p",
         nargs="+",
         help=f"Extract given pages from pdf: {
-            fcl.BYELLOW_FG}filemac --extract_pages file.pdf 6 10{RESET} for one page: {fcl.BYELLOW_FG}filemac --extract_pages file.pdf 5{RESET}",
+            fcl.BYELLOW_FG
+        }filemac --extract_pages file.pdf 6 10{RESET} for one page: {
+            fcl.BYELLOW_FG
+        }filemac --extract_pages file.pdf 5{RESET}",
     )
 
     parser.add_argument(
@@ -525,7 +530,7 @@ class argsOPMaper:
         self.ExtractAudio = ExtractAudio
         self.Scanner = Scanner
         self.DocConverter = DocConverter
-        self.Compress_Size = Compress_Size
+        self.ImageCompressor = ImageCompressor
         self.ExtractText = ExtractText
         self.SimpleAnalyzer = SimpleAnalyzer
         self._entry = _entry
@@ -627,7 +632,7 @@ class argsOPMaper:
         ev.CONVERT_VIDEO()
 
     def handle_image_resize(self):
-        res = self.Compress_Size(self.args.resize_image)
+        res = self.ImageCompressor(self.args.resize_image)
         res.resize_image(self.args.t_size)
 
     def handle_doc_to_image_conversion(self):
@@ -733,12 +738,16 @@ class argsOPMaper:
         converter.run()
 
     def image2grayscale(self):
-        from .imagepy.grayscale import Grayscale
+        from .imagepy.grayscale import GrayscaleConverter
 
         _input = self.args.image2gray
 
         if isinstance(_input, list):
-            converter = Grayscale(_input) if len(_input) > 1 else Grayscale(_input[0])
+            converter = (
+                GrayscaleConverter(_input)
+                if len(_input) > 1
+                else GrayscaleConverter(_input[0])
+            )
             converter.run()
 
     def display_version(self):
@@ -761,17 +770,6 @@ class argsOPMaper:
                 f"{bcl.YELLOW_BG}{bcl.BRED_BG}Critical error:{RESET} {fcl.RED_FG}{str(e)}{RESET}"
             )
             return
-
-    def handle_markdown2docx(self):
-        from .mdConv.markdown2docx import MermaidRenderer, MarkdownToDocxConverter
-
-        output_file = generate_filename(ext="docx")
-
-        renderer = MermaidRenderer()
-
-        converter = MarkdownToDocxConverter(mermaid_renderer=renderer)
-
-        return converter.convert_file(self.args.markdown2docx, docx_path=output_file)
 
     def handle_recording(self):
         from .recorder import Recorder
@@ -804,7 +802,6 @@ class argsOPMaper:
             else args.convert_doc: self.doc_converter,
             args.convert_video: self.handle_video_conversion,
             args.convert_image: self.image_converter,
-            args.markdown2docx: self.handle_markdown2docx,
             args.resize_image: self.handle_image_resize,
             args.convert_doc2image: self.handle_doc_to_image_conversion,
             args.convert_audio: self.handle_audio_conversion,

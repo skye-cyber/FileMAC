@@ -7,7 +7,7 @@ from pynput import keyboard
 import sys
 
 
-class Recorder:
+class SoundRecorder:
     def __init__(self, frequency=44100, channels=2, dtype=np.int16):
         self.fs = frequency  # Sample rate (samples per second)
         self.channels = 2  # Number of audio channels

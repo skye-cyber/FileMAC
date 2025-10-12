@@ -9,7 +9,7 @@ import html
 import requests
 from dotenv import load_dotenv
 from importlib import resources
-from filemac_utils.colors import foreground
+from ..colors import foreground
 
 fcl = foreground()
 RESET = fcl.RESET

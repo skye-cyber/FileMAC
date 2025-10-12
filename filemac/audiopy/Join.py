@@ -5,8 +5,8 @@ import sys
 # import shutil
 from pydub import AudioSegment
 from rich.progress import Progress
-from filemac_utils.colors import foreground
-from filemac_utils.formats import SUPPORTED_AUDIO_FORMATS_DIRECT
+from ..utils.colors import foreground
+from ..utils.formats import SUPPORTED_AUDIO_FORMATS_DIRECT
 
 fcl = foreground()
 RESET = fcl.RESET

@@ -6,7 +6,8 @@ from io import BytesIO
 from typing import List
 from pathlib import Path
 import os
-from filemac_utils.colors import foreground
+from ..utils.colors import foreground
+from ...utils.file_utils import dirbuster
 
 fcl = foreground()
 RESET = fcl.RESET
@@ -107,7 +108,7 @@ class ImageExtractor:
                 print(f"Saved image: {fcl.GREEN_FG}{img_path}{RESET}")
             except Exception as e:
                 raise
-                print(f"Error saving image {i+1} from {base_filename}: {e}")
+                print(f"Error saving image {i + 1} from {base_filename}: {e}")
 
 
 class PdfImageExtractor(ImageExtractor):
@@ -146,7 +147,7 @@ class PdfImageExtractor(ImageExtractor):
                         images.append(pil_image)
                     except Exception as e:
                         print(
-                            f"Error processing image {img_index+1} from PDF page {page_index+1}: {e}"
+                            f"Error processing image {img_index + 1} from PDF page {page_index + 1}: {e}"
                         )
             pdf_document.close()
         except Exception as e:
@@ -188,25 +189,6 @@ class DocxImageExtractor(ImageExtractor):
         except Exception as e:
             print(f"Error processing DOCX file: {file_path} - {e}")
         return images
-
-
-def dirbuster(_dir_):
-    try:
-        target = []
-        for root, dirs, files in os.walk(_dir_):
-            for file in files:
-                ext = file.split(".")[-1]
-
-                _path_ = os.path.join(root, file)
-                if os.path.exists(_path_) and ext.lower() in ("pdf", "doc", "docx"):
-                    target.append(_path_)
-        return target
-    except FileNotFoundError as e:
-        print(e)
-
-    except KeyboardInterrupt:
-        print("\nQuit!")
-        return
 
 
 def process_files(
