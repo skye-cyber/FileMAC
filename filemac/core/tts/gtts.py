@@ -35,14 +35,14 @@ class GoogleTTS:
     def join_audios(files, output_file):
         masterfile = output_file + "_master.mp3"
         print(
-            f"{fg.BBLUE_FG}Create a master file {fg.BMAGENTA_FG}{masterfile}{RESET}",
+            f"{fg.BBLUE}Create a master file {fg.BMAGENTA}{masterfile}{RESET}",
             end="\r",
         )
         # Create a list to store files
         ogg_files = []
         # loop through the directory while adding the ogg files to the list
         for filename in files:
-            print(f"Join {fg.BBLUE_FG}{len(files)}{RESET} files")
+            print(f"Join {fg.BBLUE}{len(files)}{RESET} files")
             # if filename.endswith('.ogg'):
             # ogg_file = os.path.join(path, filename)
             ogg_files.append(AudioSegment.from_file(filename))
@@ -55,7 +55,7 @@ class GoogleTTS:
         # Export the combined ogg to new mp3 file or ogg file
         combined_ogg.export(output_file + "_master.ogg", format="ogg")
         print(
-            f"{fg.BGREEN_FG}Master file:Ok                                                                             {RESET}"
+            f"{fg.BGREEN}Master file:Ok                                                                             {RESET}"
         )
 
     def Synthesise(
@@ -81,13 +81,13 @@ class GoogleTTS:
 
         # Remove temporary dir if it exists, rare-cases since file names are mostly unique
         if os.path.exists(_tmp_folder_) and self.resume is False:
-            # query = input(f"{fg.BBLUE_FG}Remove the {os.path.join(out_dir, _tmp_folder_)} directory (y/n)?{RESET} ").lower() in ('y', 'yes')
+            # query = input(f"{fg.BBLUE}Remove the {os.path.join(out_dir, _tmp_folder_)} directory (y/n)?{RESET} ").lower() in ('y', 'yes')
             shutil.rmtree(_tmp_folder_)
 
         # Create temporary folder to house chunks
         if not os.path.exists(_tmp_folder_):
             logger.info(
-                f"{fg.BYELLOW_FG}Create temporary directory = {fg.BBLUE_FG}{_tmp_folder_}{RESET}"
+                f"{fg.BYELLOW}Create temporary directory = {fg.BBLUE}{_tmp_folder_}{RESET}"
             )
             os.mkdir(_tmp_folder_)
 
@@ -103,7 +103,7 @@ class GoogleTTS:
         resume_chunk_pos = start_chunk * 1_000 if start_chunk != 0 else start_chunk
 
         try:
-            print(f"{fg.BYELLOW_FG}Start thread:: {thread_name}{RESET}")
+            print(f"{fg.BYELLOW}Start thread:: {thread_name}{RESET}")
 
             total_chunks = math.ceil(len(text) / CHUNK_SIZE)
 
@@ -119,7 +119,7 @@ class GoogleTTS:
 
                     for i in range(resume_chunk_pos, len(text), CHUNK_SIZE):
                         print(
-                            f"Processing: chunk {fg.BMAGENTA_FG}{counter}/{total_chunks} {fg.DCYAN_FG}{counter / total_chunks * 100:.2f}%{RESET}\n",
+                            f"Processing: chunk {fg.BMAGENTA}{counter}/{total_chunks} {fg.DCYAN}{counter / total_chunks * 100:.2f}%{RESET}\n",
                             end="\r",
                         )
                         chunk = text[i : i + CHUNK_SIZE]
@@ -127,7 +127,7 @@ class GoogleTTS:
                         if os.path.exists(f"{_full_output_path_}_{counter}.ogg"):
                             if counter == start_chunk:
                                 print(
-                                    f"{fg.CYAN_FG}Chunk vs file confict: {fg.BLUE_FG}Resolving{RESET}"
+                                    f"{fg.CYAN}Chunk vs file confict: {fg.BLUE}Resolving{RESET}"
                                 )
                                 os.remove(f"{_full_output_path_}_{counter}.ogg")
                                 output_filename = f"{_full_output_path_}_{counter}.ogg"
@@ -158,18 +158,18 @@ class GoogleTTS:
                         counter += 1
 
                 except FileNotFoundError as e:
-                    logger.error(f"{fg.RED_FG}{e}{RESET}")
+                    logger.error(f"{fg.RED}{e}{RESET}")
 
                 except (
                     requests.exceptions.ConnectionError
                 ):  # Handle connectivity/network error
-                    logger.error(f"{fg.RED_FG}ConnectionError{RESET}")
+                    logger.error(f"{fg.RED}ConnectionError{RESET}")
 
                     # Exponential backoff for retries
                     for _sec_ in range(2**attempt, 0, -1):
                         print(
                             # Increament the attempts
-                            f"{fg.BWHITE_FG}Resume in {fg.BBLUE_FG}{_sec_}{RESET}",
+                            f"{fg.BWHITE}Resume in {fg.BBLUE}{_sec_}{RESET}",
                             end="\r",
                         )
 
@@ -184,7 +184,7 @@ class GoogleTTS:
                     logger.error(f"HTTP error: {e.status_code} - {e.reason}")
                     for _sec_ in range(2**attempt, 0, -1):
                         print(
-                            f"{fg.BWHITE_FG}Resume in {fg.BBLUE_FG}{_sec_}{RESET}",
+                            f"{fg.BWHITE}Resume in {fg.BBLUE}{_sec_}{RESET}",
                             end="\r",
                         )
 
@@ -193,11 +193,11 @@ class GoogleTTS:
                     resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
 
                 except requests.exceptions.RequestException as e:
-                    logger.error(f"{fg.RED_FG}{e}{RESET}")
+                    logger.error(f"{fg.RED}{e}{RESET}")
 
                     for _sec_ in range(2**attempt, 0, -1):
                         print(
-                            f"{fg.BWHITE_FG}Resume in {fg.BBLUE_FG}{_sec_}{RESET}",
+                            f"{fg.BWHITE}Resume in {fg.BBLUE}{_sec_}{RESET}",
                             end="\r",
                         )
                     attempt += 1
@@ -210,11 +210,11 @@ class GoogleTTS:
                     ConnectionRefusedError,
                     ConnectionResetError,
                 ):
-                    logger.error(f"{fg.RED_FG}Connection at attempt{RESET}")
+                    logger.error(f"{fg.RED}Connection at attempt{RESET}")
 
                     for _sec_ in range(2**attempt, 0, -1):
                         print(
-                            f"{fg.BWHITE_FG}Resume in {fg.BLUE_FG}{_sec_}{RESET}",
+                            f"{fg.BWHITE}Resume in {fg.BLUE}{_sec_}{RESET}",
                             end="\r",
                         )
 
@@ -223,10 +223,10 @@ class GoogleTTS:
                     resume_chunk_pos = int(config.read_config_file(thread_name)) * 1_000
 
                 except MarkupError as e:
-                    logger.error(f"{fg.RED_FG}{e}{RESET}")
+                    logger.error(f"{fg.RED}{e}{RESET}")
                 except Exception as e:  # Handle all other types of exceptions
                     logger.error(
-                        f"{fg.BMAGENTA_FG}{attempt + 1}/{max_retries}:{fg.RED_FG}{e}{RESET}"
+                        f"{fg.BMAGENTA}{attempt + 1}/{max_retries}:{fg.RED}{e}{RESET}"
                     )
 
                     for _sec_ in range(2**attempt, 0, -1):
@@ -238,7 +238,7 @@ class GoogleTTS:
 
                 else:
                     print(
-                        f"{fg.BMAGENTA_FG}Conversion success✅. \n  {fg.CYAN_FG}INFO\t Create masterfile{RESET}"
+                        f"{fg.BMAGENTA}Conversion success✅. \n  {fg.CYAN}INFO\t Create masterfile{RESET}"
                     )
 
                     if (
@@ -255,7 +255,7 @@ class GoogleTTS:
 
             else:
                 print(
-                    f"{fg.RED_FG}Maximum retries reached. Unable to complete the operation after {fg.BMAGENTA_FG} {max_retries} attempts.{RESET}"
+                    f"{fg.RED}Maximum retries reached. Unable to complete the operation after {fg.BMAGENTA} {max_retries} attempts.{RESET}"
                 )
                 sys.exit(2)
 
@@ -264,25 +264,25 @@ class GoogleTTS:
 
     @staticmethod
     def pdf_to_text(pdf_path):
-        logger.info(f"{fg.GREEN_FG} Initializing pdf to text conversion{RESET}")
+        logger.info(f"{fg.GREEN} Initializing pdf to text conversion{RESET}")
         try:
             with open(pdf_path, "rb") as file:
                 pdf_reader = PyPDF2.PdfReader(file)
                 text = ""
                 _pg_ = 0
-                print(f"{fg.YELLOW_FG}Convert pages..{RESET}")
+                print(f"{fg.YELLOW}Convert pages..{RESET}")
                 for page_num in range(len(pdf_reader.pages)):
                     _pg_ += 1
                     logger.info(
-                        f"Page {fg.BBLUE_FG}{_pg_}{RESET}/{len(pdf_reader.pages)}"
+                        f"Page {fg.BBLUE}{_pg_}{RESET}/{len(pdf_reader.pages)}"
                     )
                     page = pdf_reader.pages[page_num]
                     text += page.extract_text()
-                print(f"{fg.BGREEN_FG}Ok{RESET}\n")
+                print(f"{fg.BGREEN}Ok{RESET}\n")
                 return text
         except Exception as e:
             logger.error(
-                f"{fg.RED_FG}Failed to extract text from '{fg.YELLOW_FG}{pdf_path}'{RESET}:\n {e}"
+                f"{fg.RED}Failed to extract text from '{fg.YELLOW}{pdf_path}'{RESET}:\n {e}"
             )
 
     @staticmethod
@@ -294,12 +294,12 @@ class GoogleTTS:
         except FileNotFoundError:
             logger.error("File '{}' was not found.📁".format(input_file))
         except Exception as e:
-            logger.error(f"{fg.RED_FG}{str(e)}{RESET}")
+            logger.error(f"{fg.RED}{str(e)}{RESET}")
 
     @staticmethod
     def docx_to_text(docx_path):
         try:
-            logger.info(f"{fg.BLUE_FG} Converting {docx_path} to text{RESET}")
+            logger.info(f"{fg.BLUE} Converting {docx_path} to text{RESET}")
             doc = Document(docx_path)
             paragraphs = [paragraph.text for paragraph in doc.paragraphs]
             return "\n".join(paragraphs)
@@ -307,7 +307,7 @@ class GoogleTTS:
             logger.error(f"File '{docx_path}' was not found.📁")
         except Exception as e:
             logger.error(
-                f"{fg.RED_FG}Error converting {docx_path} to text: {e} {RESET}"
+                f"{fg.RED}Error converting {docx_path} to text: {e} {RESET}"
             )
 
     class ThreadClient:

@@ -57,7 +57,7 @@ class SimpleAnalyzer:
         try:
             # Read the video file
             cap = cv2.VideoCapture(self.video)
-            print(f"{fg.BYELLOW_FG}Initializing..{RESET}")
+            print(f"{fg.BYELLOW}Initializing..{RESET}")
             # Initialize variables
             # Frame rate (fps)
             bitrate, aspect_ratio, codec_name, channels, encoder = self.get_metadata(
@@ -67,7 +67,7 @@ class SimpleAnalyzer:
             total_area = 0
             duration = 0
 
-            print(f"{fg.DCYAN_FG}Working on it{RESET}")
+            print(f"{fg.DCYAN}Working on it{RESET}")
             while True:
                 ret, frame = cap.read()
 
@@ -93,17 +93,17 @@ class SimpleAnalyzer:
             cv2.destroyAllWindows()
 
             # Print results
-            # print(f"Size {fg.BGREEN_FG}{size}{RESET}Kb")
-            print(f"Channels: {fg.BGREEN_FG}{channels}{RESET}")
-            print(f"Encoder {fg.BGREEN_FG}{encoder}{RESET}")
-            print(f"Bitrate {fg.BGREEN_FG}{bitrate}{RESET}")
-            print(f"Aspect ratio{fg.BGREEN_FG}{aspect_ratio}{RESET}")
-            print(f"Codec name {fg.BGREEN_FG}{codec_name}{RESET}")
-            print(f"Total Frames: {fg.BGREEN_FG}{frame_count}{RESET}")
+            # print(f"Size {fg.BGREEN}{size}{RESET}Kb")
+            print(f"Channels: {fg.BGREEN}{channels}{RESET}")
+            print(f"Encoder {fg.BGREEN}{encoder}{RESET}")
+            print(f"Bitrate {fg.BGREEN}{bitrate}{RESET}")
+            print(f"Aspect ratio{fg.BGREEN}{aspect_ratio}{RESET}")
+            print(f"Codec name {fg.BGREEN}{codec_name}{RESET}")
+            print(f"Total Frames: {fg.BGREEN}{frame_count}{RESET}")
             print(
-                f"Average Frame Area: {fg.BGREEN_FG}{total_area / frame_count}{RESET}"
+                f"Average Frame Area: {fg.BGREEN}{total_area / frame_count}{RESET}"
             )
-            print(f"Duration: {fg.BGREEN_FG}{duration:.2f}{RESET} seconds")
+            print(f"Duration: {fg.BGREEN}{duration:.2f}{RESET} seconds")
             return frame_count, total_area, duration
         except KeyboardInterrupt:
             print("\nExiting")

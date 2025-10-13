@@ -34,7 +34,7 @@ class DirectoryConverter:
         )
         if self._isolate_:
             print(
-                f"INFO\t {fg.FMAGENTA_FG}Isolate {fg.DCYAN_FG}{self._isolate_}{RESET}"
+                f"INFO\t {fg.FMAGENTA}Isolate {fg.DCYAN}{self._isolate_}{RESET}"
             )
 
     def _unbundle_dir_(self):
@@ -49,7 +49,7 @@ class DirectoryConverter:
 
                     if _ext_ in self._ls_ and os.path.exists(_path_):
                         print(
-                            f"INFO\t {fg.FYELLOW_FG}Parse {fg.BLUE_FG}{_path_}{RESET}"
+                            f"INFO\t {fg.FYELLOW}Parse {fg.BLUE}{_path_}{RESET}"
                         )
                         init = MethodMappingEngine(_path_, self._format_)
                         init.document_eval()
@@ -104,7 +104,7 @@ class MethodMappingEngine:
         elif self.outf.lower() == "db":
             conv.convert_xlsx_to_database()
         else:
-            print(f"{fg.RED_FG}Unsupported output format❌{RESET}")
+            print(f"{fg.RED}Unsupported output format❌{RESET}")
 
     def word(self, conv):
         if self.outf.lower() in ("txt", "text"):
@@ -117,7 +117,7 @@ class MethodMappingEngine:
             conv = GoogleTTS(self.file)
             conv.audiofy()
         else:
-            print(f"{fg.RED_FG}Unsupported output format❌{RESET}")
+            print(f"{fg.RED}Unsupported output format❌{RESET}")
 
     def text(self, conv):
         if self.outf.lower() == "pdf":
@@ -128,7 +128,7 @@ class MethodMappingEngine:
             conv = GoogleTTS(self.file)
             conv.audiofy()
         else:
-            print(f"{fg.RED_FG}Unsupported output format❌{RESET}")
+            print(f"{fg.RED}Unsupported output format❌{RESET}")
 
     def ppt(self, conv):
         if self.outf.lower() in ("doc", "docx", "word"):
@@ -143,7 +143,7 @@ class MethodMappingEngine:
             conv = GoogleTTS(self.file)
             conv.audiofy()
         else:
-            print(f"{fg.RED_FG}Unsupported output format❌{RESET}")
+            print(f"{fg.RED}Unsupported output format❌{RESET}")
 
     def pdf(self, conv):
         if self.outf.lower() in ("doc", "docx", "word"):
@@ -154,7 +154,7 @@ class MethodMappingEngine:
             conv = GoogleTTS(self.file)
             conv.audiofy()
         else:
-            print(f"{fg.RED_FG}Unsupported output format❌{RESET}")
+            print(f"{fg.RED}Unsupported output format❌{RESET}")
 
     def document_eval(self):
         self.doc_ls = ["docx", "doc"]
@@ -181,7 +181,7 @@ class MethodMappingEngine:
                     conv.convert_csv_to_xlsx()
 
             else:
-                print(f"{fg.fg.BYELLOW_FG}Unsupported Conversion type❌{RESET}")
+                print(f"{fg.fg.BYELLOW}Unsupported Conversion type❌{RESET}")
                 pass
         except Exception as e:
             logger.error(e)

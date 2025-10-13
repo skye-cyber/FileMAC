@@ -20,7 +20,7 @@ class CustomFormatter(logging.Formatter):
         logging.DEBUG: Fore.BLUE,
         logging.INFO: Fore.GREEN,
         logging.WARNING: Fore.YELLOW,
-        logging.ERROR: Fore.RED_FG,
+        logging.ERROR: Fore.RED,
         logging.CRITICAL: Fore.MAGENTA,
     }
 

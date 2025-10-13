@@ -35,7 +35,7 @@ class ImageCompressor:
             original_image = Image.open(input_image_path)
             original_size = original_image.size
             size = os.path.getsize(input_image_path)
-            print(f"Original image size {fg.YELLOW_FG}{size / 1000_000:.2f}MiB{RESET}")
+            print(f"Original image size {fg.YELLOW}{size / 1000_000:.2f}MiB{RESET}")
 
             # Calculate the aspect ratio of the original image
             aspect_ratio = original_size[0] / original_size[1]
@@ -48,21 +48,21 @@ class ImageCompressor:
                 target_size_bytes = tz * 1024
             else:
                 logger.warning(
-                    f"Invalid units. Please use either {fg.BMAGENTA_FG}'MB'{RESET}\
-        or {fg.BMAGENTA_FG}'KB'{RESET}"
+                    f"Invalid units. Please use either {fg.BMAGENTA}'MB'{RESET}\
+        or {fg.BMAGENTA}'KB'{RESET}"
                 )
 
             # Calculate the new dimensions based on the target size
             new_width, new_height = ImageCompressor.calculate_new_dimensions(
                 original_size, aspect_ratio, target_size_bytes
             )
-            print(f"{fg.BLUE_FG}Processing ..{RESET}")
+            print(f"{fg.BLUE}Processing ..{RESET}")
             resized_image = original_image.resize((new_width, new_height))
             resized_image.save(output_image_path, optimize=True, format="png")
             t_size = os.path.getsize(output_image_path) / 1000_000
-            print(f"{fg.BGREEN_FG}Ok{RESET}")
+            print(f"{fg.BGREEN}Ok{RESET}")
             print(
-                f"Image resized to {fg.BYELLOW_FG}{t_size:.2f}{RESET} and saved to {fg.BYELLOW_FG}{output_image_path}"
+                f"Image resized to {fg.BYELLOW}{t_size:.2f}{RESET} and saved to {fg.BYELLOW}{output_image_path}"
             )
         except KeyboardInterrupt:
             print("\nQuit⏹️")
@@ -70,7 +70,7 @@ class ImageCompressor:
         except KeyError:
             print("KeyError")
         except Exception as e:
-            print(f"{fg.RED_FG}{e}{RESET}")
+            print(f"{fg.RED}{e}{RESET}")
 
     def calculate_new_dimensions(original_size, aspect_ratio, target_size_bytes):
         try:
@@ -90,7 +90,7 @@ class ImageCompressor:
         except KeyError:
             print("KeyError")
         except Exception as e:
-            print(f"{fg.RED_FG}{e}{RESET}")
+            print(f"{fg.RED}{e}{RESET}")
 
 
 class ImageConverter:
@@ -147,7 +147,7 @@ class ImageConverter:
 
                 pil_img.save(output_filename, out_f)
 
-                print(f"Saved image as: {fg.DCYAN_FG}{output_filename}{RESET}")
+                print(f"Saved image as: {fg.DCYAN}{output_filename}{RESET}")
 
             return output_filename
         except KeyboardInterrupt:
@@ -157,10 +157,10 @@ class ImageConverter:
             print("Assertion failed.")
         except KeyError:
             print(
-                f"{fg.RED_FG}ERROR:\tPending Implementation for{fg.ICYAN_FG} {out_f} {fg.BWHITE_FG}format{RESET}"
+                f"{fg.RED}ERROR:\tPending Implementation for{fg.ICYAN} {out_f} {fg.BWHITE}format{RESET}"
             )
         except Exception as e:
-            print(f"{fg.RED_FG}{e}{RESET}")
+            print(f"{fg.RED}{e}{RESET}")
 
 
 class GrayscaleConverter:
@@ -199,7 +199,7 @@ class GrayscaleConverter:
         Returns:
             The computed output file path.
         """
-        logger.info(f"{fg.BWHITE_FG}Obtaining output file name{RESET}")
+        logger.info(f"{fg.BWHITE}Obtaining output file name{RESET}")
         if self.output_file and self.output_file.endswith(
             tuple(SUPPORTED_IMAGE_FORMATS.values())
         ):
@@ -224,7 +224,7 @@ class GrayscaleConverter:
         def process_image(self, image_path):
             """Processes a single image, converting it to grayscale and saving."""
             try:
-                logger.info(f"{fg.YELLOW_FG}Processing {fg.CYAN_FG}{image_path}{RESET}")
+                logger.info(f"{fg.YELLOW}Processing {fg.CYAN}{image_path}{RESET}")
                 img = cv2.imread(image_path)
                 if img is None:
                     raise FileNotFoundError(f"Could not read image: {image_path}")
@@ -234,10 +234,10 @@ class GrayscaleConverter:
                 )
                 self.save_pil_image(thresh, image_path)
             except FileNotFoundError as e:
-                logger.error(f"{fg.RED_FG}{e}{RESET}")
+                logger.error(f"{fg.RED}{e}{RESET}")
             except Exception as e:
                 raise
-                logger.error(f"An unexpected error occurred: {fg.RED_FG}{e}{RESET}")
+                logger.error(f"An unexpected error occurred: {fg.RED}{e}{RESET}")
 
         process_image(self)
 
@@ -254,10 +254,10 @@ class GrayscaleConverter:
             filename = self.get_output_file(image_path)
             filename = modify_filename_if_exists(filename)
             img_pil.save(filename)
-            logger.info(f"{fg.GREEN_FG}Image saved as {fg.BLUE_FG}{filename}{RESET}")
+            logger.info(f"{fg.GREEN}Image saved as {fg.BLUE}{filename}{RESET}")
         except Exception as e:
             raise
-            logger.error(f"Unable to save the image: {fg.RED_FG}{e}{RESET}")
+            logger.error(f"Unable to save the image: {fg.RED}{e}{RESET}")
 
 
 class ImageDocxConverter:
@@ -334,11 +334,11 @@ class ImageDocxConverter:
                     valid_images.append(image_path)
                 else:
                     print(
-                        f"{fg.MAGENTA_FG}Skipping unsupported image format: {fg.CYAN_FG}{image_path}{RESET}"
+                        f"{fg.MAGENTA}Skipping unsupported image format: {fg.CYAN}{image_path}{RESET}"
                     )
             except Exception as e:
                 print(
-                    f"{fg.RED_FG}Error processing image {fg.YELLOW_FG}{image_path} - {fg.RED_FG} {e}{RESET}"
+                    f"{fg.RED}Error processing image {fg.YELLOW}{image_path} - {fg.RED} {e}{RESET}"
                 )
         return valid_images
 
@@ -370,7 +370,7 @@ class ImageDocxConverter:
                     self.document.add_page_break()
             except Exception as e:
                 print(
-                    f"{fg.RED_FG}Error processing image {fg.YELLOW_FG}{image_path}:{fg.RED_FG} {e}{RESET}"
+                    f"{fg.RED}Error processing image {fg.YELLOW}{image_path}:{fg.RED} {e}{RESET}"
                 )
 
         docx_file_path = (
@@ -428,7 +428,7 @@ class ImageDocxConverter:
 
         if docx_file_path:
             print(
-                f"{fg.GREEN_RG}Successfully created DOCX: {fg.BLUE_FG}{docx_file_path}{RESET}"
+                f"{fg.GREEN_RG}Successfully created DOCX: {fg.BLUE}{docx_file_path}{RESET}"
             )
 
         return docx_file_path
@@ -544,10 +544,10 @@ class ImagePdfConverter:
         return file_path
 
     def _clean(self, dirs: list):
-        print(f"{fg.UWHITE_FG}{fg.BWHITE_FG}Clean Images Host dir{fg.RESET}")
+        print(f"{fg.UWHITE}{fg.BWHITE}Clean Images Host dir{fg.RESET}")
         for d in dirs:
             abspath = os.path.abspath(d)
-            print(f"{fg.BWHITE_FG}Nuke: {fg.BYELLOW_FG}{abspath}{fg.RESET}")
+            print(f"{fg.BWHITE}Nuke: {fg.BYELLOW}{abspath}{fg.RESET}")
             # print(Path(d).is_relative_to(os.path.expanduser("~")))
             if (
                 os.path.exists(d) and os.path.isdir(d)
@@ -706,7 +706,7 @@ class ImagePdfConverter:
 
                 # Create the PDF for this folder
                 self.create_pdf_from_images(image_paths, relative_path)
-                print(f"{fg.BWHITE_FG}Created PDF{RESET}: {relative_path}")
+                print(f"{fg.BWHITE}Created PDF{RESET}: {relative_path}")
             if self.clean:
                 self._clean(dclean)
         except Exception as e:
@@ -755,12 +755,12 @@ class ImagePdfConverter:
                 output_pdf_path = self.create_pdf_from_images(
                     self.image_list, self.output_pdf_path
                 )
-                print(f"{fg.GREEN_FG}PDF created successfully from directory!{RESET}")
+                print(f"{fg.GREEN}PDF created successfully from directory!{RESET}")
                 print(
-                    f"{fg.GREEN_FG}Output:{RESET} {fg.BLUE_FG}{output_pdf_path}{RESET}"
+                    f"{fg.GREEN}Output:{RESET} {fg.BLUE}{output_pdf_path}{RESET}"
                 )
             else:
-                print(f"{fg.RED_FG}One or more images in the list do not exist.{RESET}")
+                print(f"{fg.RED}One or more images in the list do not exist.{RESET}")
         elif self.input_dir and self.output_pdf_path:
             if os.path.exists(self.input_dir):
                 if self.walk:
@@ -772,14 +772,14 @@ class ImagePdfConverter:
                         self.input_dir, self.output_pdf_path
                     )
                     print(
-                        f"{fg.GREEN_FG}PDF created successfully from directory!{RESET}"
+                        f"{fg.GREEN}PDF created successfully from directory!{RESET}"
                     )
                     print(
-                        f"{fg.BWHITE_FG}Output:{RESET} {fg.BLUE_FG}{output_pdf_path}{RESET}"
+                        f"{fg.BWHITE}Output:{RESET} {fg.BLUE}{output_pdf_path}{RESET}"
                     )
             else:
                 print(
-                    f"Directory {fg.YELLOW_FG}{self.input_dir}{RESET} does not exist."
+                    f"Directory {fg.YELLOW}{self.input_dir}{RESET} does not exist."
                 )
         else:
             print(

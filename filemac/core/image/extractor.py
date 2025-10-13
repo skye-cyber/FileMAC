@@ -94,7 +94,7 @@ class ImageExtractor:
             try:
                 if self.tsize and not self.is_page_sized_image(img):
                     print(
-                        f"Skipping image {i + 1}: ({fg.CYAN_FG}{img.size}{RESET}) <= {fg.BLUE_FG}{self.tsize}{RESET}"
+                        f"Skipping image {i + 1}: ({fg.CYAN}{img.size}{RESET}) <= {fg.BLUE}{self.tsize}{RESET}"
                     )
                     continue
 
@@ -104,7 +104,7 @@ class ImageExtractor:
 
                 img_path = Path(self.output_path) / safe_filename
                 img.save(img_path)
-                print(f"Saved image: {fg.GREEN_FG}{img_path}{RESET}")
+                print(f"Saved image: {fg.GREEN}{img_path}{RESET}")
             except Exception as e:
                 raise
                 print(f"Error saving image {i + 1} from {base_filename}: {e}")
@@ -130,7 +130,7 @@ class PdfImageExtractor(ImageExtractor):
         Returns:
             A list of PIL Image objects.
         """
-        print(f"{fg.BWHITE_FG}File: {fg.BLUE_FG}{file_path}{RESET}")
+        print(f"{fg.BWHITE}File: {fg.BLUE}{file_path}{RESET}")
         images: List[Image.Image] = []
         try:
             pdf_document = fitz.open(file_path)

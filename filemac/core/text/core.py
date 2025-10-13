@@ -46,8 +46,8 @@ class StyledText:
         Set body font to fstyle and font size to fsize.
         """
 
-        print(f"{fg.BWHITE_FG}Set Font: {fg.CYAN_FG}{self.fsize}{RESET}")
-        print(f"{fg.BWHITE_FG}Set Style: {fg.CYAN_FG}{self.fstyle}{RESET}")
+        print(f"{fg.BWHITE}Set Font: {fg.CYAN}{self.fsize}{RESET}")
+        print(f"{fg.BWHITE}Set Style: {fg.CYAN}{self.fstyle}{RESET}")
         # Create a new Document
         doc = Document()
 
@@ -74,7 +74,7 @@ class StyledText:
 
         for i, line in enumerate(lines):
             print(
-                f"{fg.BWHITE_FG}Line: {fg.DCYAN_FG}{i}{fg.YELLOW_FG} of {fg.BLUE_FG}{len(lines)}{RESET}",
+                f"{fg.BWHITE}Line: {fg.DCYAN}{i}{fg.YELLOW} of {fg.BLUE}{len(lines)}{RESET}",
                 end="\r",
             )
             # Determine heading level or body text
@@ -100,7 +100,7 @@ class StyledText:
         print("\n")
         doc.save(self.out_obj)
         print(
-            f"{fg.BWHITE_FG}Text file converted to Word document: {fg.MAGENTA_FG}{self.out_obj}{RESET}"
+            f"{fg.BWHITE}Text file converted to Word document: {fg.MAGENTA}{self.out_obj}{RESET}"
         )
 
 

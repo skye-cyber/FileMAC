@@ -25,65 +25,65 @@ def CliInit():
     parser = argparse.ArgumentParser(
         description="Filemac: A file management tool with audio effects. Supporting wide range of Multimedia Operations",
         add_help=False,
-        epilog=f"{fg.BLUE_FG}When using {fg.MAGENTA_FG}-SALI{fg.BLUE_FG} long images have maximum height that can be processed{RESET}",
+        epilog=f"{fg.BLUE}When using {fg.MAGENTA}-SALI{fg.BLUE} long images have maximum height that can be processed{RESET}",
     )
 
     parser.add_argument(
         "--convert_doc",
         nargs="+",
         help=f"Converter document file(s) to different format ie pdf_to_docx.\
-       example: {fg.BYELLOW_FG}filemac --convert_doc example.docx -tff pdf{RESET}",
+       example: {fg.BYELLOW}filemac --convert_doc example.docx -tff pdf{RESET}",
     )
 
     parser.add_argument(
         "--convert_audio",
         help=f"Convert audio file(s) to and from different format ie mp3 to wav\
-        example: {fg.BYELLOW_FG}filemac --convert_audio example.mp3 -tff wav{RESET}",
+        example: {fg.BYELLOW}filemac --convert_audio example.mp3 -tff wav{RESET}",
     )
 
     parser.add_argument(
         "--convert_video",
         help=f"Convert video file(s) to and from different format ie mp4 to mkv.\
-        example: {fg.BYELLOW_FG}filemac --convert_video example.mp4 -tf mkv{RESET}",
+        example: {fg.BYELLOW}filemac --convert_video example.mp4 -tf mkv{RESET}",
     )
 
     parser.add_argument(
         "--convert_image",
         help=f"Convert image file(s) to and from different format ie png to jpg.\
-        example: {fg.BYELLOW_FG}filemac --convert_image example.jpg -tf png{RESET}",
+        example: {fg.BYELLOW}filemac --convert_image example.jpg -tf png{RESET}",
     )
 
     parser.add_argument(
         "--convert_doc2image",
         help=f"Convert documents to images ie png to jpg.\
-        example: {fg.BYELLOW_FG}filemac --convert_doc2image example.pdf -tf png{RESET}",
+        example: {fg.BYELLOW}filemac --convert_doc2image example.pdf -tf png{RESET}",
     )
 
     parser.add_argument(
         "-md",
         "--markdown2docx",
         help=f"Convert Markdown to DOCX with Mermaid rendering.\
-            example: {fg.BYELLOW_FG}filemac --markdown2docx example.md{RESET}",
+            example: {fg.BYELLOW}filemac --markdown2docx example.md{RESET}",
     )
     parser.add_argument(
         "-xA",
         "--extract_audio",
         help=f"Extract audio from a video.\
-                        example: {fg.BYELLOW_FG}filemac -xA example.mp4 {RESET}",
+                        example: {fg.BYELLOW}filemac -xA example.mp4 {RESET}",
     )
 
     parser.add_argument(
         "-iso",
         "--isolate",
         help=f"Specify file types to isolate\
-                        for conversion, only works if directory is provided as input for the {fg.FCYAN_FG}convert_doc{RESET} argument example: {fg.BYELLOW_FG}filemac --convert_doc /home/user/Documents/ --isolate pdf -tf txt{RESET}",
+                        for conversion, only works if directory is provided as input for the {fg.FCYAN}convert_doc{RESET} argument example: {fg.BYELLOW}filemac --convert_doc /home/user/Documents/ --isolate pdf -tf txt{RESET}",
     )
 
     parser.add_argument(
         "-Av",
         "--Analyze_video",
         help=f"Analyze a given video.\
-        example: {fg.BYELLOW_FG}filemac --analyze_video example.mp4 {RESET}",
+        example: {fg.BYELLOW}filemac --analyze_video example.mp4 {RESET}",
     )
 
     parser.add_argument(
@@ -93,7 +93,7 @@ def CliInit():
     parser.add_argument(
         "--resize_image",
         help=f"change size of an image compress/decompress \
-        example: {fg.BYELLOW_FG}filemac --resize_image example.png -tf_size 2mb -tf png {RESET}",
+        example: {fg.BYELLOW}filemac --resize_image example.png -tf_size 2mb -tf png {RESET}",
     )
 
     parser.add_argument(
@@ -106,36 +106,36 @@ def CliInit():
         "-S",
         "--scan",
         help=f"Scan pdf file and extract text\
-                        example: {fg.BYELLOW_FG}filemac --scan example.pdf {RESET}",
+                        example: {fg.BYELLOW}filemac --scan example.pdf {RESET}",
     )
 
     parser.add_argument(
         "-doc2L",
         "--doc_long_image",
         help=f"Convert pdf file to long image\
-                        example: {fg.BYELLOW_FG}filemac --doc_long_image example.pdf {RESET}",
+                        example: {fg.BYELLOW}filemac --doc_long_image example.pdf {RESET}",
     )
 
     parser.add_argument(
         "-SA",
         "--scanAsImg",
         help=f"Convert pdf to image then extract text\
-                        example: {fg.BYELLOW_FG}filemac --scanAsImg example.pdf {RESET}",
+                        example: {fg.BYELLOW}filemac --scanAsImg example.pdf {RESET}",
     )
 
     parser.add_argument(
         "-SALI",
         "--scanAsLong_Image",
-        help=f"Scan {fg.CYAN_FG}[doc, docx, pdf]\
+        help=f"Scan {fg.CYAN}[doc, docx, pdf]\
         {RESET} file and extract text by first converting them to long image,-> very effective\
-                    example: {fg.BYELLOW_FG}filemac --scanAsImg example.pdf {RESET}",
+                    example: {fg.BYELLOW}filemac --scanAsImg example.pdf {RESET}",
     )
 
     parser.add_argument(
         "--OCR",
         nargs="+",
         help=f"Extract text from an image.\
-        example: {fg.BYELLOW_FG}filemac --OCR image.png{RESET}",
+        example: {fg.BYELLOW}filemac --OCR image.png{RESET}",
     )
 
     """Audio join  arguements"""
@@ -144,8 +144,8 @@ def CliInit():
         "--AudioJoin",
         "-AJ",
         nargs="*",
-        help=f"{fg.YELLOW_FG}Join Audio files{RESET} into one master file.\
-            Provide a {fg.BLUE_FG}list{RESET} of audio file paths.  If no paths are provided, the program will still run.",
+        help=f"{fg.YELLOW}Join Audio files{RESET} into one master file.\
+            Provide a {fg.BLUE}list{RESET} of audio file paths.  If no paths are provided, the program will still run.",
         metavar="audio_file_path",
     )
 
@@ -154,7 +154,7 @@ def CliInit():
         "-RT2W",
         "--Richtext2word",
         help=f"Advanced Text to word conversion i.e:{
-            fg.BYELLOW_FG
+            fg.BYELLOW
         }filemac --Atext2word example.txt --font_size 12 --font_name Arial{RESET}",
     )
 
@@ -163,13 +163,13 @@ def CliInit():
         "--font_size",
         type=int,
         default=12,
-        help=f"Font size to be used default: {fg.CYAN_FG}12{RESET}",
+        help=f"Font size to be used default: {fg.CYAN}12{RESET}",
     )
     parser.add_argument(
         "--font_name",
         type=str,
         default="Times New Roman",
-        help=f"Font name default: {fg.FCYAN_FG}Times New Roman{RESET}",
+        help=f"Font name default: {fg.FCYAN}Times New Roman{RESET}",
     )
 
     """Alternative sequence args, critical redundancy measure"""
@@ -178,7 +178,7 @@ def CliInit():
         "--use_extras",
         action="store_true",
         help=f"Use alternative conversion method: Overides\
-                        default method i.e: {fg.BYELLOW_FG}filemac --convert_doc example.docx --use_extras -tf pdf{RESET}",
+                        default method i.e: {fg.BYELLOW}filemac --convert_doc example.docx --use_extras -tf pdf{RESET}",
     )
 
     """Pdf join arguements--> Accepts atleast 1 arguement"""
@@ -187,7 +187,7 @@ def CliInit():
         "--order",
         type=str,
         default="AAB",
-        help=f"Order of pages when joining the pdf use: {fg.BYELLOW_FG}filemac\
+        help=f"Order of pages when joining the pdf use: {fg.BYELLOW}filemac\
                         -pj help for more details{RESET}",
     )
     parser.add_argument(
@@ -195,9 +195,9 @@ def CliInit():
         "-p",
         nargs="+",
         help=f"Extract given pages from pdf: {
-            fg.BYELLOW_FG
+            fg.BYELLOW
         }filemac --extract_pages file.pdf 6 10{RESET} for one page: {
-            fg.BYELLOW_FG
+            fg.BYELLOW
         }filemac --extract_pages file.pdf 5{RESET}",
     )
 
@@ -205,7 +205,7 @@ def CliInit():
         "--audio_effect",
         "-af",
         action="store_true",
-        help=f"Change audio voice/apply effects/reduce noise {fg.BYELLOW_FG}-MA --help for options{RESET}",
+        help=f"Change audio voice/apply effects/reduce noise {fg.BYELLOW}-MA --help for options{RESET}",
     )
     parser.add_argument(
         "--audio_help", action="store_true", help="Show help for audiobot"
@@ -214,7 +214,7 @@ def CliInit():
         "--no-resume",
         action="store_false",
         dest="no_resume",
-        help=f"Don't Resume previous File operation {fg.BYELLOW_FG}filemac --convert_doc simpledir --no-resume{RESET}",
+        help=f"Don't Resume previous File operation {fg.BYELLOW}filemac --convert_doc simpledir --no-resume{RESET}",
     )
 
     parser.add_argument(
@@ -222,7 +222,7 @@ def CliInit():
         "-threads",
         type=int,
         default=3,
-        help=f"Number of threads for text to speech  {fg.BYELLOW_FG}filemac --convert_doc simpledir --no-resume -t 2{RESET}",
+        help=f"Number of threads for text to speech  {fg.BYELLOW}filemac --convert_doc simpledir --no-resume -t 2{RESET}",
     )
     parser.add_argument(
         "-sep",
@@ -235,30 +235,30 @@ def CliInit():
     parser.add_argument(
         "--image2pdf",
         nargs="+",
-        help=f"Convert Images to pdf. {fg.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fg.BYELLOW_FG}filemac --image2pdf image1 image2{RESET}`",
+        help=f"Convert Images to pdf. {fg.BWHITE}Accepts image list or dir/folder{RESET} e.g `{fg.BYELLOW}filemac --image2pdf image1 image2{RESET}`",
     )
     parser.add_argument(
         "--image2word",
         nargs="+",
-        help=f"Convert Images to word document. {fg.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fg.BYELLOW_FG}filemac --image2word image1 image2{RESET}`",
+        help=f"Convert Images to word document. {fg.BWHITE}Accepts image list or dir/folder{RESET} e.g `{fg.BYELLOW}filemac --image2word image1 image2{RESET}`",
     )
     parser.add_argument(
         "--image2gray",
         nargs="+",
-        help=f"Convert Images to grayscale. {fg.BWHITE_FG}Accepts image list or dir/folder{RESET} e.g `{fg.BYELLOW_FG}filemac --image2gray image1 image2{RESET}`",
+        help=f"Convert Images to grayscale. {fg.BWHITE}Accepts image list or dir/folder{RESET} e.g `{fg.BYELLOW}filemac --image2gray image1 image2{RESET}`",
     )
     parser.add_argument(
         "-vt",
         "--voicetype",
         action="store_true",
-        help=f"Use your voice to type text. e.g `{fg.BYELLOW_FG}filemac --voicetype{RESET}`",
+        help=f"Use your voice to type text. e.g `{fg.BYELLOW}filemac --voicetype{RESET}`",
     )
 
     parser.add_argument(
         "-IeX",
         "--image_extractor",
         nargs="+",
-        help=f"Convert Images to pdf. {fg.BWHITE_FG}Accepts file list {RESET} e.g `{fg.BYELLOW_FG}filemac --image_extractor file1 file2{RESET}`",
+        help=f"Convert Images to pdf. {fg.BWHITE}Accepts file list {RESET} e.g `{fg.BYELLOW}filemac --image_extractor file1 file2{RESET}`",
     )
 
     parser.add_argument(
@@ -281,7 +281,7 @@ def CliInit():
     parser.add_argument(
         "--size",
         type=str,
-        help=f"Dimensions for images to be saved by extractor eg {fg.BBLUE_FG}256x82{fg.RESET}",
+        help=f"Dimensions for images to be saved by extractor eg {fg.BBLUE}256x82{fg.RESET}",
     )
     parser.add_argument(
         "--walk",
@@ -291,7 +291,7 @@ def CliInit():
     parser.add_argument(
         "--clean",
         action="store_true",
-        help=f"Clean file/dir after an operation eg after {fg.BMAGENTA_FG}image2pdf clean image dirs{fg.RESET}.",
+        help=f"Clean file/dir after an operation eg after {fg.BMAGENTA}image2pdf clean image dirs{fg.RESET}.",
     )
     parser.add_argument("--record", action="store_true", help="Record Audio from mic")
 
@@ -313,7 +313,7 @@ class OperationMapper:
 
     def ensure_target_format(self):
         print(
-            f"{bg.YELLOW_BG}[Warning]{fg.YELLOW_FG}Please provide target format{RESET}"
+            f"{bg.YELLOW}[Warning]{fg.YELLOW}Please provide target format{RESET}"
         )
         return
 
@@ -340,7 +340,7 @@ class OperationMapper:
             return
         if self.args.target_format is None:
             print(
-                f"{fg.RED_FG}Please provide output format specified by{fg.CYAN_FG} '-tf'{RESET}"
+                f"{fg.RED}Please provide output format specified by{fg.CYAN} '-tf'{RESET}"
             )
             return
         from ..core.image.core import ImageConverter
@@ -550,7 +550,7 @@ class OperationMapper:
     def display_version(self):
         version = "1.1.7"
 
-        return print(f"{fg.BLUE_FG}filemac: V-{fg.BGREEN_FG}{version}{RESET}")
+        return print(f"{fg.BLUE}filemac: V-{fg.BGREEN}{version}{RESET}")
 
     def voicetype(self):
         from voice.VoiceType import VoiceTypeEngine
@@ -564,7 +564,7 @@ class OperationMapper:
         except Exception as e:
             logger.critical("Critical failure: %s", e)
             print(
-                f"{bg.YELLOW_BG}{bg.BRED_BG}Critical error:{RESET} {fg.RED_FG}{str(e)}{RESET}"
+                f"{bg.YELLOW}{bg.BRED}Critical error:{RESET} {fg.RED}{str(e)}{RESET}"
             )
             return
 

@@ -37,7 +37,7 @@ class PDF2LongImageConverter:
 
     def subprocess_executor(self):
         # pdf_file = ext = doc.split('.')[0] + 'docx'
-        logger.info(f"{fg.DCYAN_FG}Invoked soffice ..{RESET}")
+        logger.info(f"{fg.DCYAN}Invoked soffice ..{RESET}")
         subprocess.call(
             [
                 "soffice",
@@ -60,32 +60,32 @@ class PDF2LongImageConverter:
     @staticmethod
     def convert(pdf_file):
         try:
-            logger.info(f"{fg.BYELLOW_FG}Read pdf{RESET}")
+            logger.info(f"{fg.BYELLOW}Read pdf{RESET}")
             images = convert_from_path(pdf_file)
             out_img = pdf_file[:-4] + ".png"
             heights = [img.size[1] for img in images]
             total_height = sum(heights)
             max_width = max([img.size[0] for img in images])
 
-            logger.info(f"{fg.DCYAN_FG}Draw image ..{RESET}")
+            logger.info(f"{fg.DCYAN}Draw image ..{RESET}")
             new_im = Image.new("RGB", (max_width, total_height))
 
             y_offset = 0
             for i, img in enumerate(images):
-                logger.info(f"{fg.BBLUE_FG}{i}{RESET}", end="\r")
+                logger.info(f"{fg.BBLUE}{i}{RESET}", end="\r")
                 new_im.paste(img, (0, y_offset))
                 y_offset += img.size[1]
-            logger.info(f"{fg.BYELLOW_FG}Save dest: {fg.BMAGENTA_FG}{out_img}{RESET}")
+            logger.info(f"{fg.BYELLOW}Save dest: {fg.BMAGENTA}{out_img}{RESET}")
             new_im.save(out_img)
-            logger.info(f"{fg.BGREEN_FG}Success😇✅{RESET}")
+            logger.info(f"{fg.BGREEN}Success😇✅{RESET}")
             return out_img
         except FileNotFoundError:
-            raise FileSystemError(f"{fg.RED_FG}File not found!{RESET}")
+            raise FileSystemError(f"{fg.RED}File not found!{RESET}")
         except KeyboardInterrupt:
             logger.DEBUG("\nQuit❕")
             sys.exit()
         except Exception as e:
-            raise FilemacError(f"{fg.RED_FG}{e}{RESET}")
+            raise FilemacError(f"{fg.RED}{e}{RESET}")
 
 
 class PageExtractor:
@@ -130,10 +130,10 @@ class PageExtractor:
                 self.stop = len(reader.pages)
 
             pdf_writer = PyPDF2.PdfWriter()
-            print(f"{fg.BBLUE_FG}[🤖]{fg.BBLUE_FG} Extracting:{RESET}")
+            print(f"{fg.BBLUE}[🤖]{fg.BBLUE} Extracting:{RESET}")
             for page_num in range(self.start, self.stop):
                 print(
-                    f"{fg.BBLUE_FG}[📄]{RESET}{fg.DCYAN_FG}Page {page_num + 1}{RESET}"
+                    f"{fg.BBLUE}[📄]{RESET}{fg.DCYAN}Page {page_num + 1}{RESET}"
                 )
                 page = reader.pages[page_num]
                 pdf_writer.add_page(page)
@@ -142,14 +142,14 @@ class PageExtractor:
             with open(self.outf, "wb") as out_file:
                 pdf_writer.write(out_file)
             print(
-                f"{fg.BBLUE_FG}[+]{RESET} {fg.BWHITE_FG}File {fg.BMAGENTA_FG}{self.outf}{RESET}"
+                f"{fg.BBLUE}[+]{RESET} {fg.BWHITE}File {fg.BMAGENTA}{self.outf}{RESET}"
             )
             return self.outf
         except KeyboardInterrupt:
             print("\n [!] Quit")
             exit(2)
         except FileNotFoundError as e:
-            print(f"[{bg.BRED_BG}-{RESET}] {fg.RED_FG}{e}{RESET}")
+            print(f"[{bg.BRED}-{RESET}] {fg.RED}{e}{RESET}")
         except Exception as e:
             print(e)
             # raise
@@ -217,7 +217,7 @@ class PDFCombine:
                 for reader in pdf_readers:
                     if page_num < len(reader.pages):
                         print(
-                            f"{fg.CYAN_FG}Page {fg.BBLUE_FG}{page_num + 1}/{len(reader.pages)}{RESET}",
+                            f"{fg.CYAN}Page {fg.BBLUE}{page_num + 1}/{len(reader.pages)}{RESET}",
                             end="\r",
                         )
                         # Order pages in terms of page1-pd1, page2-pd2
@@ -227,13 +227,13 @@ class PDFCombine:
             with open(self.outf, "wb") as self.outf:
                 pdf_writer.write(self.outf)
             print(
-                f"\n{fg.FCYAN_FG}PDFs combined with specified page order into{RESET}{fg.BBLUE_FG} {self.outf.name}{RESET}"
+                f"\n{fg.FCYAN}PDFs combined with specified page order into{RESET}{fg.BBLUE} {self.outf.name}{RESET}"
             )
         except KeyboardInterrupt:
             print("\nQuit!")
             sys.exit(1)
         except Exception as e:
-            print(f"{fg.RED_FG}{e}{RESET}")
+            print(f"{fg.RED}{e}{RESET}")
 
     def combine_pdfs_AAB_order(self):
         try:
@@ -242,14 +242,14 @@ class PDFCombine:
             reader2 = PyPDF2.PdfReader(self.obj2)
             # pdf_readers = [PyPDF2.PdfReader(pdf) for pdf in pdf_files]
 
-            print(f"{fg.CYAN_FG}File A{RESET}")
+            print(f"{fg.CYAN}File A{RESET}")
             for p1_num in range(len(reader1.pages)):
                 print(f"Page {p1_num + 1}/{len(reader1.pages)}", end="\r")
                 p1 = reader1.pages[p1_num]
                 # Order pages in terms of page1-pd1, page2-pd2
                 pdf_writer.add_page(p1)
 
-            print(f"\n{fg.CYAN_FG}File B{RESET}")
+            print(f"\n{fg.CYAN}File B{RESET}")
             for p2_num in range(len(reader2.pages)):
                 print(f"Page {p2_num + 1}/{len(reader2.pages)}", end="\r")
                 p2 = reader2.pages[p2_num]
@@ -258,13 +258,13 @@ class PDFCombine:
             with open(self.outf, "wb") as self.outf:
                 pdf_writer.write(self.outf)
             print(
-                f"\n{fg.FCYAN_FG}PDFs combined with specified page order into{RESET}{fg.BBLUE_FG} {self.outf.name}{RESET}"
+                f"\n{fg.FCYAN}PDFs combined with specified page order into{RESET}{fg.BBLUE} {self.outf.name}{RESET}"
             )
         except KeyboardInterrupt:
             print("\nQuit!")
             sys.exit(1)
         except Exception as e:
-            print(f"{fg.RED_FG}{e}{RESET}")
+            print(f"{fg.RED}{e}{RESET}")
 
     def merge_All_AAB(self):
         try:
@@ -278,7 +278,7 @@ class PDFCombine:
             for reader in pdf_readers:
                 for page_num in range(len(reader.pages)):
                     print(
-                        f"{fg.BWHITE_FG}Page {fg.CYAN_FG}{page_num + 1}/{len(reader.pages)}{RESET}",
+                        f"{fg.BWHITE}Page {fg.CYAN}{page_num + 1}/{len(reader.pages)}{RESET}",
                         end="\r",
                     )
                     page = reader.pages[page_num]
@@ -288,13 +288,13 @@ class PDFCombine:
             with open(self.outf, "wb") as out_file:
                 pdf_writer.write(out_file)
             print(
-                f"\n{fg.FCYAN_FG}PDFs combined with specified page order into{RESET}{fg.BBLUE_FG} {self.outf}{RESET}"
+                f"\n{fg.FCYAN}PDFs combined with specified page order into{RESET}{fg.BBLUE} {self.outf}{RESET}"
             )
         except KeyboardInterrupt:
             print("\nQuit!")
             sys.exit(1)
         except Exception as e:
-            print(f"{fg.RED_FG}{e}{RESET}")
+            print(f"{fg.RED}{e}{RESET}")
 
 
 class Scanner:
@@ -332,7 +332,7 @@ class Scanner:
 
         for pdf in pdf_list:
             out_f = pdf[:-3] + "txt"
-            print(f"{fg.YELLOW_FG}Read pdf ..{RESET}")
+            print(f"{fg.YELLOW}Read pdf ..{RESET}")
 
             with open(pdf, "rb") as f:
                 reader = PyPDF2.PdfReader(f)
@@ -342,17 +342,17 @@ class Scanner:
                 for page_num in range(len(reader.pages)):
                     pg += 1
 
-                    print(f"{fg.BYELLOW_FG}Progress:{RESET}", end="")
-                    print(f"{fg.CYAN_FG}{pg}/{len(reader.pages)}{RESET}", end="\r")
+                    print(f"{fg.BYELLOW}Progress:{RESET}", end="")
+                    print(f"{fg.CYAN}{pg}/{len(reader.pages)}{RESET}", end="\r")
                     page = reader.pages[page_num]
                     text += page.extract_text()
 
             print(f"\n{text}")
-            print(f"\n{fg.YELLOW_FG}Write text to {fg.GREEN_FG}{out_f}{RESET}")
+            print(f"\n{fg.YELLOW}Write text to {fg.GREEN}{out_f}{RESET}")
             with open(out_f, "w") as f:
                 f.write(text)
 
-            print(f"\n{fg.BGREEN_FG}Ok{RESET}")
+            print(f"\n{fg.BGREEN}Ok{RESET}")
 
     def scanAsImgs(self):
         file = self.input_file
@@ -371,7 +371,7 @@ class Scanner:
                     _writer.write(text)
 
         def _cleaner_():
-            print(f"{fg.FMAGENTA_FG}Clean")
+            print(f"{fg.FMAGENTA}Clean")
             for obj in img_objs:
                 if os.path.exists(obj):
                     print(obj, end="\r")
@@ -385,12 +385,12 @@ class Scanner:
         from ...utils.screen import clear_screen
 
         clear_screen()
-        print(f"{bg.GREEN_BG}Full Text{RESET}")
+        print(f"{bg.GREEN}Full Text{RESET}")
         print(text)
         print(
-            f"{fg.BWHITE_FG}Text File ={fg.IGREEN_FG}{self.input_file[:-4]}_filemac.txt{RESET}"
+            f"{fg.BWHITE}Text File ={fg.IGREEN}{self.input_file[:-4]}_filemac.txt{RESET}"
         )
-        print(f"{fg.GREEN_FG}Ok✅{RESET}")
+        print(f"{fg.GREEN}Ok✅{RESET}")
         return text
 
     def scanAsLongImg(self) -> bool:
@@ -409,7 +409,7 @@ class Scanner:
                 text = tx.OCR()
                 if text is not None:
                     # print(text)
-                    print(f"{fg.GREEN_FG}Ok{RESET}")
+                    print(f"{fg.GREEN}Ok{RESET}")
             return True
         except Exception as e:
             print(e)

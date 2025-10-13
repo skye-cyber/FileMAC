@@ -107,7 +107,7 @@ class ExtractText:
             text = self.sep.join(text.splitlines())  # handle empty lines
             logger.info("")
             logger.info(f"Extracted text from {image_path}")
-            print(f"{fg.YELLOW_FG}{text}{RESET}")
+            print(f"{fg.YELLOW}{text}{RESET}")
 
             # Save text to file
             with open(output_file, "w", encoding="utf-8") as file:  # Specify encoding
@@ -191,9 +191,9 @@ class ExtractText:
 
         except KeyboardInterrupt:
             print(
-                f"\n[{bg.YELLOW_BG}X{RESET}]Operation interrupted by {fg.UBLUE_FG}user{RESET}.[/]"
+                f"\n[{bg.YELLOW}X{RESET}]Operation interrupted by {fg.UBLUE}user{RESET}.[/]"
             )
             sys.exit(0)
         except Exception as e:
-            logger.error(f"An unexpected error occurred: {bg.RED_BG}{e}{RESET}")
+            logger.error(f"An unexpected error occurred: {bg.RED}{e}{RESET}")
             return None  # Ensure None is returned on error

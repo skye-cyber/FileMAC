@@ -6,17 +6,17 @@ RESET = rs
 
 SUPPORTED_DOC_FORMATS = f"""
 |---------------------------------------------------------------------------
-|{bg.BBLUE_BG}Input format{RESET}                    |{bg.BBLUE_BG}Output format{RESET}                             |
+|{bg.BBLUE}Input format{RESET}                    |{bg.BBLUE}Output format{RESET}                             |
 |________________________________|__________________________________________|
-|   xlsx    {fg.BYELLOW_FG}-------------------->{RESET}|csv txt doc/docx db(sql)                  |
+|   xlsx    {fg.BYELLOW}-------------------->{RESET}|csv txt doc/docx db(sql)                  |
 |                                |                                          |
-|   doc/docx{fg.BYELLOW_FG}-------------------->{RESET}|txt pdf ppt/pptx audio(ogg)               |
+|   doc/docx{fg.BYELLOW}-------------------->{RESET}|txt pdf ppt/pptx audio(ogg)               |
 |                                |                                          |
-|   txt     {fg.BYELLOW_FG}-------------------->{RESET}|pdf docx/doc audio(ogg)                   |
+|   txt     {fg.BYELLOW}-------------------->{RESET}|pdf docx/doc audio(ogg)                   |
 |                                |                                          |
-|   pdf     {fg.BYELLOW_FG}-------------------->{RESET}|doc/docx txt audio(ogg)                   |
+|   pdf     {fg.BYELLOW}-------------------->{RESET}|doc/docx txt audio(ogg)                   |
 |                                |                                          |
-|   pptx/ppt{fg.BYELLOW_FG}-------------------->{RESET}|doc/docx                                  |
+|   pptx/ppt{fg.BYELLOW}-------------------->{RESET}|doc/docx                                  |
 |                                                                           |
 |___________________________________________________________________________|
 """
@@ -51,20 +51,20 @@ SUPPORTED_AUDIO_FORMATS_DIRECT = [
 ]  # Video
 SUPPORTED_AUDIO_FORMATS_SHOW = f"""
 |==============================|
-|  {bg.BBLUE_BG}Supported I/O formats {RESET}      |
+|  {bg.BBLUE}Supported I/O formats {RESET}      |
 |==============================|
-|          {fg.CYAN_FG} wav {fg.BYELLOW_FG}               |
-|          {fg.CYAN_FG} mp3 {fg.BYELLOW_FG}               |
-|          {fg.CYAN_FG} ogg {fg.BYELLOW_FG}               |
-|          {fg.CYAN_FG} flv {fg.BYELLOW_FG}               |
-|          {fg.CYAN_FG} ogv {fg.BYELLOW_FG}               |
-|          {fg.CYAN_FG} mov {fg.BYELLOW_FG}               |
-|          {fg.CYAN_FG} webm {fg.BYELLOW_FG}              |
-|          {fg.CYAN_FG} aac {fg.BYELLOW_FG}-------------->|{bg.IMAGENTA_BG}Pending Implementation{RESET}{fg.BYELLOW_FG}
-|          {fg.CYAN_FG} bpf {fg.BYELLOW_FG}-------------->|{bg.IMAGENTA_BG}Pending Implementation{RESET}{fg.BYELLOW_FG}
-|          {fg.CYAN_FG} m4a {fg.BYELLOW_FG}               |
-|          {fg.CYAN_FG} raw {fg.BYELLOW_FG}               |
-|          {fg.CYAN_FG} aiff {fg.BYELLOW_FG}              |
+|          {fg.CYAN} wav {fg.BYELLOW}               |
+|          {fg.CYAN} mp3 {fg.BYELLOW}               |
+|          {fg.CYAN} ogg {fg.BYELLOW}               |
+|          {fg.CYAN} flv {fg.BYELLOW}               |
+|          {fg.CYAN} ogv {fg.BYELLOW}               |
+|          {fg.CYAN} mov {fg.BYELLOW}               |
+|          {fg.CYAN} webm {fg.BYELLOW}              |
+|          {fg.CYAN} aac {fg.BYELLOW}-------------->|{bg.IMAGENTA}Pending Implementation{RESET}{fg.BYELLOW}
+|          {fg.CYAN} bpf {fg.BYELLOW}-------------->|{bg.IMAGENTA}Pending Implementation{RESET}{fg.BYELLOW}
+|          {fg.CYAN} m4a {fg.BYELLOW}               |
+|          {fg.CYAN} raw {fg.BYELLOW}               |
+|          {fg.CYAN} aiff {fg.BYELLOW}              |
 --------------------------------
 
 """
@@ -93,17 +93,17 @@ Video_codecs = {
 }
 SUPPORTED_VIDEO_FORMATS_SHOW = f"""
 ,_______________________________________,
-|x| {bg.BBLUE_BG}Supported I/O formats{RESET}             |x|
-|x|-----------------------------------{fg.BYELLOW_FG}|x|
-|x|               {fg.BMAGENTA_FG} MP4 {fg.BYELLOW_FG}               |x|
-|x|               {fg.BMAGENTA_FG} AVI {fg.BYELLOW_FG}               |x|
-|x|               {fg.BMAGENTA_FG} OGV {fg.BYELLOW_FG}-------------->|x|{fg.IMAGENTA_FG}Pending Implementation{RESET}{fg.BYELLOW_FG}
-|x|               {fg.BMAGENTA_FG} WEBM{fg.BYELLOW_FG}               |x|
-|x|               {fg.BMAGENTA_FG} MOV {fg.BYELLOW_FG}               |x|
-|x|               {fg.BMAGENTA_FG} MKV {fg.BYELLOW_FG}               |x|
-|x|               {fg.BMAGENTA_FG} FLV {fg.BYELLOW_FG}               |x|
-|x|               {fg.BMAGENTA_FG} WMV {fg.BYELLOW_FG}-------------->|x|{fg.IMAGENTA_FG}Pending Implementation{RESET}{fg.BYELLOW_FG}
-|,|___________________.BMAGENTA_FG________________|,|{fg.BYELLOW_FG}
+|x| {bg.BBLUE}Supported I/O formats{RESET}             |x|
+|x|-----------------------------------{fg.BYELLOW}|x|
+|x|               {fg.BMAGENTA} MP4 {fg.BYELLOW}               |x|
+|x|               {fg.BMAGENTA} AVI {fg.BYELLOW}               |x|
+|x|               {fg.BMAGENTA} OGV {fg.BYELLOW}-------------->|x|{fg.IMAGENTA}Pending Implementation{RESET}{fg.BYELLOW}
+|x|               {fg.BMAGENTA} WEBM{fg.BYELLOW}               |x|
+|x|               {fg.BMAGENTA} MOV {fg.BYELLOW}               |x|
+|x|               {fg.BMAGENTA} MKV {fg.BYELLOW}               |x|
+|x|               {fg.BMAGENTA} FLV {fg.BYELLOW}               |x|
+|x|               {fg.BMAGENTA} WMV {fg.BYELLOW}-------------->|x|{fg.IMAGENTA}Pending Implementation{RESET}{fg.BYELLOW}
+|,|___________________.BMAGENTA________________|,|{fg.BYELLOW}
 """
 
 SUPPORTED_IMAGE_FORMATS = {
@@ -131,24 +131,24 @@ SUPPORTED_IMAGE_FORMATS = {
 
 SUPPORTED_IMAGE_FORMATS_SHOW = f"""
 __________________________________________
-|x|{bg.BBLUE_BG}Supported I/O formats{RESET}                |x|
-|x|_____________________________________{fg.BYELLOW_FG}|x|
-|x|               {fg.BMAGENTA_FG} JPEG {fg.BYELLOW_FG}                |x|
-|x|               {fg.BMAGENTA_FG} PNG  {fg.BYELLOW_FG}                 |x|
-|x|               {fg.BMAGENTA_FG} GIF  {fg.BYELLOW_FG}                 |x|
-|x|               {fg.BMAGENTA_FG} BMP  {fg.BYELLOW_FG}                 |x|
-|x|               {fg.BMAGENTA_FG} DIB  {fg.BYELLOW_FG}                 |x|
-|x|               {fg.BMAGENTA_FG} TIFF {fg.BYELLOW_FG}                 |x|
-|x|               {fg.BMAGENTA_FG} PIC  {fg.BYELLOW_FG}                 |x|
-|x|               {fg.BMAGENTA_FG} EXR  {fg.FMAGENTA_FG}---------------->|x|{fg.FCYAN_FG} Pending Implementation{RESET}{fg.BYELLOW_FG}
-|x|               {fg.BMAGENTA_FG} PDF  {fg.BYELLOW_FG}                 |x|
-|x|               {fg.BMAGENTA_FG} WebP {fg.BYELLOW_FG}                 |x|
-|x|               {fg.BMAGENTA_FG} ICNS {fg.BYELLOW_FG}                 |x|
-|x|               {fg.BMAGENTA_FG} PSD  {fg.FMAGENTA_FG}---------------->|x|{fg.FCYAN_FG} Pending Implementation{RESET}{fg.BYELLOW_FG}
-|x|               {fg.BMAGENTA_FG} SVG  {fg.FMAGENTA_FG}---------------->|x|{fg.FCYAN_FG} Pending Implementation{RESET}{fg.BYELLOW_FG}
-|x|               {fg.BMAGENTA_FG} EPS  {fg.BYELLOW_FG}                 |x|
-|x|               {fg.BMAGENTA_FG} Postscript {fg.FMAGENTA_FG}---------->|x|{fg.FCYAN_FG} Pending Implementation{RESET}{fg.BYELLOW_FG}
-|x|               {fg.BMAGENTA_FG} PICT {fg.FMAGENTA_FG}---------------->|x|{fg.FCYAN_FG} Pending Implementation{RESET}{fg.BYELLOW_FG}
+|x|{bg.BBLUE}Supported I/O formats{RESET}                |x|
+|x|_____________________________________{fg.BYELLOW}|x|
+|x|               {fg.BMAGENTA} JPEG {fg.BYELLOW}                |x|
+|x|               {fg.BMAGENTA} PNG  {fg.BYELLOW}                 |x|
+|x|               {fg.BMAGENTA} GIF  {fg.BYELLOW}                 |x|
+|x|               {fg.BMAGENTA} BMP  {fg.BYELLOW}                 |x|
+|x|               {fg.BMAGENTA} DIB  {fg.BYELLOW}                 |x|
+|x|               {fg.BMAGENTA} TIFF {fg.BYELLOW}                 |x|
+|x|               {fg.BMAGENTA} PIC  {fg.BYELLOW}                 |x|
+|x|               {fg.BMAGENTA} EXR  {fg.FMAGENTA}---------------->|x|{fg.FCYAN} Pending Implementation{RESET}{fg.BYELLOW}
+|x|               {fg.BMAGENTA} PDF  {fg.BYELLOW}                 |x|
+|x|               {fg.BMAGENTA} WebP {fg.BYELLOW}                 |x|
+|x|               {fg.BMAGENTA} ICNS {fg.BYELLOW}                 |x|
+|x|               {fg.BMAGENTA} PSD  {fg.FMAGENTA}---------------->|x|{fg.FCYAN} Pending Implementation{RESET}{fg.BYELLOW}
+|x|               {fg.BMAGENTA} SVG  {fg.FMAGENTA}---------------->|x|{fg.FCYAN} Pending Implementation{RESET}{fg.BYELLOW}
+|x|               {fg.BMAGENTA} EPS  {fg.BYELLOW}                 |x|
+|x|               {fg.BMAGENTA} Postscript {fg.FMAGENTA}---------->|x|{fg.FCYAN} Pending Implementation{RESET}{fg.BYELLOW}
+|x|               {fg.BMAGENTA} PICT {fg.FMAGENTA}---------------->|x|{fg.FCYAN} Pending Implementation{RESET}{fg.BYELLOW}
 |_|_____________________________________|x|
 """
 

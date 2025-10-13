@@ -25,7 +25,7 @@ def get_audio_bitrate(input_file, verbosity=False):
     """
     if verbosity:
         Clogger.info(
-            f"Fetch the original bitrate of the video file using {fg.YELLOW_FG}ffmpeg{RESET}."
+            f"Fetch the original bitrate of the video file using {fg.YELLOW}ffmpeg{RESET}."
         )
     try:
         try:

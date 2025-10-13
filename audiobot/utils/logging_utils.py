@@ -6,15 +6,15 @@ RESET = rs
 
 class LoggingFormatter(logging.Formatter):
     COLORS = {
-        logging.DEBUG: fg.BBLUE_FG,
-        logging.INFO: fg.GREEN_FG,
-        logging.WARNING: fg.YELLOW_FG,
-        logging.ERROR: fg.RED_FG,
-        logging.CRITICAL: fg.MAGENTA_FG,
+        logging.DEBUG: fg.BBLUE,
+        logging.INFO: fg.GREEN,
+        logging.WARNING: fg.YELLOW,
+        logging.ERROR: fg.RED,
+        logging.CRITICAL: fg.MAGENTA,
     }
 
     def format(self, record):
-        log_color = self.COLORS.get(record.levelno, fg.WHITE_FG)
+        log_color = self.COLORS.get(record.levelno, fg.WHITE)
         log_message = super().format(record)
         return f"{log_color}{log_message}{RESET}"
 

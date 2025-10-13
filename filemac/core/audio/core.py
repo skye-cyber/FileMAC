@@ -26,7 +26,7 @@ class AudioConverter:
             files_to_process.append(self.input_file)
         elif os.path.isdir(self.input_file):
             if os.listdir(self.input_file) is None:
-                print(f"{fg.RED_FG}Cannot work with empty folder{RESET}")
+                print(f"{fg.RED}Cannot work with empty folder{RESET}")
                 sys.exit(1)
             for file in os.listdir(self.input_file):
                 file_path = os.path.join(self.input_file, file)
@@ -44,7 +44,7 @@ class AudioConverter:
                 for item in input_list
                 if any(item.lower().endswith(ext) for ext in SUPPORTED_AUDIO_FORMATS)
             ]
-            print(f"{fg.BYELLOW_FG}Initializing conversion..{RESET}")
+            print(f"{fg.BYELLOW}Initializing conversion..{RESET}")
 
             def wav_redudancy():
                 # Load the mp3 file using Pydub
@@ -59,10 +59,10 @@ class AudioConverter:
                     fmt = ext[1:]
                     # print(fmt, out_f)
                     audio = AudioSegment.from_file(file, fmt)
-                    print(f"{fg.BMAGENTA_FG}Converting to {output_filename}{RESET}")
+                    print(f"{fg.BMAGENTA}Converting to {output_filename}{RESET}")
                     audio.export(output_filename, format=out_f)
                     # new_audio = pydub.AudioSegment.from_file('output_audio.')
-                    print(f"{fg.BGREEN_FG}Done{RESET}")
+                    print(f"{fg.BGREEN}Done{RESET}")
 
                 elif file[-3:].lower() == "m4a" or out_f.lower() == "m4a":
                     m4a(file, out_f)
@@ -74,14 +74,14 @@ class AudioConverter:
                     print("Pending Implemantation For the format")
 
                 else:
-                    print(f"{fg.RED_FG}Unsupported output format{RESET}")
+                    print(f"{fg.RED}Unsupported output format{RESET}")
                     sys.exit(1)
 
         except KeyboardInterrupt:
             print("\nQuit❕")
             sys.exit(1)
         except Exception as e:
-            print(f"{fg.RED_FG}{e}{RESET}")
+            print(f"{fg.RED}{e}{RESET}")
 
 
 class AudioJoiner:
@@ -98,7 +98,7 @@ class AudioJoiner:
         elif os.path.isdir(self.obj):
             self.obj = self.obj
             self.isdir = True
-            print(f"Join {fg.BBLUE_FG}{len(os.listdir(self.obj))}{RESET} files")
+            print(f"Join {fg.BBLUE}{len(os.listdir(self.obj))}{RESET} files")
 
             for file in list(os.listdir(self.obj)):
                 path = os.path.join(self.obj, file)
@@ -132,13 +132,13 @@ class AudioJoiner:
                 print(os.path.splitext(self.files[0]))
             else:
                 masterfile = self.masterfile
-            print(f"{fg.YELLOW_FG}Master file = {fg.BLUE_FG}{masterfile}{RESET}")
+            print(f"{fg.YELLOW}Master file = {fg.BLUE}{masterfile}{RESET}")
 
             self.ext = os.path.splitext(masterfile)[-1]
             _format = self.ext if self.ext in SUPPORTED_AUDIO_FORMATS_DIRECT else "ogg"
-            print(f"{fg.BYELLOW_FG}Format = {fg.BBLUE_FG}{_format}{RESET}")
+            print(f"{fg.BYELLOW}Format = {fg.BBLUE}{_format}{RESET}")
 
-            print(f"{fg.BBLUE_FG}Create a master file{RESET}")
+            print(f"{fg.BBLUE}Create a master file{RESET}")
             # Create a list to store files
             ogg_files = []
 
@@ -179,7 +179,7 @@ class AudioJoiner:
 
             # Export the combined ogg to new mp3 file or ogg file
             combined_ogg.export(masterfile, format=_format)
-            print(f"{fg.BGREEN_FG}Master file:Ok🤏")
+            print(f"{fg.BGREEN}Master file:Ok🤏")
             """
             if self.isdir:
                 query = input(f"{BBLUE}Remove the directory ?(y/n)").lower() in ('y', 'yes')
@@ -191,7 +191,7 @@ class AudioJoiner:
             sys.exit(1)
         except Exception as e:
             raise
-            print(f"{fg.RED_FG}{e}{RESET}")
+            print(f"{fg.RED}{e}{RESET}")
 
 
 class AudioExtracter:
@@ -206,7 +206,7 @@ class AudioExtracter:
                 files_to_process.append(self.input_file)
             elif os.path.isdir(self.input_file):
                 if os.listdir(self.input_file) is None:
-                    print(f"{fg.RED_FG}Cannot work with empty folder{RESET}")
+                    print(f"{fg.RED}Cannot work with empty folder{RESET}")
                     sys.exit(1)
                 for file in os.listdir(self.input_file):
                     file_path = os.path.join(self.input_file, file)
@@ -224,7 +224,7 @@ class AudioExtracter:
         try:
             video_list = self.preprocess()
             for input_video in video_list:
-                print(f"{fg.BYELLOW_FG}Extracting..{fg.DCYAN_FG}")
+                print(f"{fg.BYELLOW}Extracting..{fg.DCYAN}")
                 video = VideoFileClip(input_video)
                 audio = video.audio
                 basename, _ = os.path.splitext(input_video)

@@ -139,7 +139,7 @@ class AudioModulator:
         """
 
         cutoff = self._cutoff if self._cutoff else cutoff
-        Clogger.debug(f"{fg.BLUE_FG}cutoff: {fg.CYAN_FG}{cutoff}{RESET}")
+        Clogger.debug(f"{fg.BLUE}cutoff: {fg.CYAN}{cutoff}{RESET}")
         Clogger.info("Apply a low-pass filter to remove frequencies higher than cutoff")
         nyquist = 0.5 * sample_rate
         normal_cutoff = cutoff / nyquist
@@ -160,12 +160,12 @@ class AudioModulator:
 
     def highpass(self, audio_segment, cutoff: int = 200):
         cutoff = self._cutoff if self._cutoff else cutoff
-        Clogger.info(f"Cutoff: {fg.BBLUE_FG}{cutoff}{RESET}")
+        Clogger.info(f"Cutoff: {fg.BBLUE}{cutoff}{RESET}")
         return effects.high_pass_filter(audio_segment, cutoff=cutoff)
 
     def lowpass(self, audio_segment, cutoff: int = 2200):
         cutoff = self._cutoff if self._cutoff else cutoff
-        Clogger.info(f"Cutoff: {fg.BBLUE_FG}{cutoff}{RESET}")
+        Clogger.info(f"Cutoff: {fg.BBLUE}{cutoff}{RESET}")
         return effects.low_pass_filter(audio_segment, cutoff=cutoff)
 
     def normalize(self, audio_segment):
@@ -179,7 +179,7 @@ class AudioDenoiser:
         self._sos_low = {}
         self._sos_high = {}
         self._cutoff = config.options.get("cutoff")
-        Clogger.debug(f"{fg.BLUE_FG}cutoff: {fg.CYAN_FG}{self._cutoff}{RESET}")
+        Clogger.debug(f"{fg.BLUE}cutoff: {fg.CYAN}{self._cutoff}{RESET}")
 
     def lowpass_filter(
         self, samples: np.ndarray, cutoff: int = 2200, order: int = 6
@@ -268,7 +268,7 @@ class AudioDenoiser:
         noise = config.options.get("noise") if config.options.get("noise") else "low"
 
         Clogger.info(
-            f"{fg.BLUE_FG}Noise: {fg.CYAN_FG}{config.options.get('noise')}{RESET}"
+            f"{fg.BLUE}Noise: {fg.CYAN}{config.options.get('noise')}{RESET}"
         )
         if noise == "low":
             # Remove high-frequency noise

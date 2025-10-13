@@ -46,7 +46,7 @@ class SecurePython:
 
         if not full_path.startswith(os.path.abspath(base_dir)):
             raise ValueError("Invalid file path: Path traversal attempt detected")
-        print(f"{fg.BBLUE_FG}Return safe path: {fg.BGREEN_FG}{full_path}{RESET}")
+        print(f"{fg.BBLUE}Return safe path: {fg.BGREEN}{full_path}{RESET}")
         return full_path
 
     # ✅ 3. Prevent SQL Injection
