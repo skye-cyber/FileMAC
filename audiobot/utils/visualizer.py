@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 import soundfile as sf
-from ..logging_config import setup_colored_logger
+from .logging_utils import colored_logger
 
 
-Clogger = setup_colored_logger()
+Clogger = colored_logger()
 
 
-def visualize_audio_wave(original_file, modified_file):
+def audiowave_visualizer(original_file, modified_file):
     Clogger.info(f"Visualizing audio: {original_file} and {modified_file}")
     try:
         original_data, original_sr = sf.read(original_file)

@@ -1,18 +1,18 @@
 import os
-from .modulator import Modulator
+from .audio.core import AudioModulator
 from moviepy import AudioFileClip, VideoFileClip
-from .logging_config import setup_colored_logger
+from ..utils.logging_utils import colored_logger
 from pydub import AudioSegment
-from .utils.visualizer import visualize_audio_wave
-from .utils.metadata_utils import get_bitrate
+from ..utils.visualizer import audiowave_visualizer
+from ..utils.metadata_utils import get_audio_bitrate
 from .effects import VoiceEffectProcessor
 from filemac.utils.colors import fg, rs
 import sys
-import io
+# import io
 
 RESET = rs
 
-Clogger = setup_colored_logger()
+Clogger = colored_logger()
 
 
 class VideoProcessor:
@@ -36,7 +36,7 @@ class VideoProcessor:
 
         try:
             # Get the original video bitrate
-            original_bitrate = get_bitrate(input_file, verbosity)
+            original_bitrate = get_audio_bitrate(input_file, verbosity)
             if verbosity and original_bitrate:
                 Clogger.info(
                     f"Original video bitrate: {fg.YELLOW_FG}{original_bitrate}{RESET}"
@@ -45,8 +45,8 @@ class VideoProcessor:
             # Capture stdout and stderr
             old_stdout = sys.stdout
             old_stderr = sys.stderr
-            sys.stdout = captured_stdout = io.StringIO()
-            sys.stderr = captured_stderr = io.StringIO()
+            # sys.stdout = captured_stdout = io.StringIO()
+            # sys.stderr = captured_stderr = io.StringIO()
 
             # Load the video
             try:
@@ -69,7 +69,7 @@ class VideoProcessor:
             modified_audio = VoiceEffectProcessor(audio_segment, effect).apply_effect()
 
             # Normalize the modified audio
-            modified_audio = Modulator().normalize(modified_audio)
+            modified_audio = AudioModulator().normalize(modified_audio)
 
             # Export the modified audio to a WAV file
             if verbosity:
@@ -105,10 +105,10 @@ class VideoProcessor:
             )
 
             Clogger.info(f"Modified video saved as: {output_file}")
-            Clogger.debug(f"Final bitrate = {get_bitrate(output_file)}")
+            Clogger.debug(f"Final bitrate = {get_audio_bitrate(output_file)}")
             # Optional: visualize the before and after audio
             if visualize:
-                visualize_audio_wave(audio_file, "modified_audio.wav")
+                audiowave_visualizer(audio_file, "modified_audio.wav")
 
             # Clean up temporary files
             if os.path.exists(audio_file):
@@ -140,7 +140,7 @@ class AudioProcessor:
                 print(f"- INFO - Audio channels: {audio_segment.channels}")
                 print(f"- INFO - Audio sample width: {audio_segment.sample_width}")
             modified_audio = VoiceEffectProcessor(audio_segment, effect).apply_effect()
-            modified_audio = Modulator().normalize(modified_audio)
+            modified_audio = AudioModulator().normalize(modified_audio)
             output_file = os.path.join(
                 output_dir, f"{effect}_{os.path.basename(input_file)}"
             )
@@ -148,7 +148,7 @@ class AudioProcessor:
             Clogger.info(f"Modified audio saved as: {output_file}")
 
             if visualize:
-                visualize_audio_wave(input_file, output_file)
+                audiowave_visualizer(input_file, output_file)
 
         except Exception as e:
             Clogger.error(f"Error processing audio file {input_file}: {e}")

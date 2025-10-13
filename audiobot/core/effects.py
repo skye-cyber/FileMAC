@@ -1,10 +1,10 @@
 from pydub import effects
 from .codec import AudioSegmentArrayCodec
-from .modulator import Modulator
-from .logging_config import setup_colored_logger
+from .audio.core import AudioModulator
+from ..utils.logging_utils import colored_logger
 from pydub import AudioSegment
 
-# logger = setup_colored_logger()
+# logger = colored_logger()
 
 
 class VoiceEffectProcessor:
@@ -13,30 +13,30 @@ class VoiceEffectProcessor:
         self.audio_segment = audio_segment
         self.verbosity = verbosity
         self.handler = AudioSegmentArrayCodec()
-        self.logger = setup_colored_logger()
+        self.logger = colored_logger()
 
     def _apply_chipmunk(self):
-        return Modulator().pitch_shift(
+        return AudioModulator().pitch_shift(
             effects.speedup(self.audio_segment, 1.01), n_steps=9
         )
 
     def _apply_high(self):
-        return Modulator().pitch_shift(self.audio_segment, n_steps=4)
+        return AudioModulator().pitch_shift(self.audio_segment, n_steps=4)
 
     def _apply_lowpass(self):
-        return Modulator().lowpass(self.audio_segment)
+        return AudioModulator().lowpass(self.audio_segment)
 
     def _apply_highpass(self):
-        return Modulator().highpass(self.audio_segment)
+        return AudioModulator().highpass(self.audio_segment)
 
     def _apply_robotic(self):
-        return Modulator().pitch_shift(
+        return AudioModulator().pitch_shift(
             effects.speedup(self.audio_segment, 1.01), n_steps=-10
         )
 
     def _apply_demonic(self):
         return (
-            Modulator()
+            AudioModulator()
             .pitch_shift(effects.speedup(self.audio_segment, 1.01), n_steps=-10)
             .overlay(
                 AudioSegment.silent(duration=700) + self.audio_segment.fade_out(500)
@@ -44,11 +44,11 @@ class VoiceEffectProcessor:
         )
 
     def _apply_hacker(self):
-        return Modulator().hacker(self.audio_segment)
+        return AudioModulator().hacker(self.audio_segment)
 
     def _apply_distortion(self):
         samples, sample_rate = self.handler.audiosegment_to_numpy(self.audio_segment)
-        distorted_samples = Modulator().distort(samples)
+        distorted_samples = AudioModulator().distort(samples)
         return self.handler.numpy_to_audiosegment(
             distorted_samples,
             sample_rate,
@@ -57,18 +57,18 @@ class VoiceEffectProcessor:
         )
 
     def _apply_deep(self):
-        return Modulator().pitch_shift(self.audio_segment, n_steps=-4)
+        return AudioModulator().pitch_shift(self.audio_segment, n_steps=-4)
 
     def _apply_echo(self):
         delay = AudioSegment.silent(duration=1000)
         return self.audio_segment.overlay(delay + self.audio_segment)
 
     def _apply_whisper(self):
-        return Modulator().whisper(self.audio_segment)
+        return AudioModulator().whisper(self.audio_segment)
 
     def _apply_reverb(self):
         samples, sample_rate = self.handler.audiosegment_to_numpy(self.audio_segment)
-        reverbed_samples = Modulator().reverb(samples)
+        reverbed_samples = AudioModulator().reverb(samples)
         return self.handler.numpy_to_audiosegment(
             reverbed_samples,
             sample_rate,
@@ -77,10 +77,10 @@ class VoiceEffectProcessor:
         )
 
     def denoise(self):
-        from .modulator import Denoiser
+        from .modulator import AudioDenoiser
 
         sample, sample_rate = self.handler.audiosegment_to_numpy(self.audio_segment)
-        denoised_sample = Denoiser().denoise(sample)
+        denoised_sample = AudioDenoiser().denoise(sample)
         audio_segment = self.handler.numpy_to_audiosegment(
             denoised_sample,
             sample_rate,

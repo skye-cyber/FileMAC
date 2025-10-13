@@ -1,18 +1,18 @@
 import numpy as np
-from .logging_config import setup_colored_logger
+from ...utils.logging_utils import colored_logger
 import librosa
 from pydub import AudioSegment, effects
 from scipy.signal import butter, lfilter, sosfilt
-from .config import Config
+from ...config.core import Config
 from filemac.utils.colors import fg, rs
 
 RESET = rs
 
-Clogger = setup_colored_logger()
+Clogger = colored_logger()
 config = Config()
 
 
-class Modulator:
+class AudioModulator:
     def __init__(self):
         self._cutoff = config.options.get("cutoff")
 
@@ -172,7 +172,7 @@ class Modulator:
         return effects.normalize(audio_segment)
 
 
-class Denoiser:
+class AudioDenoiser:
     def __init__(self, sample_rate=44100):
         self.sample_rate = sample_rate
         # Dictionaries to cache filter coefficients by cutoff value

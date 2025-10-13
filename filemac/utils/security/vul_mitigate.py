@@ -16,6 +16,8 @@ from ..colors import fg, rs
 
 RESET = rs
 
+pkg_resources = []
+
 
 class SecurePython:
     def __init__(self):

@@ -38,7 +38,7 @@ Extract text from an image.
         example filemac --OCR image.png
 """
 
-from audiobot.cli import Argsmain as audiobot
+from audiobot.cli import cli as audiobot
 
 from .core.image.core import (
     GrayscaleConverter,

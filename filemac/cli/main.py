@@ -3,30 +3,15 @@ import argparse
 import os
 import sys
 from ..core.document import DocConverter
-from ..core.audio.core import AudioConverter
-from ..core.audio.core import AudioExtracter
-from ..core.image.core import ImageCompressor, ImageConverter
-from ..core.ocr import ExtractText
 from ..core.pdf.core import PageExtractor
-from ..core.video.core import VideoConverter
 from ..core.exceptions import FileSystemError, FilemacError
-from ..miscellaneous.video_analyzer import SimpleAnalyzer
-from .converter import MethodMappingEngine, DirectoryConverter, Batch_Audiofy
 
-from ..utils.formats import (
-    SUPPORTED_AUDIO_FORMATS_DIRECT,
-    SUPPORTED_AUDIO_FORMATS_SHOW,
-    SUPPORTED_DOC_FORMATS,
-    SUPPORTED_IMAGE_FORMATS_SHOW,
-    SUPPORTED_VIDEO_FORMATS_SHOW,
-)
 from ..utils.colors import fg, bg, rs
-from ..core.image.extractor import process_files
 
 from ..utils.simple import logger
 
 try:
-    from audiobot.cli import Argsmain
+    from audiobot.cli import cli as audiobot_cli
 except ImportError:
     pass
 
@@ -325,25 +310,6 @@ class OperationMapper:
         self.parser = parser
         self.args = args
         self.remaining_args = remaining_args
-        self.SUPPORTED_IMAGE_FORMATS_SHOW = SUPPORTED_IMAGE_FORMATS_SHOW
-        self.SUPPORTED_DOC_FORMATS = SUPPORTED_DOC_FORMATS
-        self.SUPPORTED_AUDIO_FORMATS_SHOW = SUPPORTED_AUDIO_FORMATS_SHOW
-        self.SUPPORTED_AUDIO_FORMATS_DIRECT = SUPPORTED_AUDIO_FORMATS_DIRECT
-        self.SUPPORTED_VIDEO_FORMATS_SHOW = SUPPORTED_VIDEO_FORMATS_SHOW
-        self.Argsmain = Argsmain
-        self.VideoConverter = VideoConverter
-        self.AudioConverter = AudioConverter
-        self.AudioExtracter = AudioExtracter
-        self.PageExtractor = PageExtractor
-        self.DocConverter = DocConverter
-        self.ImageCompressor = ImageCompressor
-        self.ExtractText = ExtractText
-        self.SimpleAnalyzer = SimpleAnalyzer
-        self._entry = _entry_
-        self.ImageConverter = ImageConverter
-        self.Batch_Audiofy = Batch_Audiofy
-        self.DirectoryConverter = DirectoryConverter
-        self.MethodMappingEngine = MethodMappingEngine
 
     def ensure_target_format(self):
         print(
@@ -365,7 +331,9 @@ class OperationMapper:
 
     def image_converter(self):
         if self.args.convert_image == "help":
-            print(self.SUPPORTED_IMAGE_FORMATS_SHOW)
+            from ..utils.formats import SUPPORTED_IMAGE_FORMATS_SHOW
+
+            print(SUPPORTED_IMAGE_FORMATS_SHOW)
             return
         if self.args.target_format is None:
             self.ensure_target_format()
@@ -375,26 +343,29 @@ class OperationMapper:
                 f"{fg.RED_FG}Please provide output format specified by{fg.CYAN_FG} '-tf'{RESET}"
             )
             return
-        conv = self.ImageConverter(self.args.convert_image, self.args.target_format)
+        from ..core.image.core import ImageConverter
+
+        conv = ImageConverter(self.args.convert_image, self.args.target_format)
         conv.convert_image()
 
     def doc_converter(self):
+        from ..utils.formats import SUPPORTED_AUDIO_FORMATS_DIRECT
+        from .converter import MethodMappingEngine, DirectoryConverter, Batch_Audiofy
+
         if self.args.target_format is None:
             self.ensure_target_format()
             return
         if self.args.use_extras:
-            self.DocConverter.word2pdf_extra(self.args.convert_doc)
+            DocConverter.word2pdf_extra(self.args.convert_doc)
         if (
             len(self.args.convert_doc) <= 1
             and not os.path.isdir(self.args.convert_doc[0])
             and isinstance(self.args.convert_doc, list)
-            and self.args.target_format in self.SUPPORTED_AUDIO_FORMATS_DIRECT
+            and self.args.target_format in SUPPORTED_AUDIO_FORMATS_DIRECT
         ):
-            self.Batch_Audiofy(
-                self.args.convert_doc, self.args.no_resume, self.args.threads
-            )
+            Batch_Audiofy(self.args.convert_doc, self.args.no_resume, self.args.threads)
         elif os.path.isdir(self.args.convert_doc[0]):
-            conv = self.DirectoryConverter(
+            conv = DirectoryConverter(
                 self.args.convert_doc[0],
                 self.args.target_format,
                 self.args.no_resume,
@@ -403,9 +374,7 @@ class OperationMapper:
             )
             conv._unbundle_dir_()
         elif os.path.isfile(self.args.convert_doc[0]):
-            ev = self.MethodMappingEngine(
-                self.args.convert_doc[0], self.args.target_format
-            )
+            ev = MethodMappingEngine(self.args.convert_doc[0], self.args.target_format)
             ev.document_eval()
 
     def handle_help(self):
@@ -415,64 +384,78 @@ class OperationMapper:
 
     def handle_audio_help(self):
         if self.args.audio_help:
-            self.Argsmain(["--help"])
+            audiobot_cli(["--help"])
         return
 
     def handle_audio_effect(self):
-        self.Argsmain(self.remaining_args)
+        audiobot_cli(self.remaining_args)
         return
 
     def handle_doc_conversion_help(self):
         if self.args.convert_doc and self.args.convert_doc[0] == "help":
-            print(self.SUPPORTED_DOC_FORMATS)
+            from ..utils.formats import SUPPORTED_DOC_FORMATS
+
+            print(SUPPORTED_DOC_FORMATS)
         return
 
     def handle_video_conversion_help(self):
         if self.args.convert_video and self.args.convert_video == "help":
-            print(self.SUPPORTED_VIDEO_FORMATS_SHOW)
+            from ..utils.formats import SUPPORTED_VIDEO_FORMATS_SHOW
+
+            print(SUPPORTED_VIDEO_FORMATS_SHOW)
         return
 
     def handle_video_conversion(self):
         if hasattr(self, "agrs") and self.agrs.target_format is None:
             self.ensure_target_format()
             return
-        ev = self.VideoConverter(self.args.convert_video, self.args.target_format)
+        from ..core.video.core import VideoConverter
+
+        ev = VideoConverter(self.args.convert_video, self.args.target_format)
         ev.CONVERT_VIDEO()
 
     def handle_image_resize(self):
-        res = self.ImageCompressor(self.args.resize_image)
+        from ..core.image.core import ImageCompressor
+
+        res = ImageCompressor(self.args.resize_image)
         res.resize_image(self.args.t_size)
 
     def handle_doc_to_image_conversion(self):
-        conv = self.DocConverter(self.args.convert_doc2image)
+        conv = DocConverter(self.args.convert_doc2image)
         conv.doc2image(self.args.target_format)
 
     def handle_audio_conversion_help(self):
         if self.args.convert_audio == "help":
-            print(self.SUPPORTED_AUDIO_FORMATS_SHOW)
+            from ..utils.formats import SUPPORTED_AUDIO_FORMATS_SHOW
+
+            print(SUPPORTED_AUDIO_FORMATS_SHOW)
         return
 
     def handle_audio_conversion(self):
         if self.agrs.target_format is None:
             self.ensure_target_format()
             return
-        ev = self.AudioConverter(self.args.convert_audio, self.args.target_format)
+        from ..core.audio.core import AudioConverter
+
+        ev = AudioConverter(self.args.convert_audio, self.args.target_format)
         ev.pydub_conv()
 
     def handle_audio_extraction(self):
-        vi = self.AudioExtracter(self.args.extract_audio)
+        from ..core.audio.core import AudioExtracter
+
+        vi = AudioExtracter(self.args.extract_audio)
         vi.moviepyextract()
 
     def handle_scan_pdf(self):
-        sc = self.PageExtractor(self.args.scan)
+        sc = PageExtractor(self.args.scan)
         sc.scanPDF()
 
     def handle_scan_images(self):
-        sc = self.PageExtractor(self.args.scanAsImg, self.args.no_strip)
+        sc = PageExtractor(self.args.scanAsImg, self.args.no_strip)
         sc.scanAsImgs()
 
     def handle_scan_long_image(self):
-        sc = self.PageExtractor(self.args.scanAsLong_Image, self.args.separator)
+        sc = PageExtractor(self.args.scanAsLong_Image, self.args.separator)
         sc.scanAsLongImg()
 
     def handle_doc_to_long_image(self):
@@ -482,11 +465,15 @@ class OperationMapper:
         conv.preprocess()
 
     def handle_ocr(self):
-        ocr = self.ExtractText(self.args.OCR, self.args.separator)
+        from ..core.ocr import ExtractText
+
+        ocr = ExtractText(self.args.OCR, self.args.separator)
         ocr.run()
 
     def handle_video_analysis(self):
-        analyzer = self.SimpleAnalyzer(self.args.Analyze_video)
+        from ..miscellaneous.video_analyzer import SimpleAnalyzer
+
+        analyzer = SimpleAnalyzer(self.args.Analyze_video)
         analyzer.SimpleAnalyzer()
 
     def handle_audio_join(self):
@@ -504,9 +491,11 @@ class OperationMapper:
         init.text_to_word()
 
     def handle_extract_pages(self):
-        self._entry(self.args.extract_pages)
+        _entry_(self.args.extract_pages)
 
     def ImageExtractor(self):
+        from ..core.image.extractor import process_files
+
         if self.args.size:
             size = tuple([int(x) for x in self.args.size.lower().split("x")])
             process_files(self.args.image_extractor, tsize=size)

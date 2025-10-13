@@ -4,7 +4,7 @@ from filemac.utils.colors import fg, rs
 RESET = rs
 
 
-class CustomFormatter(logging.Formatter):
+class LoggingFormatter(logging.Formatter):
     COLORS = {
         logging.DEBUG: fg.BBLUE_FG,
         logging.INFO: fg.GREEN_FG,
@@ -19,7 +19,7 @@ class CustomFormatter(logging.Formatter):
         return f"{log_color}{log_message}{RESET}"
 
 
-def setup_colored_logger(logger_name="colored_logger") -> logging.Logger:
+def colored_logger(logger_name="colored_logger") -> logging.Logger:
     """
     Sets up a colored logger with a single handler.
 
@@ -30,7 +30,7 @@ def setup_colored_logger(logger_name="colored_logger") -> logging.Logger:
 
     if not logger.handlers:  # Check if handlers already exist
         handler = logging.StreamHandler()
-        handler.setFormatter(CustomFormatter("- %(levelname)s - %(message)s"))
+        handler.setFormatter(LoggingFormatter("- %(levelname)s - %(message)s"))
         logger.addHandler(handler)
         logger.setLevel(logging.INFO)
 

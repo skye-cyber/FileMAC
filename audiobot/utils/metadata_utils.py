@@ -1,14 +1,14 @@
 import speech_recognition as sr
 import ffmpeg
-from ..logging_config import setup_colored_logger
+from .logging_utils import colored_logger
 from filemac.utils.colors import fg, rs
 
 RESET = rs
 
-Clogger = setup_colored_logger()
+Clogger = colored_logger()
 
 
-def get_bitrate(input_file, verbosity=False):
+def get_audio_bitrate(input_file, verbosity=False):
     """
     Probes a media file using ffmpeg and returns its metadata.
 

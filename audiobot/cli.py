@@ -1,4 +1,12 @@
 #!/usr/bin/python3
+
+
+"""
+CLI Entry point for audiobot.\n
+<b>Implements</b>:\n
+    Argsmain->cmd argument handler either from other packages or directly form cli
+"""
+
 import argparse
 import logging
 
@@ -7,16 +15,16 @@ import os
 import magic
 from .utils.metadata_utils import transcribe_audio
 from filemac.utils.colors import fg, rs
-from .processor import VideoProcessor, AudioProcessor
-from .logging_config import setup_colored_logger
-from .config import Config
+from .core.processor import VideoProcessor, AudioProcessor
+from .utils.logging_utils import colored_logger
+from .config.core import Config
 
 RESET = rs
 
-Clogger = setup_colored_logger()
+Clogger = colored_logger()
 
 
-class Processor:
+class ArgumentsProcessor:
     def __init__(self, args, parser):
         self.args = args
         self.parser = parser
@@ -98,7 +106,7 @@ class Processor:
             Clogger.info(e)
 
 
-def Argsmain(argsv=None):
+def cli(argsv=None):
     """
     Recieve and process agruments from audio/video audio effects
     """
@@ -181,8 +189,8 @@ def Argsmain(argsv=None):
         config.options["cutoff"] = args.cutoff
         config.options["noise"] = args.noise
     # Call argument processor
-    Processor(args, parser).process()
+    ArgumentsProcessor(args, parser).process()
 
 
 if __name__ == "__main__":
-    Argsmain()
+    cli()
