@@ -32,8 +32,8 @@ FileMAC [options] stdin format
 Replace `[options]` with the appropriate command-line options based on the functionality you want to execute.
 
 ## Available Options
-``*``
-- `1`:  --convert_doc         (doc* inter-conversion + tts)
+-----------------------
+- `1`:  --convert_doc  |       (doc* inter-conversion + tts)
 - `2`:  --convert_audio
 - `3`:  --convert_video
 - `4`:  --convert_image
