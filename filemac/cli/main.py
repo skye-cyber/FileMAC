@@ -5,7 +5,7 @@ import sys
 from ..core.document import DocConverter
 from ..core.pdf.core import PageExtractor
 from ..core.exceptions import FileSystemError, FilemacError
-
+from pathlib import Path
 from ..utils.colors import fg, bg, rs
 
 from ..utils.simple import logger
@@ -51,6 +51,12 @@ def CliInit():
         "--convert_image",
         help=f"Convert image file(s) to and from different format ie png to jpg.\
         example: {fg.BYELLOW}filemac --convert_image example.jpg -tf png{RESET}",
+    )
+
+    parser.add_argument(
+        "--convert_svg",
+        help=f"Converter svg file(s) to different format ie pdf, png.\
+       example: {fg.BYELLOW}filemac --convert_svg example.svg -tff pdf{RESET}",
     )
 
     parser.add_argument(
@@ -312,9 +318,7 @@ class OperationMapper:
         self.remaining_args = remaining_args
 
     def ensure_target_format(self):
-        print(
-            f"{bg.YELLOW}[Warning]{fg.YELLOW}Please provide target format{RESET}"
-        )
+        print(f"{bg.YELLOW}[Warning]{fg.YELLOW}Please provide target format{RESET}")
         return
 
     def pdfjoin(self):
@@ -413,6 +417,30 @@ class OperationMapper:
 
         ev = VideoConverter(self.args.convert_video, self.args.target_format)
         ev.CONVERT_VIDEO()
+
+    def handle_svg(self):
+        from ..core.svg.core import SVGConverter
+
+        converter = SVGConverter()
+        _map_ = {
+            "png": converter.to_png,
+            "pdf": converter.to_pdf,
+            "svg": converter.to_svg,
+        }
+        target = _map_.get(self.args.target_format, None)
+        if not target:
+            raise FilemacError("Target format not valid for svg input.")
+        from ..utils.file_utils import generate_filename
+
+        output = generate_filename(
+            ext=self.args.target_format, basedir=Path(self.args.convert_svg)
+        )
+        target(
+            input_svg=self.args.convert_svg,
+            output_path=output.as_posix(),
+            is_string=False,
+        )
+        print(f"Saved To:{output}")
 
     def handle_image_resize(self):
         from ..core.image.core import ImageCompressor
@@ -548,7 +576,7 @@ class OperationMapper:
             converter.run()
 
     def display_version(self):
-        version = "1.1.7"
+        version = "2.0.1"
 
         return print(f"{fg.BLUE}filemac: V-{fg.BGREEN}{version}{RESET}")
 
@@ -563,9 +591,7 @@ class OperationMapper:
             return
         except Exception as e:
             logger.critical("Critical failure: %s", e)
-            print(
-                f"{bg.YELLOW}{bg.BRED}Critical error:{RESET} {fg.RED}{str(e)}{RESET}"
-            )
+            print(f"{bg.YELLOW}{bg.BRED}Critical error:{RESET} {fg.RED}{str(e)}{RESET}")
             return
 
     def handle_recording(self):
@@ -607,6 +633,7 @@ class OperationMapper:
             args.scanAsImg: self.handle_scan_images,
             args.doc_long_image: self.handle_doc_to_long_image,
             args.scanAsLong_Image: self.handle_scan_long_image,
+            args.convert_svg: self.handle_svg,
             args.voicetype: self.voicetype,
             tuple(args.OCR)
             if isinstance(args.OCR, list)
@@ -664,6 +691,7 @@ class OperationMapper:
             logger.error(e)
 
         except Exception as e:
+            raise
             # Handle any exceptions that occur during method execution
             logger.error(f"An error occurred: {e}")
 

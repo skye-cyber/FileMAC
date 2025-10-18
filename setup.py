@@ -85,6 +85,7 @@ setup(
         "imageio",
         "pynput",
         "pyaudio",
+        "cairosvg",
     ],
     include_package_data=True,
     zip_safe=False,
