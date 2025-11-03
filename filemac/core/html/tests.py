@@ -79,4 +79,4 @@ def main():
 if __name__ == "__main__":
     # main()
     converter = AdvancedCVConverter()
-    converter.convert_file("/home/skye/Downloads/MWG-CV.html", "test.docx")
+    converter.convert_file("/home/skye/Downloads/MWG-RESUME.html", "test1.docx")
