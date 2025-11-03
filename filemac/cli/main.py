@@ -610,16 +610,26 @@ class OperationMapper:
         from ..utils.file_utils import generate_filename
 
         try:
-            output = generate_filename(ext="docx", basedir=Path(self.args.html2word))
             converter = HTML2Word()
-            for html_file in self.args.html2word:
+            if isinstance(self.args.html2word, str):
+                output = generate_filename(
+                    ext="docx", basedir=Path(self.args.html2word)
+                )
                 converter.convert_file(self.args.html2word, output)
                 print(f"{fg.DWHITE}Output: {fg.GREEN}{output}{RESET}")
+            else:
+                for html_file in self.args.html2word:
+                    output = generate_filename(
+                        ext="docx", basedir=Path(self.args.html2word)
+                    )
+                    converter.convert_file(self.args.html2word, output)
+                    print(f"{fg.DWHITE}Output: {fg.GREEN}{output}{RESET}")
         except KeyboardInterrupt:
             sys.exit("\nQUIT")
         except Exception as e:
+            raise
             logger.critical("Critical failure: %s", e)
-            print(f"{bg.YELLOW}{bg.BRED}Critical error:{RESET} {fg.RED}{str(e)}{RESET}")
+            print(f"{bg.YELLOW}{bg.RED}Critical error:{RESET} {fg.RED}{str(e)}{RESET}")
 
     def run(self):
         args = self.args

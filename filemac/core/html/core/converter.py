@@ -3,6 +3,7 @@ Main converter class that orchestrates the HTML to DOCX conversion
 """
 
 import re
+from pathlib import Path
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import parse_xml
@@ -47,6 +48,11 @@ class HTML2Word:
         """
         # Validate inputs
         validate_html(html_content)
+
+        output_path = (
+            output_path.as_posix() if isinstance(output_path, Path) else output_path
+        )
+
         validate_file_path(output_path, "output")
 
         # Initialize document

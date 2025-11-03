@@ -4,6 +4,7 @@ Validation utilities for the converter
 
 import os
 import re
+from pathlib import Path
 
 
 def validate_html(html_content: str) -> bool:
@@ -47,7 +48,11 @@ def validate_file_path(file_path: str, file_type: str = "input") -> bool:
         ValueError: If file path is invalid
         FileNotFoundError: If input file doesn't exist
     """
-    if not file_path or not isinstance(file_path, str):
+    if (
+        not file_path
+        or not isinstance(file_path, str)
+        and not isinstance(file_path, Path)
+    ):
         raise ValueError(f"{file_type} file path must be a non-empty string")
 
     if file_type == "input":
