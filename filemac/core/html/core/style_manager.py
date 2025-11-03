@@ -169,7 +169,7 @@ class StyleManager:
                     # This would require more complex handling with shading
                     pass
 
-            except Exception as e:
+            except Exception:
                 # Continue with other properties if one fails
                 continue
 
@@ -302,10 +302,10 @@ class StyleManager:
     def _get_heading_style_name(self, level: str) -> str:
         """Get appropriate style name for heading level"""
         if level == "1":
-            return "CV Title"
+            return "Title"
         elif level == "2":
-            return "CV Heading"
+            return "Heading"
         elif level == "3":
-            return "CV Subheading"
+            return "Subheading"
         else:
             return "Normal"

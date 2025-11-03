@@ -248,7 +248,6 @@ class HTMLParser:
             and not current_is_closing
             and current_name in self.block_elements
         ):
-            print(prev_name, current_name)
             # Add line break between block elements
             line_break = {
                 "type": "tag",

@@ -34,3 +34,5 @@ node_modules/
 # Ignore virtual environment directories (if applicable)
 env/
 venv/
+*.docx
+*.doc
