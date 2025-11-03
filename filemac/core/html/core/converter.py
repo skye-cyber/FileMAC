@@ -15,7 +15,7 @@ from .style_manager import StyleManager
 from ..utils.validation import validate_html, validate_file_path
 
 
-class AdvancedCVConverter:
+class HTML2Word:
     """Main converter class that coordinates HTML parsing and DOCX generation"""
 
     def __init__(self, default_font: str = "Calibri", default_size: int = 11):
@@ -111,12 +111,22 @@ class AdvancedCVConverter:
                 if self.current_paragraph.text.strip():
                     self.current_paragraph = None
 
-            if tag_name in ["h1", "h2", "h3", "h4", "h5", "h6"]:
+            # Check for grid/flex containers first
+            if tag_name in ("div", "section", "container"):
+                attributes = element.get("attributes", {})
+                style_attr = attributes.get("style", "")
+                is_grid = "display:grid" in style_attr.replace(" ", "")
+                is_flex = "display:flex" in style_attr.replace(" ", "")
+
+                if is_grid or is_flex:
+                    self._handle_grid_container(element, styles)
+                else:
+                    self._add_div(element, styles)
+
+            elif tag_name in ["h1", "h2", "h3", "h4", "h5", "h6"]:
                 self._add_heading(element, styles)
             elif tag_name == "p":
                 self._add_paragraph(element, styles)
-            elif tag_name == "div":
-                self._add_div(element, styles)
             elif tag_name == "table":
                 self._add_table(element, styles)
             elif tag_name == "span":
@@ -277,7 +287,6 @@ class AdvancedCVConverter:
 
     def _add_horizontal_rule(self):
         """Add a proper horizontal rule/line"""
-        print("Adding hr")
         try:
             # Create a new paragraph for the horizontal rule
             hr_paragraph = self.doc.add_paragraph()
@@ -345,32 +354,51 @@ class AdvancedCVConverter:
     # Table handling methods
     def _add_table(self, element: Dict, styles: Dict):
         """Create a new table"""
+        # Save current state
+        saved_paragraph = self.current_paragraph
+
         attributes = element.get("attributes", {})
 
         # Calculate table dimensions
         rows = self._count_table_rows(element)
         cols = self._count_table_columns(element)
 
-        # Create table with calculated dimensions
-        if rows > 0 and cols > 0:
-            self.current_table = self.doc.add_table(rows=rows, cols=cols)
-            # table.autofit = False
-            # table.allow_autofit = False
+        try:
+            # Create table with calculated dimensions
+            if rows > 0 and cols > 0:
+                # Create table at current position
+                self.current_table = self.doc.add_table(rows=rows, cols=cols)
+                self.current_table.autofit = True
+                self.current_table.allow_autofit = True
 
-            # Apply table styles
-            self._apply_table_styles(self.current_table, attributes, styles)
+                # Apply table styles
+                self._apply_table_styles(self.current_table, attributes, styles)
 
-            # Reset row and cell counters
-            self.current_row_index = 0
-            self.current_cell_index = 0
+                # Reset row and cell counters
+                self.current_row_index = 0
+                self.current_cell_index = 0
 
-            # Process table content
-            self._convert_elements(element.get("children", []), styles)
+                # Process table content
+                self._convert_elements(element.get("children", []), styles)
 
-            # Clean up empty rows/cells if needed
-            self._cleanup_table()
+                # Clean up empty rows/cells if needed
+                self._cleanup_table()
 
-        self.current_table = None
+            # Add a paragraph after the table for proper flow
+            self.current_paragraph = self.doc.add_paragraph()
+
+        except Exception as e:
+            print(f"Table creation error: {e}")
+            # Fallback: add a simple paragraph
+            self.current_paragraph = self.doc.add_paragraph()
+            self.current_paragraph.add_run("[Table content]")
+
+        finally:
+            # Restore or clear table context
+            self.current_table = None
+            # Restore paragraph context if it was saved
+            if saved_paragraph:
+                self.current_paragraph = saved_paragraph
 
     def _count_table_rows(self, table_element: Dict) -> int:
         """Count the number of rows in the table"""

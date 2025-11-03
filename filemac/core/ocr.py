@@ -31,7 +31,7 @@ class ExtractText:
 
     def __init__(
         self,
-        input_obj: Optional[Union[list[str], str, os.PathLike]],
+        input_obj: Optional[Union[list[str], tuple[str], str, os.PathLike]],
         sep: str = DEFAULT_SEPARATOR,
     ):
         """

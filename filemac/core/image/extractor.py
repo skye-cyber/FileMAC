@@ -3,7 +3,7 @@ import fitz  # PyMuPDF for PDF
 from docx import Document
 from PIL import Image
 from io import BytesIO
-from typing import List
+from typing import List, Union, Tuple
 from pathlib import Path
 import os
 from ...utils.colors import fg, rs
@@ -191,7 +191,9 @@ class DocxImageExtractor(ImageExtractor):
 
 
 def process_files(
-    file_paths: List[str], output_path: str = os.getcwd(), tsize: tuple = None
+    file_paths: Union[Tuple[str], List[str]],
+    output_path: str = os.getcwd(),
+    tsize: tuple = None,
 ) -> None:
     """
     Processes the given files and extracts images from them.

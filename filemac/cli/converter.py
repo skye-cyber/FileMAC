@@ -33,9 +33,7 @@ class DirectoryConverter:
             else [_isolate_]
         )
         if self._isolate_:
-            print(
-                f"INFO\t {fg.FMAGENTA}Isolate {fg.DCYAN}{self._isolate_}{RESET}"
-            )
+            print(f"INFO\t {fg.FMAGENTA}Isolate {fg.DCYAN}{self._isolate_}{RESET}")
 
     def _unbundle_dir_(self):
         if self._format_ in SUPPORTED_AUDIO_FORMATS_DIRECT:
@@ -48,9 +46,7 @@ class DirectoryConverter:
                     _path_ = os.path.join(root, file)
 
                     if _ext_ in self._ls_ and os.path.exists(_path_):
-                        print(
-                            f"INFO\t {fg.FYELLOW}Parse {fg.BLUE}{_path_}{RESET}"
-                        )
+                        print(f"INFO\t {fg.FYELLOW}Parse {fg.BLUE}{_path_}{RESET}")
                         init = MethodMappingEngine(_path_, self._format_)
                         init.document_eval()
 
@@ -69,7 +65,12 @@ class DirectoryConverter:
 class Batch_Audiofy:
     def __init__(
         self,
-        obj: Union[os.PathLike, str, List[Union[os.PathLike, str]]],
+        obj: Union[
+            os.PathLike,
+            str,
+            List[Union[os.PathLike, str]],
+            tuple[str],
+        ],
         no_resume: bool,
         threads: int = 3,
     ):

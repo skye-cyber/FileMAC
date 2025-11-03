@@ -66,6 +66,12 @@ def CliInit():
     )
 
     parser.add_argument(
+        "--html2word",
+        help=f"Convert image file(s) to and from different format ie png to jpg.\
+        example: {fg.BYELLOW}filemac --html2word index.html{RESET}",
+    )
+
+    parser.add_argument(
         "-md",
         "--markdown2docx",
         help=f"Convert Markdown to DOCX with Mermaid rendering.\
@@ -261,10 +267,10 @@ def CliInit():
     )
 
     parser.add_argument(
-        "-IeX",
-        "--image_extractor",
+        "-ex",
+        "--extract_img",
         nargs="+",
-        help=f"Convert Images to pdf. {fg.BWHITE}Accepts file list {RESET} e.g `{fg.BYELLOW}filemac --image_extractor file1 file2{RESET}`",
+        help=f"Extract images from pdf. e.g `{fg.BYELLOW}filemac --extract_img input.pdf{RESET}`",
     )
 
     parser.add_argument(
@@ -567,13 +573,12 @@ class OperationMapper:
 
         _input = self.args.image2gray
 
-        if isinstance(_input, list):
-            converter = (
-                GrayscaleConverter(_input)
-                if len(_input) > 1
-                else GrayscaleConverter(_input[0])
-            )
-            converter.run()
+        converter = (
+            GrayscaleConverter(_input)
+            if len(_input) > 1
+            else GrayscaleConverter(_input[0])
+        )
+        converter.run()
 
     def display_version(self):
         version = "2.0.1"
@@ -600,6 +605,22 @@ class OperationMapper:
         rec = SoundRecorder()
         return rec.run()
 
+    def handle_html2word(self):
+        from ..core.html import HTML2Word
+        from ..utils.file_utils import generate_filename
+
+        try:
+            output = generate_filename(ext="docx", basedir=Path(self.args.html2word))
+            converter = HTML2Word()
+            for html_file in self.args.html2word:
+                converter.convert_file(self.args.html2word, output)
+                print(f"{fg.DWHITE}Output: {fg.GREEN}{output}{RESET}")
+        except KeyboardInterrupt:
+            sys.exit("\nQUIT")
+        except Exception as e:
+            logger.critical("Critical failure: %s", e)
+            print(f"{bg.YELLOW}{bg.BRED}Critical error:{RESET} {fg.RED}{str(e)}{RESET}")
+
     def run(self):
         args = self.args
         """Check for help argument by calling help method"""
@@ -620,9 +641,7 @@ class OperationMapper:
         method_mapper = {
             args.version: self.display_version,
             args.audio_effect: self.handle_audio_effect,
-            tuple(args.convert_doc)
-            if isinstance(args.convert_doc, list)
-            else args.convert_doc: self.doc_converter,
+            args.convert_doc: self.doc_converter,
             args.convert_video: self.handle_video_conversion,
             args.convert_image: self.image_converter,
             args.resize_image: self.handle_image_resize,
@@ -635,32 +654,17 @@ class OperationMapper:
             args.scanAsLong_Image: self.handle_scan_long_image,
             args.convert_svg: self.handle_svg,
             args.voicetype: self.voicetype,
-            tuple(args.OCR)
-            if isinstance(args.OCR, list)
-            else args.OCR: self.handle_ocr,
+            args.OCR: self.handle_ocr,
             args.Analyze_video: self.handle_video_analysis,
-            tuple(args.AudioJoin)
-            if isinstance(args.AudioJoin, list)
-            else args.AudioJoin: self.handle_audio_join,
+            args.AudioJoin: self.handle_audio_join,
             args.Richtext2word: self.handle_advanced_text_to_word,
-            tuple(args.pdfjoin)
-            if isinstance(args.pdfjoin, list)
-            else args.pdfjoin: self.pdfjoin,
-            tuple(args.extract_pages)
-            if isinstance(args.extract_pages, list)
-            else args.extract_pages: self.handle_extract_pages,
-            tuple(args.image2pdf)
-            if isinstance(args.image2pdf, list)
-            else args.image2pdf: self.image2pdf,
-            tuple(args.image2word)
-            if isinstance(args.image2word, list)
-            else args.image2word: self.image2word,
-            tuple(args.image2gray)
-            if isinstance(args.image2gray, list)
-            else args.image2gray: self.image2grayscale,
-            tuple(args.image_extractor)
-            if isinstance(args.image_extractor, list)
-            else args.image_extractor: self.ImageExtractor,
+            args.pdfjoin: self.pdfjoin,
+            args.extract_pages: self.handle_extract_pages,
+            args.image2pdf: self.image2pdf,
+            args.image2word: self.image2word,
+            args.image2gray: self.image2grayscale,
+            args.html2word: self.handle_html2word,
+            args.extract_img: self.ImageExtractor,
             args.record: self.handle_recording,
         }
 

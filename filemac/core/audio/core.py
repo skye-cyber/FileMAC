@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+from typing import List, Tuple, Union
 from moviepy import VideoFileClip
 from pydub import AudioSegment
 from tqdm.auto import tqdm
@@ -85,7 +86,7 @@ class AudioConverter:
 
 
 class AudioJoiner:
-    def __init__(self, obj: list, masterfile=None):
+    def __init__(self, obj: Union[list, tuple[str]], masterfile=None):
         self.obj = obj
         self.masterfile = masterfile
         self.files = []

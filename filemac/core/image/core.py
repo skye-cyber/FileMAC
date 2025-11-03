@@ -174,7 +174,7 @@ class GrayscaleConverter:
 
     def __init__(
         self,
-        input_obj: Optional[Union[list[str], str, os.PathLike]],
+        input_obj: Union[List[str], Tuple[str], str, os.PathLike],
         output_file: Optional[Union[list[str], str, os.PathLike]] = None,
     ):
         """
@@ -267,7 +267,7 @@ class ImageDocxConverter:
 
     def __init__(
         self,
-        image_list: list = None,
+        image_list: Union[Tuple[str], List[str]] = None,
         input_dir: Union[str, os.PathLike] = None,
         output_path: Union[str, os.PathLike] = None,
         image_size: Tuple[float, float] = (6, 8),  # Default to 6x8 inches
@@ -504,7 +504,7 @@ class ImagePdfConverter:
 
     def __init__(
         self,
-        image_list: list = None,
+        image_list: Union[List[str], Tuple[str]] = None,
         input_dir=None,
         output_pdf_path=None,
         page_size=letter,
@@ -756,9 +756,7 @@ class ImagePdfConverter:
                     self.image_list, self.output_pdf_path
                 )
                 print(f"{fg.GREEN}PDF created successfully from directory!{RESET}")
-                print(
-                    f"{fg.GREEN}Output:{RESET} {fg.BLUE}{output_pdf_path}{RESET}"
-                )
+                print(f"{fg.GREEN}Output:{RESET} {fg.BLUE}{output_pdf_path}{RESET}")
             else:
                 print(f"{fg.RED}One or more images in the list do not exist.{RESET}")
         elif self.input_dir and self.output_pdf_path:
@@ -771,16 +769,12 @@ class ImagePdfConverter:
                     output_pdf_path = self.convert_images_in_directory(
                         self.input_dir, self.output_pdf_path
                     )
-                    print(
-                        f"{fg.GREEN}PDF created successfully from directory!{RESET}"
-                    )
+                    print(f"{fg.GREEN}PDF created successfully from directory!{RESET}")
                     print(
                         f"{fg.BWHITE}Output:{RESET} {fg.BLUE}{output_pdf_path}{RESET}"
                     )
             else:
-                print(
-                    f"Directory {fg.YELLOW}{self.input_dir}{RESET} does not exist."
-                )
+                print(f"Directory {fg.YELLOW}{self.input_dir}{RESET} does not exist.")
         else:
             print(
                 "Please provide either image_list and output_pdf_path or input_dir and output_pdf_path during object instantiation."
