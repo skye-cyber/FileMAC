@@ -2,6 +2,7 @@
 import argparse
 import os
 import sys
+from functools import lru_cache
 from ..core.document import DocConverter
 from ..core.pdf.core import PageExtractor
 from ..core.exceptions import FileSystemError, FilemacError
@@ -631,24 +632,16 @@ class OperationMapper:
             logger.critical("Critical failure: %s", e)
             print(f"{bg.YELLOW}{bg.RED}Critical error:{RESET} {fg.RED}{str(e)}{RESET}")
 
-    def run(self):
+    @lru_cache(maxsize=None)
+    def get_method(self):
         args = self.args
-        """Check for help argument by calling help method"""
-        self.handle_help()
-
-        """Check for audio help argument by calling help method"""
-        self.handle_audio_help()
-
-        """Check for doc conversion help argument by calling help method"""
-        self.handle_doc_conversion_help()
-
-        """Check for video conversion help argument by calling help method"""
-        self.handle_video_conversion_help()
-
-        """Check for audio conversion help argument by calling help method"""
-        self.handle_audio_conversion_help()
 
         method_mapper = {
+            args.audio_effect: self.handle_audio_effect,
+            (args.help and not args.audio_effect): lambda _: (
+                self.parser.print_help(),
+                sys.exit(),
+            ),
             args.version: self.display_version,
             args.audio_effect: self.handle_audio_effect,
             args.convert_doc: self.doc_converter,
@@ -677,6 +670,23 @@ class OperationMapper:
             args.extract_img: self.ImageExtractor,
             args.record: self.handle_recording,
         }
+        return next((method_mapper[key] for key in method_mapper if key), None)
+
+    def run(self):
+        """Check for help argument by calling help method"""
+        self.handle_help()
+
+        """Check for audio help argument by calling help method"""
+        self.handle_audio_help()
+
+        """Check for doc conversion help argument by calling help method"""
+        self.handle_doc_conversion_help()
+
+        """Check for video conversion help argument by calling help method"""
+        self.handle_video_conversion_help()
+
+        """Check for audio conversion help argument by calling help method"""
+        self.handle_audio_conversion_help()
 
         # Find the first non-empty key in method_mapper and execute its corresponding method
         try:
@@ -684,14 +694,7 @@ class OperationMapper:
             audio effects must take precedence due to the nested arguments which
             might possibly conflict with the original arguments
             """
-            if args.audio_effect:
-                return self.handle_audio_effect()
-
-            if args.help and not args.audio_effect:
-                self.parser.print_help()
-                sys.exit()
-
-            method = next((method_mapper[key] for key in method_mapper if key), None)
+            method = self.get_method()
             if method:
                 method()
             else:
