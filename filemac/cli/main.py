@@ -638,13 +638,12 @@ class OperationMapper:
 
         method_mapper = {
             args.audio_effect: self.handle_audio_effect,
-            (args.help and not args.audio_effect): lambda _: (
+            (args.help and not args.audio_effect): lambda: (
                 self.parser.print_help(),
                 sys.exit(),
             ),
             args.version: self.display_version,
-            args.audio_effect: self.handle_audio_effect,
-            args.convert_doc: self.doc_converter,
+            tuple(args.convert_doc or ()): self.doc_converter,
             args.convert_video: self.handle_video_conversion,
             args.convert_image: self.image_converter,
             args.resize_image: self.handle_image_resize,
@@ -657,17 +656,17 @@ class OperationMapper:
             args.scanAsLong_Image: self.handle_scan_long_image,
             args.convert_svg: self.handle_svg,
             args.voicetype: self.voicetype,
-            args.OCR: self.handle_ocr,
+            tuple(args.OCR or ()): self.handle_ocr,
             args.Analyze_video: self.handle_video_analysis,
-            args.AudioJoin: self.handle_audio_join,
+            tuple(args.AudioJoin or ()): self.handle_audio_join,
             args.Richtext2word: self.handle_advanced_text_to_word,
             args.pdfjoin: self.pdfjoin,
-            args.extract_pages: self.handle_extract_pages,
-            args.image2pdf: self.image2pdf,
-            args.image2word: self.image2word,
-            args.image2gray: self.image2grayscale,
+            tuple(args.extract_pages or ()): self.handle_extract_pages,
+            tuple(args.image2pdf or ()): self.image2pdf,
+            tuple(args.image2word or ()): self.image2word,
+            tuple(args.image2gray or ()): self.image2grayscale,
             args.html2word: self.handle_html2word,
-            args.extract_img: self.ImageExtractor,
+            tuple(args.extract_img or ()): self.ImageExtractor,
             args.record: self.handle_recording,
         }
         return next((method_mapper[key] for key in method_mapper if key), None)
