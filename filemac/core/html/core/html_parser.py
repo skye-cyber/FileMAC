@@ -68,7 +68,7 @@ class HTMLParser:
 
         # Remove JS comments within <script>...</script> blocks
         html = re.sub(
-            r"(<script[^>]*>)(.*?)(</script>)",
+            r"(<script[^>]*>)(.*?)(</script\b[^>]*>)",
             lambda m: m.group(1)
             + re.sub(r"(?m)//.*?$|/\*.*?\*/", "", m.group(2), flags=re.DOTALL)
             + m.group(3),
