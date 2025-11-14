@@ -1,0 +1,43 @@
+{
+    "name": "filemac_web",
+    "version": "1.0",
+    "private": true,
+    "description": "File Management Suite",
+    "scripts": {
+        "tailwindcss": "tailwindcss -i core/static/css/config.css -o core/static/css/styles.css --watch --minify"
+    },
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "keywords": [
+        "filemac",
+        "file_conversion"
+    ],
+    "bugs": {
+        "url": "https://github.com/skye-cyber/FileMAC/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/skye-cyber/FileMAC.git"
+    },
+    "license": "GPL",
+    "author": "skye",
+    "main": "index.js",
+    "dependencies": {},
+    "devDependencies": {}
+}

@@ -1,0 +1,30 @@
+#############################
+# MANIFEST.in for “filemac” #
+#############################
+
+# ---------- Top‑level metadata ----------
+include README.md
+include LICENSE*
+include version.txt
+
+# ---------- Package‑wide data ----------
+# (Any files your code loads at runtime – templates, models, config files…)
+# recursive-include filemac/data *
+# recursive-include filemac/templates *
+# recursive-include filemac/static *
+
+# ---------- Documentation (optional) ----------
+# Comment out if you don’t publish docs with the package
+# recursive-include docs *
+
+# ---------- Type information (if you add stubs) ----------
+# include py.typed
+
+# ---------- Exclude common cruft ----------
+exclude *.py[cod] __pycache__ *.so *.dll *.dylib
+prune build
+prune dist
+prune .git
+prune .idea
+prune .pytest_cache
+prune .~

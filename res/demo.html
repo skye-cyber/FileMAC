@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audio and Video Examples</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 20px;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+
+      h4 {
+        color: #2c3e50;
+        border-bottom: 2px solid #2980b9;
+        padding-bottom: 5px;
+      }
+
+      pre {
+        background-color: #eaeaea;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+      }
+
+      code {
+        font-family: "Courier New", Courier, monospace;
+        color: #c0392b;
+      }
+
+      p {
+        margin: 10px 0;
+      }
+
+      audio,
+      video {
+        display: block;
+        margin: 10px 0;
+        width: 100%;
+        max-width: 600px; /* Limit the width of audio/video players */
+        border: 1px solid #2980b9;
+        border-radius: 5px;
+        background-color: #fff;
+      }
+
+      hr {
+        border: 1px solid #2980b9;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h4>Audio</h4>
+    <pre><code>filemac --audio_effect 'demo.mp3' --effect high</code></pre>
+    <p><strong>Original:</strong></p>
+    <audio controls>
+      <source
+        src="https://github.com/skye-cyber/FileMAC/tree/main/res/audio_effects/demo.mp3"
+        type="audio/mpeg"
+      />
+      Your browser does not support the audio element.
+    </audio>
+
+    <p><strong>Result:</strong></p>
+    <audio controls>
+      <source
+        src="https://github.com/skye-cyber/FileMAC/tree/main/res/audio_effects/high_demo.mp3"
+        type="audio/mpeg"
+      />
+      Your browser does not support the audio element.
+    </audio>
+
+    <hr />
+
+    <h4>Video</h4>
+    <pre><code>filemac --audio_effect 'demo_v.mp4' --effect high</code></pre>
+    <p><strong>Original:</strong></p>
+    <video controls style="max-height: 400px; max-width: 400px">
+      <source
+        src="https://github.com/skye-cyber/FileMAC/tree/main/res/audio_effects/demo_v.mp4"
+      />
+      Your browser does not support the video element.
+    </video>
+
+    <p><strong>Result:</strong></p>
+    <video controls style="max-height: 400px; max-width: 400px">
+      <source
+        src="https://github.com/skye-cyber/FileMAC/tree/main/res/audio_effects/chipmunk_demo_v.mp4"
+      />
+      Your browser does not support the video element.
+    </video>
+  </body>
+</html>

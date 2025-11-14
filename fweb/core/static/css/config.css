@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.scrollbar-hide {
+  /* Hide scrollbar for Chrome, Safari, and Edge */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+  overflow: -moz-scrollbars-none; /* Older Firefox */
+  overflow-y: scroll; /* Add this to ensure the content is scrollable */
+  &::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Edge */
+  }
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.card-hover {
+  transition: all 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+.file-drop-zone {
+  border: 2px dashed #d1d5db;
+  transition: all 0.3s ease;
+}
+.file-drop-zone.dragover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+.nav-link {
+  @apply px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
+}
+.nav-link.active {
+  @apply bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300;
+}
+.tool-active {
+  @apply bg-blue-50 dark:bg-blue-900 border-blue-500 border-r-4;
+}
+
+.nav-svg {
+  @apply w-[1.1rem] h-[1.1rem] text-2xl text-blue-600 fill-gray-700 dark:fill-gray-300;
+}
+
+.nav-svg.active {
+  @apply fill-blue-700 dark:fill-blue-300;
+}
+
+.waveform {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.bar {
+  width: 3px;
+  height: 10px;
+  background-color: #3b82f6;
+  border-radius: 3px;
+  animation: wave 1.2s infinite ease-in-out;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1.8);
+  }
+}
+
+.bar:nth-child(1) {
+  animation-delay: 0s;
+}
+.bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.bar:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.bar:nth-child(6) {
+  animation-delay: 0.5s;
+}
+.bar:nth-child(7) {
+  animation-delay: 0.6s;
+}
+.bar:nth-child(8) {
+  animation-delay: 0.7s;
+}
+.bar:nth-child(9) {
+  animation-delay: 0.8s;
+}
+.bar:nth-child(10) {
+  animation-delay: 0.9s;
+}
