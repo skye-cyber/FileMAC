@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
-
+from werkzeug.utils import secure_filename
 # Import CLI functionality
 import sys
 import argparse
@@ -92,7 +92,11 @@ def process_tool(request, tool_id):
             # Save uploaded files
             file_paths = []
             for file in files:
-                file_path = os.path.join(temp_dir, file.name)
+                safe_name = secure_filename(file.name)
+                file_path = os.path.normpath(os.path.join(temp_dir, safe_name))
+                # Ensure file is stored strictly in temp_dir
+                if not file_path.startswith(os.path.abspath(temp_dir) + os.sep):
+                    return JsonResponse({"error": "Invalid file name"}, status=400)
                 with open(file_path, "wb") as f:
                     for chunk in file.chunks():
                         f.write(chunk)
