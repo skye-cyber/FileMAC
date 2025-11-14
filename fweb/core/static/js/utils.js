@@ -1,4 +1,15 @@
 // Additional utility functions for the new tools
+
+// Escape HTML to prevent XSS attacks when inserting text into innerHTML
+function escapeHtml(string) {
+  return String(string)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function toggleAdvanced(sectionId) {
   const section = document.getElementById(sectionId);
   section.classList.toggle("hidden");
@@ -449,8 +460,8 @@ function updateFileList(dropZoneId, files, showFolderInfo = false) {
       <div class="flex items-center flex-1 min-w-0">
       <i class="fas ${isFolder ? "fa-folder" : "fa-file"} text-${isFolder ? "yellow" : "gray"}-400 mr-3 flex-shrink-0"></i>
       <div class="min-w-0 flex-1">
-      <div class="text-sm font-medium truncate">${file.name}</div>
-      ${isFolder ? '<div class="text-xs text-gray-500 truncate">' + file.webkitRelativePath + "</div>" : ""}
+      <div class="text-sm font-medium truncate">${escapeHtml(file.name)}</div>
+      ${isFolder ? '<div class="text-xs text-gray-500 truncate">' + escapeHtml(file.webkitRelativePath) + "</div>" : ""}
       </div>
       </div>
       <div class="flex items-center space-x-3 flex-shrink-0 ml-2">
